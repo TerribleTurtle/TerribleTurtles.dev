@@ -9,50 +9,58 @@ interface Props {
 const { title, description, link, tags = [] } = Astro.props;
 ---
 
-<a href={link} class="project-card">
-  <article>
-    <header>
-      <h3>{title}</h3>
-    </header>
-    <div class="content">
-      <p>{description}</p>
-    </div>
-    {tags.length > 0 && (
-      <footer>
-        <ul class="tags">
-          {tags.map((tag) => (
-            <li>{tag}</li>
-          ))}
-        </ul>
-      </footer>
-    )}
-  </article>
-</a>
+<article class="project-card">
+  <header>
+    <h3><a href={link} class="card-link">{title}</a></h3>
+  </header>
+  <div class="content">
+    <p>{description}</p>
+  </div>
+  {tags.length > 0 && (
+    <footer>
+      <ul class="tags">
+        {tags.map((tag) => (
+          <li>{tag}</li>
+        ))}
+      </ul>
+    </footer>
+  )}
+</article>
 
 <style>
   .project-card {
-    display: block;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     background-color: var(--surface-card);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     padding: 1.5rem;
     color: var(--text-primary);
-    text-decoration: none;
     transition: transform 0.2s ease, border-color 0.2s ease;
     height: 100%;
   }
 
-  .project-card:hover {
+  .project-card:hover,
+  .project-card:focus-within {
     transform: translateY(-2px);
     border-color: var(--accent-primary);
-    text-decoration: none;
   }
 
-  article {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    gap: 1rem;
+  .card-link {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  
+  .card-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  
+  .card-link:focus-visible {
+    outline: none;
   }
 
   header h3 {
