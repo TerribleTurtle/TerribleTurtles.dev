@@ -30,17 +30,19 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 - `[x]` **2.5.1 Update SDD & Findings:** Remove `Astro.locals.runtime` references, document `cloudflare:workers` and explicit `prerender = false` requirements.
 - `[x]` **2.5.2 Plan Verification:** Execute `grep_search` to verify NO old legacy concepts exist in the memory files.
 
-## Phase 3: Database, State & Middleware (ARCHIVED)
+## Phase 3: Database, State & Middleware
 **Goal:** Establish privacy-first edge error tracking and KV bindings.
-*Note: Phase 3 was entirely reverted in Phase 5 because the user's GitHub repo is natively paired to the Cloudflare Pages UI, which no longer supports Astro 5 SSR deployments via `@astrojs/cloudflare`. The project must remain 100% pure static.*
-- `[x]` **3.1 Astro Actions Integration:** Removed.
-- `[x]` **3.2 Astro Middleware:** Removed.
-- `[x]` **3.3 Telemetry Integration:** Removed.
-- `[x]` **3.4 KV Connections:** Removed.
-- `[x]` **3.5 Client State APIs:** Create `src/utils/storage.ts` providing safe `localStorage` wrappers. (Retained, runs purely in browser).
-- `[x]` **3.6 Edge Rendering:** Removed.
+- `[x]` **3.1 Astro Actions Integration:** Establish `src/actions/index.ts` utilizing `astro:actions` for all type-safe client-to-server mutations.
+- `[x]` **3.2 Astro Middleware:** Create `src/middleware.ts` strictly scoped to intercept `next()` execution for dynamic error catching (NOT for static global headers, which belong in `public/_headers`).
+- `[x]` **3.3 Telemetry Integration:** Configure Action handlers to strip PII and write sanitized logs to `console.error` (for native CF Tail / Workers Analytics Engine).
+- `[x]` **3.4 KV Connections:** Configure the KV binding in `wrangler.jsonc` and implement accesses via `import { env } from "cloudflare:workers"`. Run `npm run generate-types` to update `worker-configuration.d.ts`.
+- `[x]` **3.5 Client State APIs:** Create `src/utils/storage.ts` providing safe `localStorage` wrappers.
+- `[x]` **3.6 Edge Rendering:** Ensure any dynamic API routes querying KV during their initial HTML render payload explicitly declare `export const prerender = false;`. purely static pages interacting with Actions via RPC do not require this.
 **Automated Verifiable Outcomes:**
-*   *Test 1 (Storage Wrapper Safety):* `grep -q "try {" src/utils/storage.ts` succeeds (proving `localStorage` is safely wrapped against strict-mode browser crashes).
+*   *Test 1 (Zero-Cookie Rule):* `curl -I http://localhost:8788 | grep -i "Set-Cookie"` must fail (return no matches).
+*   *Test 2 (Telemetry Hook):* Execute an action via RPC to simulate an error. Assert HTTP code `500` is returned, and `stdout` of Wrangler contains the sanitized JSON log.
+*   *Test 3 (KV Read):* `wrangler kv:key get --binding CONFIG_KV config:test --local` succeeds without binding errors.
+*   *Test 4 (Storage Wrapper Safety):* `grep -q "try {" src/utils/storage.ts` succeeds (proving `localStorage` is safely wrapped against strict-mode browser crashes).
 
 ## Phase 4: Content Routing & The Bucket System
 **Goal:** Build the static file-based routing architecture and Markdown parsing pipelines via Astro Content Layer.
