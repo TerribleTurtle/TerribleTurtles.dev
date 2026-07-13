@@ -1,9 +1,9 @@
 # TerribleTurtles.dev - Project-Scoped Rules
 **DO NOT IGNORE THESE RULES. THEY STRICTLY OVERRIDE GLOBAL DEFAULT AGENT BEHAVIORS.**
 
-## 1. The "Node.js Mirage"
-- This project deploys to Cloudflare Pages/Workers (`workerd` runtime).
-- **NEVER** use or install npm packages that rely on native Node.js modules (`fs`, `child_process`, `crypto`, `path`).
+## 1. Pure Static Architecture
+- This project is a 100% pure static site deployed via Cloudflare Pages GitHub integration.
+- **NEVER** install server-side adapters (like `@astrojs/cloudflare`) or attempt to use SSR features like Middleware, Actions, or KV. Doing so will break the Pages UI deployment.
 - Do not use Astro's default `sharp` image optimizer.
 
 ## 2. Strict Output Mode
