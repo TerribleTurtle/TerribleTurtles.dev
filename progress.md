@@ -18,3 +18,4 @@
 - Legacy `Astro.locals.runtime` ripped out of documentation.
 - Native `import { env } from "cloudflare:workers"` is the new mandated standard.
 - Content Layer API correctly defined for Phase 4.
+- Audited and updated `README.md` to reflect Astro 7+, Node.js 22.12.0+ requirements, and clarified that Astro's default KV session capability does not violate the Zero-Cookie Policy.

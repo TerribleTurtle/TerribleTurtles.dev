@@ -1,6 +1,10 @@
 # TerribleTurtles.dev
 
-A highly performant portfolio and tool-hosting platform with zero manual maintenance requirements. Built with modern Astro 5+ and Cloudflare Pages/Workers architecture.
+A highly performant portfolio and tool-hosting platform with zero manual maintenance requirements. Built with modern Astro 7+ and Cloudflare Pages/Workers architecture.
+
+## 📋 Prerequisites
+
+- **Node.js**: `>=22.12.0` is strictly required.
 
 ## 🚀 Tech Stack
 
@@ -23,6 +27,6 @@ All commands are run from the root of the project:
 | `npm run deploy`          | Build and deploy the project via `wrangler deploy`|
 
 ## 🔒 Security & Architecture Notes
-- This project enforces a strict **Zero-Cookie Policy**.
+- This project enforces a strict **Zero-Cookie Policy**. *(Note: During the build, Astro may announce enabling sessions with a `SESSION` KV binding. This is a default framework capability and is safely ignored; no cookies are generated as long as `Astro.session` is never called in the code.)*
 - All dependencies must be strictly compatible with Cloudflare's `workerd` edge runtime. Node.js native modules (`fs`, `crypto`, `child_process`) are forbidden.
 - Security headers (CSP) are natively injected via `public/_headers`.
