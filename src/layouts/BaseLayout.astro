@@ -1,0 +1,75 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = 'TerribleTurtles.dev', description = 'A highly performant portfolio and tool-hosting platform.' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <nav aria-label="Primary">
+        <!-- Header Menu: Home, Tools, Sites from SDD -->
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/tools">Tools</a></li>
+          <li><a href="/sites">Sites</a></li>
+        </ul>
+      </nav>
+    </header>
+    
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <nav aria-label="Footer">
+        <!-- Footer Menu: About, Privacy, Security, Changelog / RSS from SDD -->
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/security">Security</a></li>
+          <li><a href="/changelog">Changelog</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </body>
+</html>
+
+<style>
+  header nav ul, footer nav ul {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    padding: 1rem;
+    margin: 0;
+  }
+  
+  header {
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  footer {
+    border-top: 1px solid var(--border-color);
+    margin-top: 2rem;
+  }
+</style>

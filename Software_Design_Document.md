@@ -9,7 +9,7 @@
 ## 2. Tech Stack & Deployment Architecture
 The platform leverages a modern, serverless edge architecture to guarantee high performance and strict zero-maintenance. 
 
-*   **Framework:** Astro (configured with `output: 'hybrid'` to combine pre-rendered static HTML with on-demand edge middleware and SSR for D1/KV interactions).
+*   **Framework:** Astro (configured with `output: 'static'`, where all dynamic routes explicitly declare `export const prerender = false;` to combine pre-rendered static HTML with on-demand edge middleware and SSR for D1/KV interactions).
 *   **Hosting:** Cloudflare Pages (via Wrangler).
 *   **Database & Storage:**
     *   **Cloudflare D1 (SQL):** For relational data needs.
@@ -24,11 +24,12 @@ graph TD
     Client[User Browser] -->|HTTPS Request| CFEdge[Cloudflare Edge Network]
     CFEdge --> Turnstile[Cloudflare Turnstile]
     CFEdge --> Middleware[Astro Middleware onRequest]
-    Middleware -->|Reads/Writes Edge Secrets| EnvBindings[Astro.locals.runtime.env]
-    Middleware -->|Stateless Data| KV[(Cloudflare KV)]
-    Middleware -->|SQL Queries| D1[(Cloudflare D1)]
-    Middleware -->|Logs/Telemetry| Tail[Workers Analytics Engine / Tail]
-    Middleware --> PageRoute[Astro Hybrid/Static Route]
+    Middleware --> Actions[Astro Actions / Server Mutations]
+    Actions -->|Reads/Writes Edge Secrets| EnvBindings[cloudflare:workers env / astro:env]
+    Actions -->|Stateless Data| KV[(Cloudflare KV)]
+    Actions -->|SQL Queries| D1[(Cloudflare D1)]
+    Actions -->|Logs/Telemetry| Tail[Workers Analytics Engine / Tail]
+    Middleware --> PageRoute[Astro Static/Edge Route]
     PageRoute -->|Pre-rendered HTML| CFEdge
 ```
 
@@ -67,7 +68,7 @@ The platform utilizes a "Bucket System": projects are built, placed in "Tools" o
 *   `src/pages/index.astro`: Homepage (Welcome, Current Project, Archive Grid).
 *   `src/pages/tools/[slug].astro`: Dynamic routing for utility tools.
 *   `src/pages/sites/[slug].astro`: Dynamic routing for hosted/archived sites.
-*   `src/pages/api/[endpoint].ts`: Serverless endpoints for specific tool logic.
+*   `src/actions/index.ts`: Astro Actions for type-safe backend mutations.
 
 ### 4.2 Handling "Bucket System" Bit-Rot
 While projects are intended to be zero-maintenance, external APIs deprecate. 
@@ -82,7 +83,10 @@ While projects are intended to be zero-maintenance, external APIs deprecate.
 ### 5.1 Secret & Credential Management
 *   **Mechanism:** Provisioning via Cloudflare Edge Network.
 *   **Implementation:** Keys are injected into the Cloudflare network using the `wrangler secret put` command.
-*   **Boundary:** The codebase is prohibited from holding raw keys. Runtime Cloudflare bindings (D1, KV, R2) and edge secrets in Astro must be securely accessed via `Astro.locals.runtime.env` or the `astro:env/server` module. `import.meta.env` is reserved strictly for build-time static variables.
+*   **Boundary:** The codebase is prohibited from holding raw keys. 
+    *   **Cloudflare Bindings (Objects):** Runtime Cloudflare bindings (D1, KV, R2) must be securely accessed via direct imports (`import { env } from "cloudflare:workers"`).
+    *   **String Secrets:** Edge secrets (like Turnstile Keys) must be strictly typed using `astro:env/server`.
+    *   **Legacy Ban:** `import.meta.env` is strictly banned for all server-side edge logic.
 
 ### 5.2 Privacy-First Error Tracking & Logging
 *   **Mechanism:** Native Cloudflare Tail Logs + Workers Analytics Engine.

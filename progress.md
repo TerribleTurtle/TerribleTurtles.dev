@@ -1,17 +1,18 @@
 # Current Session Progress
 
-**Current Stage:** Phase 1 Complete.
-**Target Goal:** Proceed to Phase 2 (Design Tokens & Base Architecture).
+**Current Stage:** Phase 2.5 Complete (Astro 6 Migration Audit).
+**Target Goal:** Proceed to Phase 3 (Database, State & Middleware).
 
 ### 5-Question Reboot Check
-1. **What is the immediate next step?** -> Begin Phase 2: Design Tokens & Base Architecture.
-2. **Are there any blocking errors?** -> No, the build passes and the `astro.config.mjs` has been fixed.
-3. **Have findings been updated?** -> Yes, `findings.md` is updated with the Astro 5+ hybrid output removal.
-4. **Is the task plan accurate?** -> Yes, Phase 1 tasks are complete and verified.
-5. **Are we straying from the SDD?** -> No, all files are anchored perfectly to `Software_Design_Document.md`.
+1. **What is the immediate next step?** -> Begin Phase 3: Database, State & Middleware.
+2. **Are there any blocking errors?** -> No, Phase 2.5 documentation audit perfectly aligns our architecture with Astro 6+ and `workerd`.
+3. **Have findings been updated?** -> Yes, `findings.md`, `task_plan.md`, and the SDD were aggressively updated to remove `Astro.locals.runtime` and `hybrid` mode.
+4. **Is the task plan accurate?** -> Yes, Phase 3, 4, and 5 have been rewritten for Astro 6 rules.
+5. **Are we straying from the SDD?** -> No, the SDD has been officially patched.
 
 ### Scratchpad
-- Phase 1 audited and fully fixed.
-- `astro.config.mjs` correctly ignores `sharp` and uses the default `static` mode with Cloudflare adapter.
-- `package.json` deploy script added.
-- `AGENTS.md` rules patched for Astro 5+.
+- Phase 2 fully complete and audited.
+- Phase 2.5: Astro 6+ architecture documentation audit is complete.
+- Legacy `Astro.locals.runtime` ripped out of documentation.
+- Native `import { env } from "cloudflare:workers"` is the new mandated standard.
+- Content Layer API correctly defined for Phase 4.

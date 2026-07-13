@@ -1,0 +1,97 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  link: string;
+  tags?: string[];
+}
+
+const { title, description, link, tags = [] } = Astro.props;
+---
+
+<a href={link} class="project-card">
+  <article>
+    <header>
+      <h3>{title}</h3>
+    </header>
+    <div class="content">
+      <p>{description}</p>
+    </div>
+    {tags.length > 0 && (
+      <footer>
+        <ul class="tags">
+          {tags.map((tag) => (
+            <li>{tag}</li>
+          ))}
+        </ul>
+      </footer>
+    )}
+  </article>
+</a>
+
+<style>
+  .project-card {
+    display: block;
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    height: 100%;
+  }
+
+  .project-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-primary);
+    text-decoration: none;
+  }
+
+  article {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 1rem;
+  }
+
+  header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+  }
+
+  .content {
+    flex: 1;
+  }
+
+  .content p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  footer {
+    margin-top: auto;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tags li {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--bg-base);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-muted);
+  }
+</style>
