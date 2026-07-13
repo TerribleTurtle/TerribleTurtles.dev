@@ -7,5 +7,10 @@
 		"enabled": true
 	},
 
-
+	"kv_namespaces": [
+		{
+			"binding": "CONFIG_KV",
+			"id": "REDACTED"
+		}
+	]
 }
