@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BitRotBanner from '../../components/BitRotBanner.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const readmes = await getCollection('readmes');
+  const sites = readmes.filter(r => r.data.type === 'site');
+  return sites.map(project => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={`${project.data.title} | Sites`} description={project.data.description || ''}>
+  {project.data.status === 'deprecated' && (
+    <BitRotBanner message="Deprecated: Requires Update. This site is no longer actively maintained." />
+  )}
+  
+  <article class="site-content">
+    <header>
+      <h1>{project.data.title}</h1>
+      {project.data.description && <p class="description">{project.data.description}</p>}
+      <div class="meta">
+        <span class={`status badge-${project.data.status}`}>{project.data.status}</span>
+      </div>
+    </header>
+    
+    <div class="content-body markdown-body">
+      {Content ? <Content /> : <p>No documentation provided.</p>}
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .site-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+  
+  .description {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+  
+  .meta {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  
+  .badge-active {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+  
+  .badge-deprecated {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .badge-archived {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+</style>
