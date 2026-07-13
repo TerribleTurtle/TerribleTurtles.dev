@@ -20,12 +20,9 @@ const { title = 'TerribleTurtles.dev', description = 'A highly performant portfo
     <meta name="description" content={description} />
     <title>{title}</title>
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   </head>
   <body>
+    <a href="#main" class="skip-link">Skip to main content</a>
     <header>
       <nav aria-label="Primary">
         <!-- Header Menu: Home, Tools, Sites from SDD -->
@@ -37,7 +34,7 @@ const { title = 'TerribleTurtles.dev', description = 'A highly performant portfo
       </nav>
     </header>
     
-    <main>
+    <main id="main">
       <slot />
     </main>
 
@@ -71,5 +68,19 @@ const { title = 'TerribleTurtles.dev', description = 'A highly performant portfo
   footer {
     border-top: 1px solid var(--border-color);
     margin-top: 2rem;
+  }
+  
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--accent-primary);
+    color: var(--bg-base);
+    padding: 8px;
+    z-index: 100;
+  }
+  
+  .skip-link:focus {
+    top: 0;
   }
 </style>

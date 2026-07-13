@@ -67,24 +67,24 @@ const { Content } = await render(project);
   
   .status {
     padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
+    border-radius: var(--border-radius-sm);
     font-size: 0.875rem;
     font-weight: 500;
     text-transform: uppercase;
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-color);
   }
   
   .badge-active {
-    background-color: #d1fae5;
-    color: #065f46;
+    color: var(--accent-primary);
   }
   
   .badge-deprecated {
-    background-color: #fee2e2;
-    color: #991b1b;
+    color: var(--text-muted);
+    text-decoration: line-through;
   }
   
   .badge-archived {
-    background-color: #f3f4f6;
-    color: #374151;
+    color: var(--text-muted);
   }
 </style>

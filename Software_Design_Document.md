@@ -11,24 +11,14 @@ The platform leverages a modern, serverless edge architecture to guarantee high 
 
 *   **Framework:** Astro 7 (configured with `output: 'static'`, utilizing Astro's Content Layer API to act as a 100% static Git-based CMS).
 *   **Hosting:** Cloudflare Pages.
-*   **Database & Storage:**
-    *   **Cloudflare KV (Key-Value):** For fast, globally distributed key-value configurations and stateless caching (no relational DB used).
-    *   **Cloudflare R2 (File Storage):** For object and large file storage.
+*   **Database & Storage:** None. 100% Static file-based CMS.
 *   **Development Workflow:** 100% AI Agent Managed.
-*   **Configuration Management:** `wrangler.jsonc` serves as the single source of truth for Cloudflare Pages bindings (KV, R2).
 
 ### 2.1 Architecture Request Flow
 ```mermaid
 graph TD
-    Client[User Browser] -->|HTTPS Request| CFEdge[Cloudflare Edge Network]
-    CFEdge --> Turnstile[Cloudflare Turnstile]
-    CFEdge --> Middleware[Astro Middleware onRequest]
-    Middleware --> Actions[Astro Actions / Server Mutations]
-    Actions -->|Reads/Writes Edge Secrets| EnvBindings[cloudflare:workers env / astro:env]
-    Actions -->|Stateless Data| KV[(Cloudflare KV)]
-    Actions -->|Logs/Telemetry| Tail[Workers Analytics Engine / Tail]
-    Middleware --> PageRoute[Astro Static Route]
-    PageRoute -->|Pre-rendered HTML| CFEdge
+    Client[User Browser] -->|HTTPS Request| CFEdge[Cloudflare Edge Network / CDN]
+    CFEdge --> PageRoute[Astro Static HTML]
 ```
 
 ### 2.2 Native GitHub Integration (Deployment)
@@ -66,7 +56,6 @@ The platform utilizes a "Bucket System": projects are built, placed in "Tools" o
 *   `src/pages/index.astro`: Homepage (Welcome, Current Project, Archive Grid). Completely static.
 *   `src/pages/tools/[slug].astro`: Statically generated routing for utility tools, driven by the Content Layer.
 *   `src/pages/sites/[slug].astro`: Statically generated routing for hosted/archived sites, driven by the Content Layer.
-*   `src/actions/index.ts`: Astro Actions for type-safe backend mutations.
 
 ### 4.2 Handling "Bucket System" Bit-Rot
 While projects are intended to be zero-maintenance, external APIs deprecate. 
@@ -79,16 +68,10 @@ While projects are intended to be zero-maintenance, external APIs deprecate.
 ## 5. Data, State & Security Architecture
 
 ### 5.1 Secret & Credential Management
-*   **Mechanism:** Provisioning via Cloudflare Edge Network.
-*   **Implementation:** Keys are injected into the Cloudflare network using the `wrangler secret put` command.
-*   **Boundary:** The codebase is prohibited from holding raw keys. 
-    *   **Cloudflare Bindings (Objects):** Runtime Cloudflare bindings (KV, R2) must be securely accessed via direct imports (`import { env } from "cloudflare:workers"`).
-    *   **String Secrets:** Edge secrets (like Turnstile Keys) must be strictly typed using `astro:env/server`.
-    *   **Legacy Ban:** `import.meta.env` is strictly banned for all server-side edge logic.
+*   **Mechanism:** None. Pure static architecture has no secrets or runtime credentials.
 
-### 5.2 Privacy-First Error Tracking & Logging
-*   **Mechanism:** Native Cloudflare Tail Logs + Workers Analytics Engine.
-*   **Implementation:** Custom Astro middleware (`src/middleware.ts`) intercepts exceptions. Since KV writes are subject to strict rate limits and eventual consistency, telemetry and error metadata (with stripped PII) are passed natively to `console.error` (viewable via Cloudflare Tail) or structured via Cloudflare Workers Analytics Engine. No third-party trackers are used.
+### 5.2 Privacy-First Logging
+*   **Mechanism:** Cloudflare Web Analytics (Cookie-free). No custom middleware required.
 
 ### 5.3 Backup & Disaster Recovery
 *   **Mechanism:** Git Version Control.
@@ -96,7 +79,6 @@ While projects are intended to be zero-maintenance, external APIs deprecate.
 
 ### 5.4 Data Models & Schemas
 *   **Content Layer (Markdown):** Project metadata (title, status, type) is strictly enforced via Zod schemas in `src/content.config.ts` and stored in the frontmatter of individual Markdown files.
-*   **KV Structure:** Used exclusively for fast-read configurations, feature flags, or heavily cached semi-static responses. (e.g., key: `config:theme:dark_mode`).
 
 ### 5.5 Client-Side State Boundaries
 *   **Mechanism:** Vanilla Web Storage API.
@@ -111,12 +93,10 @@ All NFRs must be objectively verifiable prior to deployment:
 
 **Wrangler CSP Spec Example:**
 The CSP strictly enforces domains while accommodating necessary Cloudflare utilities:
-```toml
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; frame-src 'self' https://challenges.cloudflare.com;"
-```
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self' https://static.cloudflareinsights.com; frame-src 'self';"
 
 ## 7. AI Development Guardrails & Workflow
 Crucial instructions for any LLM or AI agent interacting with the codebase:
@@ -131,9 +111,4 @@ Crucial instructions for any LLM or AI agent interacting with the codebase:
 Because AI agents operate locally and cannot securely authenticate into your Cloudflare or GitHub dashboards, the human user **must** perform the following manual setup actions:
 
 1.  **Repository Connection:** Create a GitHub repository, push the local code, and log into the Cloudflare Pages dashboard to "Connect to Git" and enable automatic deployments.
-2.  **Provision Cloudflare Resources:** Run the following commands in your terminal (while authenticated to Cloudflare) to create the remote resources, then provide the resulting IDs to the AI to place in `wrangler.jsonc`:
-    *   `npx wrangler kv:namespace create "CONFIG_KV"`
-3.  **Secure Secret Injection:** AI cannot manage live production secrets. You must inject them manually via the dashboard or CLI:
-    *   `npx wrangler pages secret put TURNSTILE_SECRET_KEY`
-4.  **Turnstile Provisioning:** Log into the Cloudflare Dashboard, navigate to Turnstile, create a new site for `terribleturtles.dev`, and provide the public Site Key to the AI.
-5.  **DNS & Custom Domain:** Add `terribleturtles.dev` to Cloudflare, update your registrar's nameservers, and bind the Custom Domain to your Pages project in the Cloudflare dashboard.
+2.  **DNS & Custom Domain:** Add `terribleturtles.dev` to Cloudflare, update your registrar's nameservers, and bind the Custom Domain to your Pages project in the Cloudflare dashboard.

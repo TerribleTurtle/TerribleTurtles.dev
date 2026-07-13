@@ -7,7 +7,7 @@
 - Do not use Astro's default `sharp` image optimizer.
 
 ## 2. Strict Output Mode
-- The Astro config MUST rely on the default `static` mode (which provides hybrid functionality in Astro 5+) and use the Cloudflare adapter. Legacy `output: 'hybrid'` and pure server are prohibited.
+- The Astro config MUST rely on the default `static` mode. Legacy `output: 'hybrid'` and pure server are prohibited.
 
 ## 3. Design Tokens & Styling
 - Inline styles (`style="..."`) are strictly forbidden.

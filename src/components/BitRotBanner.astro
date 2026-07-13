@@ -19,17 +19,17 @@ const { message } = Astro.props;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background-color: var(--warning-bg, #fffbeb);
-    color: var(--warning-text, #92400e);
-    border: 1px solid var(--warning-border, #fcd34d);
+    background-color: var(--surface-card);
+    color: var(--text-primary);
+    border: 1px solid var(--accent-primary);
     padding: 1rem;
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius);
     margin-bottom: 2rem;
     font-weight: 500;
   }
   
   .bit-rot-banner svg {
     flex-shrink: 0;
-    color: var(--warning-icon, #d97706);
+    color: var(--accent-primary);
   }
 </style>
