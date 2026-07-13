@@ -7,7 +7,7 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 - `[x]` **1.1 Astro Initialization:** Initialize a new Astro project in `c:\dev\personal\TerribleTurtles.dev` using the strict TypeScript template.
 - `[x]` **1.2 Adapter Configuration:** Install `@astrojs/cloudflare` and configure `astro.config.mjs` with `output: 'hybrid'`. Bypass the default `sharp` image adapter to respect Cloudflare constraints.
 - `[x]` **1.3 Wrangler Setup:** Create `wrangler.jsonc` defining the D1 and KV bindings matching the Cloudflare Pages environment.
-- `[x]` **1.4 CI/CD Pipeline:** Executing direct `wrangler pages deploy` locally to bypass Cloudflare UI bugs.
+- `[x]` **1.4 CI/CD Pipeline:** Executing direct `wrangler deploy` locally to bypass Cloudflare UI bugs (updated from `pages deploy` to support Astro 5+ Workers Assets).
 - `[x]` **1.5 Security Headers:** Implement the explicit CSP headers from the SDD inside `wrangler.toml` (allowing Turnstile and CF Analytics).
 **Automated Verifiable Outcomes:**
 *   *Test 1 (Build):* `npm run build` succeeds with zero strict TypeScript errors.
