@@ -70,6 +70,7 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 - `[x]` **6.4 Script Definition:** Update `package.json` with `lint:js`, `lint:css`, and `typecheck`.
 - `[x]` **6.5 Cloudflare Deployment Block:** Modify the `build` script in `package.json` to execute `npm run typecheck && npm run lint:js && npm run lint:css && astro build` to guarantee broken code never deploys.
 - `[x]` **6.6 GitHub Actions CI:** Create `.github/workflows/ci.yml` to run the linters on push/PR for GitHub UI visibility.
+- `[x]` **6.7 Accessibility Auditing (CI):** Integrate `axe-core` CLI into the GitHub Actions pipeline to strictly enforce WCAG 2.1 AA compliance.
 **Automated Verifiable Outcomes:**
 *   *Test 1 (Linter Installation):* `npm run lint:js` and `npm run lint:css` execute successfully.
 *   *Test 2 (Deployment Blocker):* Inject a `color: #ff0000;` into a scratch file and run `npm run build`. The command MUST fail with exit code 1.

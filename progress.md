@@ -14,3 +14,4 @@
 - **Major Milestone:** CI/CD Guardrails implemented.
 - The build script correctly executes `astro check && npm run lint:js && npm run lint:css` before `astro build`.
 - A failed linting check will now block Cloudflare Pages from deploying, mathematically enforcing the Project Rules Engine (`AGENTS.md`).
+- `axe-core` accessibility checks are integrated into GitHub Actions, enforcing WCAG 2.1 AA.
