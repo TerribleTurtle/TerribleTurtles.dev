@@ -20,3 +20,10 @@
 ## 5. D1 Migrations
 - Never attempt to modify the database schema via raw runtime SQL queries.
 - All schema changes require a formal SQL migration file, applied explicitly via `wrangler d1 migrations apply`.
+
+## 6. Behavioral Prompt Commands (AI Guardrails)
+- **The "No Magic" Rule:** Strict token adherence. Agents are forbidden from using inline CSS, magic numbers, or raw hex codes. They must use predefined blueprint tokens.
+- **The "Atomic Modification" Rule:** Agents must modify only the exact component required. No unprompted refactoring of unrelated code.
+- **The "Semantic Accessibility" Rule:** Mandatory use of correct HTML semantics (no `<div>` buttons) and ARIA labels.
+- **The "Amnesia" Preventer:** Stack lockdown to Astro and Cloudflare. Agents must not import React, Vue, or unapproved frameworks.
+- **Code Transparency:** The website repository will be Open Source to demonstrate clean architecture and AI management practices.

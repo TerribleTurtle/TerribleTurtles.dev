@@ -61,3 +61,17 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 **Automated Verifiable Outcomes:**
 *   *Test 1 (Speed):* `curl -o /dev/null -s -w "%{time_starttransfer}\n" http://localhost:8787` output is strictly `< 0.05` seconds.
 *   *Test 2 (Secret Syntax Boundary):* `grep -rn "import.meta.env" src/` must return nothing (exit code 1). Ensures we explicitly use `astro:env/server` for string secrets and `import { env } from "cloudflare:workers"` for bindings.
+
+## Phase 6: AI Guardrails & CI/CD Pipeline Enforcement
+**Goal:** Mathematically lock down the codebase against magic colors, inline styles, and unapproved frameworks using strict 2026 CI/CD integrations.
+- `[x]` **6.1 Project Rules Engine:** Append the Behavioral Rules (No Magic, Atomic Mod, Semantic A11y, Amnesia, Code Transparency) to `.agents/AGENTS.md`.
+- `[x]` **6.2 ESLint (Flat Config):** Install `eslint`, `eslint-plugin-astro`, and configure `eslint.config.mjs` for Astro 7 strictness.
+- `[x]` **6.3 Stylelint (Token Enforcement):** Install `stylelint`, `stylelint-config-astro`, and `stylelint-declaration-use-variable` to formally ban raw hex codes via `stylelint.config.mjs`.
+- `[x]` **6.4 Script Definition:** Update `package.json` with `lint:js`, `lint:css`, and `typecheck`.
+- `[x]` **6.5 Cloudflare Deployment Block:** Modify the `build` script in `package.json` to execute `npm run typecheck && npm run lint:js && npm run lint:css && astro build` to guarantee broken code never deploys.
+- `[x]` **6.6 GitHub Actions CI:** Create `.github/workflows/ci.yml` to run the linters on push/PR for GitHub UI visibility.
+**Automated Verifiable Outcomes:**
+*   *Test 1 (Linter Installation):* `npm run lint:js` and `npm run lint:css` execute successfully.
+*   *Test 2 (Deployment Blocker):* Inject a `color: #ff0000;` into a scratch file and run `npm run build`. The command MUST fail with exit code 1.
+*   *Test 3 (Variable Enforcement):* `grep -q "stylelint-declaration-use-variable" package.json` succeeds.
+

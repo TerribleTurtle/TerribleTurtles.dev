@@ -10,6 +10,10 @@
 *   **Typography:** Google Fonts (`Inter`, `Fira Code`) are loaded via standard `<link>` tags in `<head>` rather than generic `@import`, enforcing `font-display: swap` for maximum performance and zero layout shift.
 *   **Accessibility:** Semantic HTML (e.g., `<header>`, `<main>`, `<nav aria-label="...">`) is enforced across layouts. Axe-core audits ensure zero WCAG 2.1 AA violations.
 *   **Inline Style Ban:** No `.astro` components are permitted to use the `style="..."` attribute. All modifications must leverage CSS root variables in their local `<style>` blocks.
+*   **AI Guardrails & CI/CD Pipeline (Phase 6):** The project enforces mathematical adherence to the "No Magic" rule. 
+    *   `stylelint` is configured with `color-named: "never"`, `function-disallowed-list: ["rgb", "hsl", ...]`, and strict property allowances to completely ban hex codes and force variables for all colors, fills, and strokes.
+    *   `eslint` uses flat config and `typescript-eslint` parser.
+    *   The `package.json` build command requires `astro check && eslint && stylelint` to pass before `astro build`, physically preventing broken or non-compliant AI-generated code from deploying to Cloudflare Pages.
 ## 2. Data Strategy
 *   **Content Layer:** The project relies on Astro's Content Layer for 100% static project metadata. No relational databases (D1) are used for metadata.
 *   **KV Configs:** Cloudflare KV is reserved strictly for fast-read runtime configurations.
