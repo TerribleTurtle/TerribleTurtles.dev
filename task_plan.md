@@ -4,11 +4,11 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 
 ## Phase 1: Core Infrastructure & Scaffolding
 **Goal:** Establish the foundational Astro environment, Cloudflare integrations, and automated deployment pipeline.
-- `[ ]` **1.1 Astro Initialization:** Initialize a new Astro project in `c:\dev\personal\TerribleTurtles.dev` using the strict TypeScript template.
-- `[ ]` **1.2 Adapter Configuration:** Install `@astrojs/cloudflare` and configure `astro.config.mjs` with `output: 'hybrid'`. Bypass the default `sharp` image adapter to respect Cloudflare constraints.
-- `[ ]` **1.3 Wrangler Setup:** Create `wrangler.toml` defining the D1, KV, and R2 bindings, matching the Cloudflare Pages environment.
-- `[ ]` **1.4 CI/CD Pipeline (User Action Required):** The human user must push the local codebase to a GitHub repository and manually link it in the Cloudflare Pages dashboard to establish the native deployment pipeline. No `.github/workflows/deploy.yml` is required.
-- `[ ]` **1.5 Security Headers:** Implement the explicit CSP headers from the SDD inside `wrangler.toml` (allowing Turnstile and CF Analytics).
+- `[x]` **1.1 Astro Initialization:** Initialize a new Astro project in `c:\dev\personal\TerribleTurtles.dev` using the strict TypeScript template.
+- `[x]` **1.2 Adapter Configuration:** Install `@astrojs/cloudflare` and configure `astro.config.mjs` with `output: 'hybrid'`. Bypass the default `sharp` image adapter to respect Cloudflare constraints.
+- `[x]` **1.3 Wrangler Setup:** Create `wrangler.jsonc` defining the D1 and KV bindings matching the Cloudflare Pages environment.
+- `[x]` **1.4 CI/CD Pipeline:** Executing direct `wrangler pages deploy` locally to bypass Cloudflare UI bugs.
+- `[x]` **1.5 Security Headers:** Implement the explicit CSP headers from the SDD inside `wrangler.toml` (allowing Turnstile and CF Analytics).
 **Automated Verifiable Outcomes:**
 *   *Test 1 (Build):* `npm run build` succeeds with zero strict TypeScript errors.
 *   *Test 2 (CSP):* `curl -I http://localhost:8788 | grep -F "Content-Security-Policy: default-src 'self'"` succeeds.

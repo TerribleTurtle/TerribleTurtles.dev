@@ -3,8 +3,8 @@
 ## 1. Introduction & Domain Strategy
 **TerribleTurtles.dev** is designed to be a highly performant portfolio and tool-hosting platform with zero manual maintenance requirements. 
 
-*   **Primary Domain:** `terribleturtles.dev`
-*   **Redirect Domain:** `terribleturtle.dev`
+*   **Primary Domain:** `terribleturtles.dev` (Bound directly to the Cloudflare Pages project)
+*   **Redirect Domain:** `terribleturtle.dev` (Bound via a Cloudflare Dynamic Redirect Rule: `concat("https://terribleturtles.dev", http.request.uri.path)` using HTTP 301 to prevent SEO duplicate content penalties and map deep links).
 
 ## 2. Tech Stack & Deployment Architecture
 The platform leverages a modern, serverless edge architecture to guarantee high performance and strict zero-maintenance. 
