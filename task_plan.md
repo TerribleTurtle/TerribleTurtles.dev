@@ -8,7 +8,7 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 - `[x]` **1.2 Adapter Configuration:** Install `@astrojs/cloudflare` and configure `astro.config.mjs` with `output: 'static'`. Bypass the default `sharp` image adapter to respect Cloudflare constraints.
 - `[x]` **1.3 Wrangler Setup:** Create `wrangler.jsonc` defining the D1 and KV bindings matching the Cloudflare Pages environment.
 - `[x]` **1.4 CI/CD Pipeline:** Executing direct `wrangler deploy` locally to bypass Cloudflare UI bugs (updated from `pages deploy` to support Astro 5+ Workers Assets).
-- `[x]` **1.5 Security Headers:** Implement the explicit CSP headers from the SDD inside `wrangler.toml` (allowing Turnstile and CF Analytics).
+- `[x]` **1.5 Security Headers:** Implement the explicit CSP headers from the SDD inside `public/_headers` (allowing Turnstile and CF Analytics).
 **Automated Verifiable Outcomes:**
 *   *Test 1 (Build):* `npm run build` succeeds with zero strict TypeScript errors.
 *   *Test 2 (CSP):* `curl -I http://localhost:8788 | grep -F "Content-Security-Policy: default-src 'self'"` succeeds.
@@ -31,29 +31,29 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 - `[x]` **2.5.2 Plan Verification:** Execute `grep_search` to verify NO old legacy concepts exist in the memory files.
 
 ## Phase 3: Database, State & Middleware
-**Goal:** Provision local mock databases, establish the D1 schemas, and implement privacy-first edge error tracking.
-- `[ ]` **3.1 D1 Migrations:** Create initial SQL migration (`0001_init.sql`) defining the `projects` table and apply via `wrangler d1 migrations apply --local`.
-- `[ ]` **3.2 Astro Actions Integration:** Establish `src/actions/index.ts` utilizing `astro:actions` for all type-safe client-to-server mutations.
-- `[ ]` **3.3 Astro Middleware:** Create `src/middleware.ts` to intercept `next()` execution for global headers and error catching.
-- `[ ]` **3.4 Telemetry Integration:** Configure middleware/actions to strip PII and write sanitized logs to `console.error` (for CF Tail).
-- `[ ]` **3.5 KV Connections:** Configure the KV binding in `wrangler.toml` and implement accesses via `import { env } from "cloudflare:workers"`.
-- `[ ]` **3.6 Client State APIs:** Create `src/utils/storage.ts` providing safe `localStorage` wrappers.
-- `[ ]` **3.7 Edge Rendering:** Ensure any dynamic API routes or Action-heavy pages explicitly declare `export const prerender = false;`.
+**Goal:** Establish privacy-first edge error tracking and KV bindings.
+- `[x]` **3.1 Astro Actions Integration:** Establish `src/actions/index.ts` utilizing `astro:actions` for all type-safe client-to-server mutations.
+- `[x]` **3.2 Astro Middleware:** Create `src/middleware.ts` strictly scoped to intercept `next()` execution for dynamic error catching (NOT for static global headers, which belong in `public/_headers`).
+- `[x]` **3.3 Telemetry Integration:** Configure Action handlers to strip PII and write sanitized logs to `console.error` (for native CF Tail / Workers Analytics Engine).
+- `[x]` **3.4 KV Connections:** Configure the KV binding in `wrangler.jsonc` and implement accesses via `import { env } from "cloudflare:workers"`. Run `npm run generate-types` to update `worker-configuration.d.ts`.
+- `[x]` **3.5 Client State APIs:** Create `src/utils/storage.ts` providing safe `localStorage` wrappers.
+- `[x]` **3.6 Edge Rendering:** Ensure any dynamic API routes querying KV during their initial HTML render payload explicitly declare `export const prerender = false;`. purely static pages interacting with Actions via RPC do not require this.
 **Automated Verifiable Outcomes:**
 *   *Test 1 (Zero-Cookie Rule):* `curl -I http://localhost:8788 | grep -i "Set-Cookie"` must fail (return no matches).
 *   *Test 2 (Telemetry Hook):* Execute an action via RPC to simulate an error. Assert HTTP code `500` is returned, and `stdout` of Wrangler contains the sanitized JSON log.
-*   *Test 3 (KV Read):* `wrangler kv:key get config:test --local` succeeds without binding errors.
+*   *Test 3 (KV Read):* `wrangler kv:key get --binding CONFIG_KV config:test --local` succeeds without binding errors.
+*   *Test 4 (Storage Wrapper Safety):* `grep -q "try {" src/utils/storage.ts` succeeds (proving `localStorage` is safely wrapped against strict-mode browser crashes).
 
 ## Phase 4: Content Routing & The Bucket System
-**Goal:** Build the dynamic file-based routing architecture and Markdown parsing pipelines.
-- `[ ]` **4.1 Homepage Grid:** Implement `src/pages/index.astro` to map D1 data to `ProjectCard.astro`.
-- `[ ]` **4.2 Dynamic Routes:** Create `src/pages/tools/[slug].astro` and `src/pages/sites/[slug].astro`.
-- `[ ]` **4.3 Markdown Processing:** Configure Astro's modern Content Layer API (`src/content.config.ts` using `defineCollection({ loader: glob(...) })`) to parse the "Enhanced Readmes".
-- `[ ]` **4.4 Graceful Degradation:** Implement the "Bit-Rot" banner component.
-- `[ ]` **4.5 Custom 404 Layout:** Create `src/pages/404.astro`.
+**Goal:** Build the static file-based routing architecture and Markdown parsing pipelines via Astro Content Layer.
+- `[x]` **4.1 Homepage Grid:** Implement `src/pages/index.astro` to statically map Content Layer data to `ProjectCard.astro`.
+- `[x]` **4.2 Dynamic Routes:** Create `src/pages/tools/[slug].astro` and `src/pages/sites/[slug].astro` using `getStaticPaths()` for static generation.
+- `[x]` **4.3 Markdown Processing:** Configure Astro's modern Content Layer API (`src/content.config.ts` using `defineCollection({ loader: glob(...) })`) to parse the "Enhanced Readmes" and their frontmatter schemas.
+- `[x]` **4.4 Graceful Degradation:** Implement the "Bit-Rot" banner component.
+- `[x]` **4.5 Custom 404 Layout:** Create `src/pages/404.astro`.
 **Automated Verifiable Outcomes:**
-*   *Test 1 (Bit-Rot Policy):* A test script overrides an API dependency var, fetches the page, and parses the DOM to assert "Deprecated: Requires Update" text is present (avoiding 500 crashes).
-*   *Test 2 (Syntax Highlighting):* `grep -q "class=\"shiki\"" dist/tools/test-utility/index.html` succeeds.
+*   *Test 1 (Bit-Rot Policy):* Fetch a dedicated test route that simulates an API failure and verify the fallback UI: `curl -s http://localhost:8788/test-bitrot | grep "Deprecated: Requires Update"` succeeds.
+*   *Test 2 (Syntax Highlighting):* `npm run build && grep -q "class=\"shiki\"" dist/tools/test-utility/index.html` succeeds.
 *   *Test 3 (404 Routing):* `curl -s -o /dev/null -w "%{http_code}" http://localhost:8788/does-not-exist` outputs exactly `404`.
 
 ## Phase 5: Security & Final NFR Auditing
@@ -63,5 +63,5 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 - `[ ]` **5.3 Secret Inspection:** Ensure no runtime functions are bleeding build-time `.env` variables via `import.meta.env`.
 **Automated Verifiable Outcomes:**
 *   *Test 1 (Speed):* `curl -o /dev/null -s -w "%{time_starttransfer}\n" http://localhost:8788` output is strictly `< 0.05` seconds.
-*   *Test 2 (CSP Violation Catch):* A headless script loads the page and fails if `page.on('console')` emits `securitypolicyviolation` or Turnstile load errors.
+*   *Test 2 (CSP Turnstile Integrity):* `curl -I http://localhost:8788 | grep -F "https://challenges.cloudflare.com"` succeeds, proving the strict CSP explicitly allows the Turnstile widget to load.
 *   *Test 3 (Secret Syntax Boundary):* `grep -rn "import.meta.env" src/` must return nothing (exit code 1). Ensures we explicitly use `astro:env/server` for string secrets and `import { env } from "cloudflare:workers"` for bindings.

@@ -1,13 +1,87 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const readmes = await getCollection('readmes');
+const activeProjects = readmes.filter(r => r.data.status === 'active');
+
+const tools = activeProjects.filter(p => p.data.type === 'tool');
+const sites = activeProjects.filter(p => p.data.type === 'site');
 ---
 
-<BaseLayout>
-	<section>
-		<h1>TerribleTurtles.dev</h1>
-		<p>Welcome to the portfolio.</p>
-	</section>
+<BaseLayout title="Home | TerribleTurtles.dev" description="Welcome to the portfolio.">
+  <section class="hero">
+    <h1>TerribleTurtles.dev</h1>
+    <p class="subtitle">A collection of performant, purpose-built tools and sites.</p>
+  </section>
+
+  <section class="bucket-section">
+    <h2>Active Tools</h2>
+    <div class="project-grid">
+      {tools.map(project => (
+        <ProjectCard 
+          title={project.data.title} 
+          description={project.data.description || ''} 
+          link={`/tools/${project.id}`} 
+          tags={['tool', 'active']} 
+        />
+      ))}
+      {tools.length === 0 && <p class="empty-state">No active tools found.</p>}
+    </div>
+  </section>
+
+  <section class="bucket-section">
+    <h2>Active Sites</h2>
+    <div class="project-grid">
+      {sites.map(project => (
+        <ProjectCard 
+          title={project.data.title} 
+          description={project.data.description || ''} 
+          link={`/sites/${project.id}`} 
+          tags={['site', 'active']} 
+        />
+      ))}
+      {sites.length === 0 && <p class="empty-state">No active sites found.</p>}
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .hero {
+    margin-bottom: 4rem;
+  }
+  
+  .hero h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+  
+  .subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+  }
+
+  .bucket-section {
+    margin-bottom: 4rem;
+  }
+
+  .bucket-section h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .empty-state {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+</style>

@@ -9,14 +9,13 @@
 ## 2. Tech Stack & Deployment Architecture
 The platform leverages a modern, serverless edge architecture to guarantee high performance and strict zero-maintenance. 
 
-*   **Framework:** Astro (configured with `output: 'static'`, where all dynamic routes explicitly declare `export const prerender = false;` to combine pre-rendered static HTML with on-demand edge middleware and SSR for D1/KV interactions).
-*   **Hosting:** Cloudflare Pages (via Wrangler).
+*   **Framework:** Astro 7 (configured with `output: 'static'`, utilizing Astro's Content Layer API to act as a 100% static Git-based CMS).
+*   **Hosting:** Cloudflare Pages.
 *   **Database & Storage:**
-    *   **Cloudflare D1 (SQL):** For relational data needs.
-    *   **Cloudflare KV (Key-Value):** For fast, globally distributed key-value configurations and stateless caching.
+    *   **Cloudflare KV (Key-Value):** For fast, globally distributed key-value configurations and stateless caching (no relational DB used).
     *   **Cloudflare R2 (File Storage):** For object and large file storage.
 *   **Development Workflow:** 100% AI Agent Managed.
-*   **Configuration Management:** `wrangler.toml` serves as the single source of truth for Cloudflare Pages bindings (D1, KV, R2) and compatibility flags.
+*   **Configuration Management:** `wrangler.jsonc` serves as the single source of truth for Cloudflare Pages bindings (KV, R2).
 
 ### 2.1 Architecture Request Flow
 ```mermaid
@@ -27,9 +26,8 @@ graph TD
     Middleware --> Actions[Astro Actions / Server Mutations]
     Actions -->|Reads/Writes Edge Secrets| EnvBindings[cloudflare:workers env / astro:env]
     Actions -->|Stateless Data| KV[(Cloudflare KV)]
-    Actions -->|SQL Queries| D1[(Cloudflare D1)]
     Actions -->|Logs/Telemetry| Tail[Workers Analytics Engine / Tail]
-    Middleware --> PageRoute[Astro Static/Edge Route]
+    Middleware --> PageRoute[Astro Static Route]
     PageRoute -->|Pre-rendered HTML| CFEdge
 ```
 
@@ -65,9 +63,9 @@ The platform utilizes a "Bucket System": projects are built, placed in "Tools" o
 *   **System Pages:** Branded static 404 Error page routing back to active projects.
 
 ### 4.1 Core Route Mapping
-*   `src/pages/index.astro`: Homepage (Welcome, Current Project, Archive Grid).
-*   `src/pages/tools/[slug].astro`: Dynamic routing for utility tools.
-*   `src/pages/sites/[slug].astro`: Dynamic routing for hosted/archived sites.
+*   `src/pages/index.astro`: Homepage (Welcome, Current Project, Archive Grid). Completely static.
+*   `src/pages/tools/[slug].astro`: Statically generated routing for utility tools, driven by the Content Layer.
+*   `src/pages/sites/[slug].astro`: Statically generated routing for hosted/archived sites, driven by the Content Layer.
 *   `src/actions/index.ts`: Astro Actions for type-safe backend mutations.
 
 ### 4.2 Handling "Bucket System" Bit-Rot
@@ -84,7 +82,7 @@ While projects are intended to be zero-maintenance, external APIs deprecate.
 *   **Mechanism:** Provisioning via Cloudflare Edge Network.
 *   **Implementation:** Keys are injected into the Cloudflare network using the `wrangler secret put` command.
 *   **Boundary:** The codebase is prohibited from holding raw keys. 
-    *   **Cloudflare Bindings (Objects):** Runtime Cloudflare bindings (D1, KV, R2) must be securely accessed via direct imports (`import { env } from "cloudflare:workers"`).
+    *   **Cloudflare Bindings (Objects):** Runtime Cloudflare bindings (KV, R2) must be securely accessed via direct imports (`import { env } from "cloudflare:workers"`).
     *   **String Secrets:** Edge secrets (like Turnstile Keys) must be strictly typed using `astro:env/server`.
     *   **Legacy Ban:** `import.meta.env` is strictly banned for all server-side edge logic.
 
@@ -93,13 +91,11 @@ While projects are intended to be zero-maintenance, external APIs deprecate.
 *   **Implementation:** Custom Astro middleware (`src/middleware.ts`) intercepts exceptions. Since KV writes are subject to strict rate limits and eventual consistency, telemetry and error metadata (with stripped PII) are passed natively to `console.error` (viewable via Cloudflare Tail) or structured via Cloudflare Workers Analytics Engine. No third-party trackers are used.
 
 ### 5.3 Backup & Disaster Recovery
-*   **Mechanism:** Cloudflare D1 Native "Time Travel".
-*   **Implementation:** Relies entirely on D1's Time Travel append-only log of database bookmarks, allowing point-in-time recovery within a 30-day rolling window. 
-*   **Constraint Note:** Time Travel performs a *full database state rollback*. It does not support restoring individual tables or rows natively; recovering specific records requires extracting data from a restored point prior to resuming operations.
+*   **Mechanism:** Git Version Control.
+*   **Implementation:** Since the architecture utilizes a 100% static Git-based CMS approach via Astro's Content Layer, all project metadata and content is stored in the repository. Disaster recovery is inherently managed by Git history and GitHub repository backups.
 
 ### 5.4 Data Models & Schemas
-*   **D1 Tables:** Will vary by tool, but must follow strict normalized schemas (e.g., `projects` table for global metadata, `tool_state` table for specific utilities).
-*   **D1 Migrations:** Changes to the database schema cannot be done via raw runtime queries. All schema changes require explicit, version-controlled SQL migration files (e.g., `0001_create_table.sql`) and must be applied via `wrangler d1 migrations apply`.
+*   **Content Layer (Markdown):** Project metadata (title, status, type) is strictly enforced via Zod schemas in `src/content.config.ts` and stored in the frontmatter of individual Markdown files.
 *   **KV Structure:** Used exclusively for fast-read configurations, feature flags, or heavily cached semi-static responses. (e.g., key: `config:theme:dark_mode`).
 
 ### 5.5 Client-Side State Boundaries
@@ -135,8 +131,7 @@ Crucial instructions for any LLM or AI agent interacting with the codebase:
 Because AI agents operate locally and cannot securely authenticate into your Cloudflare or GitHub dashboards, the human user **must** perform the following manual setup actions:
 
 1.  **Repository Connection:** Create a GitHub repository, push the local code, and log into the Cloudflare Pages dashboard to "Connect to Git" and enable automatic deployments.
-2.  **Provision Cloudflare Resources:** Run the following commands in your terminal (while authenticated to Cloudflare) to create the remote resources, then provide the resulting IDs to the AI to place in `wrangler.toml`:
-    *   `npx wrangler d1 create terribleturtles-db`
+2.  **Provision Cloudflare Resources:** Run the following commands in your terminal (while authenticated to Cloudflare) to create the remote resources, then provide the resulting IDs to the AI to place in `wrangler.jsonc`:
     *   `npx wrangler kv:namespace create "CONFIG_KV"`
 3.  **Secure Secret Injection:** AI cannot manage live production secrets. You must inject them manually via the dashboard or CLI:
     *   `npx wrangler pages secret put TURNSTILE_SECRET_KEY`

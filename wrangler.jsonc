@@ -6,13 +6,7 @@
 	"observability": {
 		"enabled": true
 	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "terribleturtles-db",
-			"database_id": "622d096f-51a0-4b5d-a6d4-a5c75a1e79bf"
-		}
-	],
+
 	"kv_namespaces": [
 		{
 			"binding": "CONFIG_KV",

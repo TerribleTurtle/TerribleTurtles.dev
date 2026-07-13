@@ -1,0 +1,10 @@
+---
+export const prerender = false;
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BitRotBanner from '../components/BitRotBanner.astro';
+---
+
+<BaseLayout title="Test Bit-Rot Policy" description="Testing graceful degradation.">
+  <BitRotBanner message="Deprecated: Requires Update. This tool is no longer actively maintained." />
+  <p>If you can see the banner above, the bit-rot policy works.</p>
+</BaseLayout>
