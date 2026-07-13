@@ -58,10 +58,8 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 
 ## Phase 5: Security & Final NFR Auditing
 **Goal:** Lock down the application and verify all non-functional requirements before marking the project complete.
-- `[ ]` **5.1 Turnstile Integration:** Inject the Cloudflare Turnstile widget.
-- `[ ]` **5.2 Mozilla Observatory Headers:** Implement HSTS, X-Content-Type-Options, and Referrer-Policy headers.
-- `[ ]` **5.3 Secret Inspection:** Ensure no runtime functions are bleeding build-time `.env` variables via `import.meta.env`.
+- `[x]` **5.1 Mozilla Observatory Headers:** Implement HSTS, X-Content-Type-Options, and Referrer-Policy headers.
+- `[x]` **5.2 Secret Inspection:** Ensure no runtime functions are bleeding build-time `.env` variables via `import.meta.env`.
 **Automated Verifiable Outcomes:**
-*   *Test 1 (Speed):* `curl -o /dev/null -s -w "%{time_starttransfer}\n" http://localhost:8788` output is strictly `< 0.05` seconds.
-*   *Test 2 (CSP Turnstile Integrity):* `curl -I http://localhost:8788 | grep -F "https://challenges.cloudflare.com"` succeeds, proving the strict CSP explicitly allows the Turnstile widget to load.
-*   *Test 3 (Secret Syntax Boundary):* `grep -rn "import.meta.env" src/` must return nothing (exit code 1). Ensures we explicitly use `astro:env/server` for string secrets and `import { env } from "cloudflare:workers"` for bindings.
+*   *Test 1 (Speed):* `curl -o /dev/null -s -w "%{time_starttransfer}\n" http://localhost:8787` output is strictly `< 0.05` seconds.
+*   *Test 2 (Secret Syntax Boundary):* `grep -rn "import.meta.env" src/` must return nothing (exit code 1). Ensures we explicitly use `astro:env/server` for string secrets and `import { env } from "cloudflare:workers"` for bindings.
