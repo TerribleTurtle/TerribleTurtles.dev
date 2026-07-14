@@ -98,3 +98,9 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 - `[x]` **9.3 Professional Standards:** Add `.env.example` and a dual-licensed `LICENSE` file (MIT for Code, CC BY-NC 4.0 for Content).
 **Automated Verifiable Outcomes:**
 *   *Test 1 (Package Bloat Removal):* `npm run test` executes successfully natively without `jsdom`.
+
+## Phase 10: Lighthouse Performance & CSP Hardening
+**Goal:** Achieve perfect Lighthouse scores and harden the CSP.
+- `[x]` **10.1 Font Optimization:** Self-host Google Fonts via `@fontsource` to eliminate render-blocking LCP delays.
+- `[x]` **10.2 CSP & Headers:** Enforce `require-trusted-types-for` and `Cross-Origin-Opener-Policy: same-origin` in `public/_headers`.
+- `[x]` **10.3 Contrast Ratios:** Update `--text-muted` to pass AAA contrast on dark backgrounds.
