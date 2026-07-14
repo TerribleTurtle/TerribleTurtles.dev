@@ -16,7 +16,7 @@
     *   `stylelint` is configured with `color-named: "never"`, `function-disallowed-list: ["rgb", "hsl", ...]`, and strict property allowances to completely ban hex codes and force variables for all colors, fills, and strokes. A `.stylelintignore` explicitly excludes `dist/` and `node_modules/` to prevent linting built vendor assets like `@fontsource`.
     *   `eslint` uses flat config and `typescript-eslint` parser.
     *   The `package.json` build command requires `astro check && eslint && stylelint` to pass before `astro build`, physically preventing broken or non-compliant AI-generated code from deploying to Cloudflare Pages.
-    *   `axe-core` accessibility audits are integrated into GitHub Actions (`ci.yml`), mathematically proving WCAG 2.1 AA compliance on all routes via a background `astro preview` server.
+    *   `axe-core` accessibility audits are strictly enforced locally on every commit via a `.husky/pre-commit` hook (using `start-server-and-test` to manage the `astro preview` lifecycle) and remotely in GitHub Actions (`ci.yml`), mathematically proving WCAG 2.1 AA compliance on all routes before deployment.
 ## 2. Data Strategy
 *   **Content Layer:** The project relies on Astro's Content Layer for 100% static project metadata. No relational databases (D1) are used for metadata.
 *   **KV Configs:** Cloudflare KV is reserved strictly for fast-read runtime configurations.

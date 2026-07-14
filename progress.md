@@ -16,3 +16,5 @@
 - Updated `BaseLayout.astro` with Canonical, Open Graph, Twitter Cards, and JSON-LD schema.
 - Added `robots.txt` and `llm.txt` to `public/` directory.
 - User manually added `tabindex="-1"` to `<main>` to ensure programmatic focus for the "Skip to main content" link works correctly.
+- Fixed WCAG 2.1 `heading-order` violations by updating `ProjectCard` to accept dynamic `headingLevel` props.
+- Automated `axe-core` accessibility audits in the `.husky/pre-commit` hook using `start-server-and-test`.
