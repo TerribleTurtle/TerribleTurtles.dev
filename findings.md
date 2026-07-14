@@ -21,7 +21,10 @@
 *   **Content Layer:** The project relies on Astro's Content Layer for 100% static project metadata. No relational databases (D1) are used for metadata.
 *   **KV Configs:** Cloudflare KV is reserved strictly for fast-read runtime configurations.
 
-
+## 3. Testing Infrastructure (Phase 8 Remediation)
+*   **Unit Testing:** `Vitest` is used exclusively for unit tests, ensuring fast, lightweight verification of utilities (e.g. `storage.ts`).
+*   **E2E Testing:** `@playwright/test` is used for End-to-End browser verification. Tests explicitly verify critical UI states (e.g. Empty States, BitRot banners, Routing).
+*   **CI Reliability:** The `ci.yml` must use dynamic polling mechanisms like `npx wait-on` before executing browser tests or axe-core audits. Hardcoded `sleep` statements are strictly banned due to inherent flakiness.
 
 ## Rejected Approaches (Mandatory Negative Knowledge)
 *   **D1 for Project Metadata (The "Split Brain"):** Rejected. Storing project metadata (title, status) in a Cloudflare D1 database while storing the actual project content (READMEs) in Git Markdown creates an inefficient split-brain architecture. It forces all pages to be dynamically server-rendered (`prerender = false`) at the edge, costing worker invocations and losing static CDN caching. Instead, we use 100% static Astro Content Layer with Markdown frontmatter.

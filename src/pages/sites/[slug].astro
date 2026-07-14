@@ -31,7 +31,7 @@ const { Content } = await render(project);
     </header>
     
     <div class="content-body markdown-body">
-      {Content ? <Content /> : <p>No documentation provided.</p>}
+      {project.body && project.body.trim() ? <Content /> : <p>No documentation provided.</p>}
     </div>
   </article>
 </BaseLayout>

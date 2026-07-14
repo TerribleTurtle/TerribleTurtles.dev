@@ -90,3 +90,11 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 - `[x]` **8.3 Fluid Typography:** Implement `clamp()` for base `html` font size and hero text in `index.astro`.
 **Automated Verifiable Outcomes:**
 *   *Test 1 (CSS Parsing):* `npm run lint:css` validates `clamp()` usage without stylelint errors.
+
+## Phase 9: Deep Environment Clean & Tidy
+**Goal:** Optimize repository hygiene, secure configuration boundaries, and remove package bloat based on a multi-agent domain audit.
+- `[x]` **9.1 Security & Cruft Sweeping:** Update `.gitignore` with comprehensive rules, delete ghost files (`scratch.txt`, `script.py`), and add `.editorconfig`.
+- `[x]` **9.2 Dependency Optimization:** Remove `jsdom` and `@typescript-eslint/parser`, add `"test"` script, and enforce Node-native Vitest environments.
+- `[x]` **9.3 Professional Standards:** Add `.env.example` and a dual-licensed `LICENSE` file (MIT for Code, CC BY-NC 4.0 for Content).
+**Automated Verifiable Outcomes:**
+*   *Test 1 (Package Bloat Removal):* `npm run test` executes successfully natively without `jsdom`.
