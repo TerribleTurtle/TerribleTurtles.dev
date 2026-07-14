@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const readmes = await getCollection('readmes');
+const sites = readmes.filter(p => p.data.type === 'site');
+---
+
+<BaseLayout title="Sites | TerribleTurtles.dev" description="A collection of sites.">
+  <section class="bucket-section">
+    <h2>Sites</h2>
+    <div class="project-grid">
+      {sites.map(project => (
+        <ProjectCard 
+          title={project.data.title} 
+          description={project.data.description || ''} 
+          link={`/sites/${project.id}`} 
+          tags={['site', project.data.status]} 
+        />
+      ))}
+      {sites.length === 0 && <p class="empty-state">No sites found.</p>}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .bucket-section {
+    margin-bottom: 4rem;
+  }
+
+  .bucket-section h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: var(--space-lg);
+  }
+
+  .empty-state {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+</style>
