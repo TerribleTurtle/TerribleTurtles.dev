@@ -7,7 +7,7 @@
 
 ## 1. CSS & Styling Standards
 *   **Implementation:** Phase 2 introduced `src/styles/global.css` with the strict SDD design tokens mapped to CSS variables (e.g., `--bg-base`, `--accent-primary`).
-*   **Typography:** Google Fonts (`Inter`, `Fira Code`) are loaded via standard `<link>` tags in `<head>` rather than generic `@import`, enforcing `font-display: swap` for maximum performance and zero layout shift.
+*   **Typography:** Google Fonts (`Inter`, `Fira Code`) are loaded via standard `<link>` tags in `<head>` rather than generic `@import`, enforcing `font-display: swap` for maximum performance and zero layout shift. CSP must whitelist `https://fonts.googleapis.com` in `style-src` and `https://fonts.gstatic.com` in `font-src`.
 *   **Accessibility:** Semantic HTML (e.g., `<header>`, `<main>`, `<nav aria-label="...">`) is enforced across layouts. Axe-core audits ensure zero WCAG 2.1 AA violations.
 *   **Inline Style Ban:** No `.astro` components are permitted to use the `style="..."` attribute. All modifications must leverage CSS root variables in their local `<style>` blocks.
 *   **Fluid Typography & Spacing (Phase 8):** Hardcoded pixel boundaries and static padding are deprecated. The project relies on mathematical `clamp()` functions for all `--space-*` tokens and font sizes, dynamically scaling between mobile and 1440p displays up to a `1200px` container width.
@@ -44,3 +44,4 @@
 *   **Voice:** Always use **First-Person Singular ("I")** when generating copy for the platform. Strictly omit the user's real name.
 *   **Vibe:** Minimalist, direct, open, and factual. Avoid marketing fluff, pretentious hacker personas ("I go by the name..."), or aggressive anti-tracking rants. Let the work speak for itself.
 *   **Scope Promises:** Never make sweeping promises about the tools hosted here (e.g., do not claim *every* tool will be "accessible and fast"). The *platform shell* is static and secure, but the tools themselves are experimental and unboxed.
+*   **Basic CSP without Trusted Types/COOP:** Rejected. To mitigate DOM XSS and prevent cross-origin leaks, CSP must enforce `require-trusted-types-for 'script'`, and `_headers` must include `Cross-Origin-Opener-Policy: same-origin`.

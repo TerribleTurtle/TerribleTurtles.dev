@@ -14,3 +14,4 @@
 - **Major Milestone:** Multi-Agent Deep Environment Clean sweep completed.
 - Ghost files deleted. `.editorconfig` created. Dual License established.
 - Removed `jsdom` and `@typescript-eslint/parser` to reduce bloat. Tests passed locally using Node environment.
+- Fixed Lighthouse warnings: improved contrast for `--text-muted` (updated to `#94A3B8`), explicitly whitelisted Google Fonts in CSP, added `require-trusted-types-for` and `Cross-Origin-Opener-Policy` headers.
