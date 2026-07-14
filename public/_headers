@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://static.cloudflareinsights.com; frame-src 'self'; require-trusted-types-for 'script';
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' https://static.cloudflareinsights.com; frame-src 'self'; require-trusted-types-for 'script';
   Cross-Origin-Opener-Policy: same-origin
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
