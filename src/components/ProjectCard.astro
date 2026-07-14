@@ -7,7 +7,7 @@ interface Props {
 }
 
 const { title, description, link, tags = [] } = Astro.props;
-const descId = desc-;
+const descId = `desc-${title.toLowerCase().replace(/\\W+/g, '-')}`;
 ---
 
 <article class="project-card">
@@ -101,6 +101,6 @@ const descId = desc-;
     background-color: var(--bg-base);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
-    color: #CBD5E1;
+    color: var(--text-tag);
   }
 </style>
