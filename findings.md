@@ -45,3 +45,9 @@
 *   **Vibe:** Minimalist, direct, open, and factual. Avoid marketing fluff, pretentious hacker personas ("I go by the name..."), or aggressive anti-tracking rants. Let the work speak for itself.
 *   **Scope Promises:** Never make sweeping promises about the tools hosted here (e.g., do not claim *every* tool will be "accessible and fast"). The *platform shell* is static and secure, but the tools themselves are experimental and unboxed.
 *   **Basic CSP without Trusted Types/COOP:** Rejected. To mitigate DOM XSS and prevent cross-origin leaks, CSP must enforce `require-trusted-types-for 'script'`, and `_headers` must include `Cross-Origin-Opener-Policy: same-origin`.
+
+## 5. Search Engine Optimization (SEO) & Metadata
+*   **Sitemap & Crawlability:** The site uses `@astrojs/sitemap` to generate XML sitemaps automatically at build time (`sitemap-index.xml`). A `public/robots.txt` explicitly allows crawling and points to this sitemap.
+*   **AI Crawler Context:** A `public/llm.txt` manifest provides a high-level overview of the platform's purpose to AI agents.
+*   **On-Page Meta:** `BaseLayout.astro` mandates the inclusion of canonical URLs, Open Graph (OG) tags, and Twitter Cards to ensure optimal social sharing and duplicate-content protection.
+*   **Structured Data:** The site uses `JSON-LD` WebSite schema within `<script type="application/ld+json">`. ESLint's `astro/no-set-html-directive` rule is disabled in `eslint.config.mjs` to permit dynamic Schema.org markup injection safely.

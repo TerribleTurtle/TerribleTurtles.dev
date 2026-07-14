@@ -1,19 +1,18 @@
 # Current Session Progress
 
-**Current Stage:** Lighthouse Performance & CSP Hardening.
-**Target Goal:** Perfect Lighthouse scores, eliminate LCP delays, and harden Content Security Policy.
+**Current Stage:** Technical SEO & Accessibility Updates.
+**Target Goal:** Perfect bot crawlability via sitemaps/robots and fix skipped link focus management.
 
 ### 5-Question Reboot Check
-1. **What is the immediate next step?** -> Await user's next objective after completing Phase 10.
-2. **Are there any blocking errors?** -> No, the site builds correctly and Lighthouse metrics are optimized.
-3. **Have findings been updated?** -> Yes, `findings.md` correctly outlines the mandate to self-host fonts.
-4. **Is the task plan accurate?** -> Yes, Phase 10 has been added and checked off in `task_plan.md`.
-5. **Are we straying from the SDD?** -> No, self-hosting fonts improves the "Perfect Speed" NFR without changing the aesthetic.
+1. **What is the immediate next step?** -> Commit and push the SEO/Accessibility fixes.
+2. **Are there any blocking errors?** -> No, the site builds correctly.
+3. **Have findings been updated?** -> Yes, `findings.md` correctly outlines the SEO metadata structure.
+4. **Is the task plan accurate?** -> Yes.
+5. **Are we straying from the SDD?** -> No, SEO optimizations fulfill the NFR for discoverability.
 
 ### Scratchpad
-- **Major Milestone:** Phase 10 Lighthouse fixes completed.
-- Migrated from external Google Fonts to `@fontsource` packages.
-- Hardened CSP with Trusted Types and COOP (and allowed `data:` URIs for font fallbacks).
-- Fixed AAA color contrast for muted text.
-- Enforced `build.inlineStylesheets: 'always'` in Astro config to completely eliminate render-blocking CSS files.
-- Added `.stylelintignore` to prevent linting built vendor CSS in `dist/`.
+- **Major Milestone:** Technical SEO Audit & Implementation completed.
+- Added `@astrojs/sitemap`, configured `astro.config.mjs` with production `site` URL.
+- Updated `BaseLayout.astro` with Canonical, Open Graph, Twitter Cards, and JSON-LD schema.
+- Added `robots.txt` and `llm.txt` to `public/` directory.
+- User manually added `tabindex="-1"` to `<main>` to ensure programmatic focus for the "Skip to main content" link works correctly.
