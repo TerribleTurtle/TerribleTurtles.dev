@@ -13,5 +13,7 @@
 ### Scratchpad
 - **Major Milestone:** Phase 10 Lighthouse fixes completed.
 - Migrated from external Google Fonts to `@fontsource` packages.
-- Hardened CSP with Trusted Types and COOP.
+- Hardened CSP with Trusted Types and COOP (and allowed `data:` URIs for font fallbacks).
 - Fixed AAA color contrast for muted text.
+- Enforced `build.inlineStylesheets: 'always'` in Astro config to completely eliminate render-blocking CSS files.
+- Added `.stylelintignore` to prevent linting built vendor CSS in `dist/`.

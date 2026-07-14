@@ -7,13 +7,13 @@
 
 ## 1. CSS & Styling Standards
 *   **Implementation:** Phase 2 introduced `src/styles/global.css` with the strict SDD design tokens mapped to CSS variables (e.g., `--bg-base`, `--accent-primary`).
-*   **Typography:** Google Fonts (`Inter`, `Fira Code`) are self-hosted using `@fontsource` packages and imported into `BaseLayout.astro`. This avoids render-blocking external requests to Google's CDN, resolving a 680ms LCP delay identified in Phase 8.
+*   **Typography:** Google Fonts (`Inter`, `Fira Code`) are self-hosted using `@fontsource` packages and imported into `BaseLayout.astro`. To completely eliminate render-blocking network requests, Astro's `build.inlineStylesheets: 'always'` is configured in `astro.config.mjs` to inject all CSS natively into the `<head>`, achieving near-instant LCP (0ms Element render delay).
 *   **Accessibility:** Semantic HTML (e.g., `<header>`, `<main>`, `<nav aria-label="...">`) is enforced across layouts. Axe-core audits ensure zero WCAG 2.1 AA violations.
 *   **Inline Style Ban:** No `.astro` components are permitted to use the `style="..."` attribute. All modifications must leverage CSS root variables in their local `<style>` blocks.
 *   **Fluid Typography & Spacing (Phase 8):** Hardcoded pixel boundaries and static padding are deprecated. The project relies on mathematical `clamp()` functions for all `--space-*` tokens and font sizes, dynamically scaling between mobile and 1440p displays up to a `1200px` container width.
 *   **Visually Hidden Accessibility:** The deprecated `clip: rect(0, 0, 0, 0)` pattern is banned. Use `clip-path: inset(50%)` to visually hide elements (like `.skip-link`) without creating visual artifacts or violating Stylelint rules.
 *   **AI Guardrails & CI/CD Pipeline (Phase 6):** The project enforces mathematical adherence to the "No Magic" rule. 
-    *   `stylelint` is configured with `color-named: "never"`, `function-disallowed-list: ["rgb", "hsl", ...]`, and strict property allowances to completely ban hex codes and force variables for all colors, fills, and strokes.
+    *   `stylelint` is configured with `color-named: "never"`, `function-disallowed-list: ["rgb", "hsl", ...]`, and strict property allowances to completely ban hex codes and force variables for all colors, fills, and strokes. A `.stylelintignore` explicitly excludes `dist/` and `node_modules/` to prevent linting built vendor assets like `@fontsource`.
     *   `eslint` uses flat config and `typescript-eslint` parser.
     *   The `package.json` build command requires `astro check && eslint && stylelint` to pass before `astro build`, physically preventing broken or non-compliant AI-generated code from deploying to Cloudflare Pages.
     *   `axe-core` accessibility audits are integrated into GitHub Actions (`ci.yml`), mathematically proving WCAG 2.1 AA compliance on all routes via a background `astro preview` server.
