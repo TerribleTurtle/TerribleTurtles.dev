@@ -19,11 +19,13 @@ const { title = 'TerribleTurtles.dev', description = 'A highly performant portfo
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to main content</a>
-    <header>
+    <header class="container">
       <nav aria-label="Primary">
         <!-- Header Menu: Home, Tools, Sites from SDD -->
         <ul>
@@ -34,11 +36,11 @@ const { title = 'TerribleTurtles.dev', description = 'A highly performant portfo
       </nav>
     </header>
     
-    <main id="main">
+    <main id="main" class="container">
       <slot />
     </main>
 
-    <footer>
+    <footer class="container">
       <nav aria-label="Footer">
         <!-- Footer Menu: About, Privacy, Security, Changelog / RSS from SDD -->
         <ul>
@@ -55,9 +57,9 @@ const { title = 'TerribleTurtles.dev', description = 'A highly performant portfo
 <style>
   header nav ul, footer nav ul {
     display: flex;
-    gap: 1rem;
+    gap: var(--space-md);
     list-style: none;
-    padding: 1rem;
+    padding: var(--space-md);
     margin: 0;
   }
   
@@ -67,16 +69,16 @@ const { title = 'TerribleTurtles.dev', description = 'A highly performant portfo
   
   footer {
     border-top: 1px solid var(--border-color);
-    margin-top: 2rem;
+    margin-top: var(--space-xl);
   }
   
   .skip-link {
     position: absolute;
-    top: -40px;
+    top: calc(var(--space-2xl) * -1);
     left: 0;
     background: var(--accent-primary);
     color: var(--bg-base);
-    padding: 8px;
+    padding: var(--space-sm);
     z-index: 100;
   }
   
