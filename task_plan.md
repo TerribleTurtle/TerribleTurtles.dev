@@ -26,8 +26,8 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 *   *Test 3 (Accessibility):* `npx @axe-core/cli http://localhost:8788` scans the index page and returns 0 violations (verifies WCAG 2.1 AA).
 
 ## Phase 2.5: Astro 6+ Migration & Documentation Adjustment
-**Goal:** Align architectural memory with Astro 6+ and `workerd` parity.
-- `[x]` **2.5.1 Update SDD & Findings:** Remove `Astro.locals.runtime` references, document `cloudflare:workers` and explicit `prerender = false` requirements.
+**Goal:** Align architectural memory with pure static nature.
+- `[x]` **2.5.1 Update SDD & Findings:** Remove `Astro.locals.runtime` and `cloudflare:workers` references, and document pure static architecture without SSR.
 - `[x]` **2.5.2 Plan Verification:** Execute `grep_search` to verify NO old legacy concepts exist in the memory files.
 
 ## Phase 3: Database, State & Middleware (ARCHIVED)
@@ -50,8 +50,8 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 - `[x]` **4.4 Graceful Degradation:** Implement the "Bit-Rot" banner component.
 - `[x]` **4.5 Custom 404 Layout:** Create `src/pages/404.astro`.
 **Automated Verifiable Outcomes:**
-*   *Test 1 (Bit-Rot Policy):* Fetch a dedicated test route that simulates an API failure and verify the fallback UI: `curl -s http://localhost:8788/test-bitrot | grep "Deprecated: Requires Update"` succeeds.
-*   *Test 2 (Syntax Highlighting):* `npm run build && grep -q "class=\"shiki\"" dist/tools/test-utility/index.html` succeeds.
+*   *Test 1 (Bit-Rot Policy):* Fetch a dedicated test route that simulates an API failure and verify the fallback UI: `curl -s http://localhost:8788/tools/test-bitrot | grep "Deprecated: Requires Update"` succeeds.
+*   *Test 2 (Syntax Highlighting):* `npm run build && grep -q "class=\\"astro-code\\"" dist/tools/test-utility/index.html` succeeds.
 *   *Test 3 (404 Routing):* `curl -s -o /dev/null -w "%{http_code}" http://localhost:8788/does-not-exist` outputs exactly `404`.
 
 ## Phase 5: Security & Final NFR Auditing
