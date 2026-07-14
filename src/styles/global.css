@@ -6,6 +6,7 @@
   --text-muted: #64748B;
   --accent-primary: #2A9D8F;
   --border-color: #2E2E2E;
+  --text-tag: #CBD5E1;
   /* stylelint-enable color-no-hex */
   --border-radius: 8px; /* 6px to 8px range from SDD */
   --border-radius-sm: 6px;
