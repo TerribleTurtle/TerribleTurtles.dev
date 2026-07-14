@@ -27,3 +27,9 @@
 - **The "Semantic Accessibility" Rule:** Mandatory use of correct HTML semantics (no `<div>` buttons) and ARIA labels.
 - **The "Amnesia" Preventer:** Stack lockdown to Astro and Cloudflare. Agents must not import React, Vue, or unapproved frameworks.
 - **Code Transparency:** The website repository will be Open Source to demonstrate clean architecture and AI management practices.
+
+## 7. The "Quiet Workshop" Tone (Content Generation)
+- **Pseudonymous Identity:** "TerribleTurtles" is the user's online pseudonym. The site is built by a solo developer, not a faceless corporate brand. 
+- **Voice:** Always use **First-Person Singular ("I")** when generating copy for the platform. Strictly omit the user's real name.
+- **Vibe:** Minimalist, direct, open, and factual. Avoid marketing fluff, pretentious hacker personas ("I go by the name..."), or aggressive anti-tracking rants. Let the work speak for itself.
+- **Scope Promises:** Never make sweeping promises about the tools hosted here (e.g., do not claim *every* tool will be "accessible and fast"). The *platform shell* is static and secure, but the tools themselves are experimental and unboxed.

@@ -38,3 +38,9 @@
 *   **Axe-core against `astro dev --background`:** Rejected. `npx wrangler dev` natively runs `workerd` correctly, serves the built edge assets perfectly, and allows for robust `curl` and `axe-core` verification.
 *   **Strict `style-src 'self'` CSP:** Rejected. It completely blocks Astro's default CSS inlining optimization and Shiki syntax highlighting, which natively inject `<style>` blocks. `style-src` MUST include `'unsafe-inline'`. (Note: `script-src` remains strictly locked down to prevent XSS).
 *   **Default Cloudflare Pages NPM Install (`npm ci`):** Rejected. Modern NPM strictly enforces peer dependencies (like `eslint-plugin-jsx-a11y` failing on newer `eslint` versions), causing automated Cloudflare builds to fail with `ERESOLVE`. We MUST maintain an `.npmrc` with `legacy-peer-deps=true` in the project root to ensure Cloudflare Pages successfully builds without manual intervention.
+
+## 4. The "Quiet Workshop" Tone (Content Generation)
+*   **Pseudonymous Identity:** "TerribleTurtles" is the user's online pseudonym. The site is built by a solo developer, not a faceless corporate brand. 
+*   **Voice:** Always use **First-Person Singular ("I")** when generating copy for the platform. Strictly omit the user's real name.
+*   **Vibe:** Minimalist, direct, open, and factual. Avoid marketing fluff, pretentious hacker personas ("I go by the name..."), or aggressive anti-tracking rants. Let the work speak for itself.
+*   **Scope Promises:** Never make sweeping promises about the tools hosted here (e.g., do not claim *every* tool will be "accessible and fast"). The *platform shell* is static and secure, but the tools themselves are experimental and unboxed.
