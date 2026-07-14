@@ -1,4 +1,10 @@
 ---
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/fira-code/400.css';
+import '@fontsource/fira-code/500.css';
 import '../styles/global.css';
 
 interface Props {
@@ -19,9 +25,7 @@ const { title = 'TerribleTurtles.dev', description = 'A highly performant portfo
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to main content</a>
