@@ -1,0 +1,53 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="document-container">
+    <slot />
+  </div>
+</BaseLayout>
+
+<style>
+  .document-container {
+    width: 100%;
+    /* Align with the homepage's vertical rhythm */
+    padding-bottom: var(--space-2xl); 
+  }
+
+  /* Treat the H1 like a homepage Hero / Section header */
+  .document-container :global(h1) {
+    font-size: clamp(2.5rem, 5vw + 1rem, 4.5rem);
+    margin-top: 0;
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+    letter-spacing: -0.02em;
+  }
+
+  /* Style other headings */
+  .document-container :global(h2), .document-container :global(h3) {
+    color: var(--text-primary);
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-md);
+  }
+
+  /* Constrain the reading text but keep it left-aligned to match the flow */
+  .document-container :global(p) {
+    max-width: 65ch;
+    color: var(--text-primary);
+    opacity: 0.85;
+    font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+    line-height: 1.7;
+    margin-bottom: var(--space-md);
+  }
+</style>
