@@ -1,0 +1,8 @@
+# TerribleTurtles.dev
+
+A highly performant portfolio and tool-hosting platform.
+
+This site is statically generated and hosted via Cloudflare Pages.
+Tools hosted here are experimental and focus on performance, accessibility, and utility.
+
+Sitemap: https://terribleturtles.dev/sitemap-index.xml
