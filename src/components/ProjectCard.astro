@@ -7,18 +7,19 @@ interface Props {
 }
 
 const { title, description, link, tags = [] } = Astro.props;
+const descId = desc-;
 ---
 
 <article class="project-card">
   <header>
-    <h3><a href={link} class="card-link">{title}</a></h3>
+    <h3><a href={link} class="card-link" aria-describedby={descId}>{title}</a></h3>
   </header>
   <div class="content">
-    <p>{description}</p>
+    <p id={descId}>{description}</p>
   </div>
   {tags.length > 0 && (
     <footer>
-      <ul class="tags">
+      <ul class="tags" aria-label="Project tags">
         {tags.map((tag) => (
           <li>{tag}</li>
         ))}
@@ -32,11 +33,11 @@ const { title, description, link, tags = [] } = Astro.props;
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--space-md);
     background-color: var(--surface-card);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: 1.5rem;
+    padding: var(--space-lg);
     color: var(--text-primary);
     transition: transform 0.2s ease, border-color 0.2s ease;
     height: 100%;
@@ -87,7 +88,7 @@ const { title, description, link, tags = [] } = Astro.props;
   .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--space-sm);
     list-style: none;
     padding: 0;
     margin: 0;
@@ -96,10 +97,10 @@ const { title, description, link, tags = [] } = Astro.props;
   .tags li {
     font-family: var(--font-mono);
     font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
+    padding: var(--space-xs) var(--space-sm);
     background-color: var(--bg-base);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
-    color: var(--text-muted);
+    color: #CBD5E1;
   }
 </style>

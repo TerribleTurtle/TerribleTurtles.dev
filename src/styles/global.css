@@ -3,12 +3,18 @@
   --bg-base: #121212;
   --surface-card: #1C1C1C;
   --text-primary: #F4F4F4;
-  --text-muted: #94A3B8;
+  --text-muted: #64748B;
   --accent-primary: #2A9D8F;
   --border-color: #2E2E2E;
   /* stylelint-enable color-no-hex */
   --border-radius: 8px; /* 6px to 8px range from SDD */
   --border-radius-sm: 6px;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 2.5rem;
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'Fira Code', monospace;
 }
@@ -27,9 +33,16 @@ html, body {
   box-sizing: border-box;
 }
 
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
 a {
   color: var(--accent-primary);
-  text-decoration: underline;
+  text-decoration: none;
+  transition: text-decoration-color 0.2s ease;
 }
 
 *:focus-visible {
@@ -39,4 +52,6 @@ a {
 
 a:hover {
   text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
