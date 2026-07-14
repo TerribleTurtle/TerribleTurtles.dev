@@ -76,3 +76,17 @@ This document serves as the ultra-detailed, strict checklist for AI agents. An a
 *   *Test 2 (Deployment Blocker):* Inject a `color: #ff0000;` into a scratch file and run `npm run build`. The command MUST fail with exit code 1.
 *   *Test 3 (Variable Enforcement):* `grep -q "stylelint-declaration-use-variable" package.json` succeeds.
 
+## Phase 7: UI/UX Professional Polish
+**Goal:** Resolve scaling issues, fix visual artifacts, and transition to a full-bleed grid architecture.
+- `[x]` **7.1 Full-Bleed Architecture:** Update `BaseLayout.astro` and `global.css` to allow header/footer to span 100% width while the `.container` restricts inner content.
+- `[x]` **7.2 Fluid Grid:** Update `ProjectCard.astro` and grid layouts to dynamically scale down without horizontal scrolling.
+- `[x]` **7.3 Sticky Footer:** Convert the body to a Flexbox column with `min-height: 100vh` to anchor the footer.
+- `[x]` **7.4 Visual Artifact Fix:** Refactor the `.skip-link` accessibility pattern to use `clip-path: inset(50%)` instead of `clip: rect(...)`, resolving the green artifact glitch and passing Stylelint v17 deprecation rules.
+
+## Phase 8: Fluid Typography & Wide-Screen Adaptation
+**Goal:** Transition static pixel tokens to mathematical fluid `clamp()` functions for native large-screen scaling.
+- `[x]` **8.1 Wide Container:** Increase `.container` max-width from `900px` to `1200px` to utilize 1440p displays.
+- `[x]` **8.2 Fluid Spaces:** Convert `--space` padding tokens to CSS `clamp()` in `global.css`.
+- `[x]` **8.3 Fluid Typography:** Implement `clamp()` for base `html` font size and hero text in `index.astro`.
+**Automated Verifiable Outcomes:**
+*   *Test 1 (CSS Parsing):* `npm run lint:css` validates `clamp()` usage without stylelint errors.
