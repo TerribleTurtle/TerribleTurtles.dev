@@ -9,7 +9,7 @@ const sites = readmes.filter(p => p.data.type === 'site');
 
 <BaseLayout title="Sites | TerribleTurtles.dev" description="A collection of sites.">
   <section class="bucket-section">
-    <h2>Sites</h2>
+    <h1>Sites</h1>
     <div class="project-grid">
       {sites.map(project => (
         <ProjectCard 
@@ -17,6 +17,7 @@ const sites = readmes.filter(p => p.data.type === 'site');
           description={project.data.description || ''} 
           link={`/sites/${project.id}`} 
           tags={['site', project.data.status]} 
+          headingLevel="h2"
         />
       ))}
       {sites.length === 0 && <p class="empty-state">No sites found.</p>}
@@ -29,7 +30,7 @@ const sites = readmes.filter(p => p.data.type === 'site');
     margin-bottom: 4rem;
   }
 
-  .bucket-section h2 {
+  .bucket-section h1 {
     font-size: 2rem;
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;

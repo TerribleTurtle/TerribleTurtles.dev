@@ -15,7 +15,7 @@
     "astro": "astro",
     "deploy": "npm run build",
     "test": "vitest run",
-    "audit": "node scripts/audit.mjs",
+    "audit": "start-server-and-test preview http://localhost:4321 'node scripts/audit.mjs'",
     "prepare": "husky"
   },
   "dependencies": {
@@ -36,6 +36,7 @@
     "lint-staged": "^17.0.8",
     "postcss": "^8.5.19",
     "postcss-html": "^1.8.1",
+    "start-server-and-test": "^3.0.11",
     "stylelint": "^17.14.0",
     "stylelint-config-astro": "^2.0.0",
     "stylelint-config-standard": "^40.0.0",

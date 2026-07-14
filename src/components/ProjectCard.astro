@@ -4,15 +4,17 @@ interface Props {
   description: string;
   link: string;
   tags?: string[];
+  headingLevel?: "h2" | "h3";
 }
 
-const { title, description, link, tags = [] } = Astro.props;
-const descId = `desc-${title.toLowerCase().replace(/\\W+/g, '-')}`;
+const { title, description, link, tags = [], headingLevel = "h3" } = Astro.props;
+const descId = `desc-${title.toLowerCase().replace(/\W+/g, '-')}`;
+const TitleTag = headingLevel;
 ---
 
 <article class="project-card">
   <header>
-    <h3><a href={link} class="card-link" aria-describedby={descId}>{title}</a></h3>
+    <TitleTag><a href={link} class="card-link" aria-describedby={descId}>{title}</a></TitleTag>
   </header>
   <div class="content">
     <p id={descId}>{description}</p>
@@ -65,6 +67,7 @@ const descId = `desc-${title.toLowerCase().replace(/\\W+/g, '-')}`;
     outline: none;
   }
 
+  header h2,
   header h3 {
     margin: 0;
     font-size: 1.25rem;
