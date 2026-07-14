@@ -37,5 +37,5 @@ jobs:
       - name: Run Accessibility Audit
         run: |
           npm run preview &
-          sleep 5
+          npx wait-on http://localhost:4321/
           npx @axe-core/cli http://localhost:4321/ http://localhost:4321/test-bitrot/ http://localhost:4321/404 http://localhost:4321/tools/test-utility/
