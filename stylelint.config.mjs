@@ -18,6 +18,12 @@ export default {
       "/^border-color$/": ["/^var\\(/", "transparent", "inherit", "initial", "currentColor", "none"],
       "/^fill$/": ["/^var\\(/", "transparent", "inherit", "initial", "currentColor", "none"],
       "/^stroke$/": ["/^var\\(/", "transparent", "inherit", "initial", "currentColor", "none"]
-    }
+    },
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        ignorePseudoClasses: ["global"]
+      }
+    ]
   }
 };
