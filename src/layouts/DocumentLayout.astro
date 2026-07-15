@@ -25,7 +25,7 @@ const { title, description } = Astro.props;
 
   /* Treat the H1 like a homepage Hero / Section header */
   .document-container :global(h1) {
-    font-size: clamp(2.5rem, 5vw + 1rem, 4.5rem);
+    font-size: var(--font-size-4xl);
     margin-top: 0;
     margin-bottom: var(--space-xl);
     padding-bottom: var(--space-md);
@@ -47,7 +47,7 @@ const { title, description } = Astro.props;
     max-width: 65ch;
     color: var(--text-primary);
     opacity: 0.85;
-    font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+    font-size: var(--font-size-base);
     line-height: 1.7;
     margin-bottom: var(--space-md);
   }
