@@ -16,6 +16,15 @@
   --space-lg: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
   --space-xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
   --space-2xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+  --font-size-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --font-size-lg: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --font-size-xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --font-size-2xl: clamp(2rem, 1.8rem + 1.5vw, 3rem);
+  --font-size-4xl: clamp(3rem, 2.5rem + 3vw, 5rem);
+  --offset-interaction: -4px;
+  --layout-card-min: 20rem;
+  --layout-content-max: 50rem;
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'Fira Code', monospace;
 }
@@ -27,11 +36,14 @@ html, body {
   background-color: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: clamp(16px, 1vw + 12px, 20px);
+  font-size: var(--font-size-base);
   line-height: 1.6;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+
+  /* Add subtle SVG noise texture */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
 * {
@@ -73,3 +85,25 @@ a:hover {
     scroll-behavior: auto !important;
   }
 }
+
+/* Staggered Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fade-in-up 0.6s ease forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }

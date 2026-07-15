@@ -86,17 +86,18 @@ While projects are intended to be zero-maintenance, external APIs deprecate.
 
 ## 6. Strict Non-Functional Requirements (NFRs)
 All NFRs must be objectively verifiable prior to deployment:
-*   **Perfect Speed:** Time to First Byte (TTFB) < 50ms and a 100/100 Lighthouse Performance score, achieved via hybrid architecture and zero unnecessary JS.
-*   **Perfect Privacy:** Zero cookies, zero third-party tracking scripts. Analytics restricted to Cloudflare Web Analytics (server-side, cookie-free).
-*   **Perfect Security:** Cloudflare enterprise DDoS protection, Turnstile bot protection, and an A+ Mozilla Observatory Score.
-*   **Perfect Accessibility:** WCAG 2.1 AA Compliant semantic HTML, high-contrast color ratios, and full screen-reader support via ARIA tagging.
+*   **Target Speed:** Time to First Byte (TTFB) < 50ms and a 100/100 Lighthouse Performance score, achieved via strict 100% static architecture and zero unnecessary JS.
+*   **Target Privacy:** Zero cookies, zero third-party tracking scripts. Analytics restricted to Cloudflare Web Analytics (server-side, cookie-free).
+*   **Target Security:** Cloudflare enterprise DDoS protection, Turnstile bot protection, and an A+ Mozilla Observatory Score.
+*   **Target Accessibility:** WCAG 2.1 AA Compliant semantic HTML, high-contrast color ratios, and full screen-reader support via ARIA tagging.
 
 **Wrangler CSP Spec Example:**
 The CSP strictly enforces domains while accommodating necessary Cloudflare utilities:
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self' https://static.cloudflareinsights.com; frame-src 'self';"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self' https://static.cloudflareinsights.com; frame-src 'self'; require-trusted-types-for 'script';"
+    Cross-Origin-Opener-Policy = "same-origin"
 
 ## 7. AI Development Guardrails & Workflow
 Crucial instructions for any LLM or AI agent interacting with the codebase:

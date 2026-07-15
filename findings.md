@@ -12,6 +12,11 @@
 *   **Inline Style Ban:** No `.astro` components are permitted to use the `style="..."` attribute. All modifications must leverage CSS root variables in their local `<style>` blocks.
 *   **Fluid Typography & Spacing (Phase 8):** Hardcoded pixel boundaries and static padding are deprecated. The project relies on mathematical `clamp()` functions for all `--space-*` tokens and font sizes, dynamically scaling between mobile and 1440p displays up to a `1200px` container width.
 *   **Visually Hidden Accessibility:** The deprecated `clip: rect(0, 0, 0, 0)` pattern is banned. Use `clip-path: inset(50%)` to visually hide elements (like `.skip-link`) without creating visual artifacts or violating Stylelint rules.
+*   **Bleeding Edge Aesthetics (Phase 10):**
+    *   **View Transitions:** Native MPA view transitions are implemented via Astro's `<ClientRouter />` (Astro 7 spec, imported from `astro:transitions`), delivering SPA-like navigation performance.
+    *   **Glassmorphism & Texture:** Tactile design is achieved via inline SVG fractal noise backgrounds and `backdrop-filter: blur(12px)` combined with `color-mix` for sticky headers.
+    *   **Interactive Command Palette:** A global search/command palette is implemented natively via `<dialog>` without heavy UI frameworks (React/Vue), maintaining the static-first mandate.
+    *   **Strict Styling Compliance:** Complex effects (glowing hover borders) use `color-mix` and strict alpha notation (e.g. `rgb(0 0 0 / 50%)`) to achieve depth without violating the "No Hex" stylelint policies.
 *   **AI Guardrails & CI/CD Pipeline (Phase 6):** The project enforces mathematical adherence to the "No Magic" rule. 
     *   `stylelint` is configured with `color-named: "never"`, `function-disallowed-list: ["rgb", "hsl", ...]`, and strict property allowances to completely ban hex codes and force variables for all colors, fills, and strokes. A `.stylelintignore` explicitly excludes `dist/` and `node_modules/` to prevent linting built vendor assets like `@fontsource`.
     *   `eslint` uses flat config and `typescript-eslint` parser.

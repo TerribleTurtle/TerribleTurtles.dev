@@ -1,4 +1,6 @@
 ---
+import { ClientRouter } from 'astro:transitions';
+import CommandPalette from '../components/CommandPalette.astro';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
@@ -11,16 +13,19 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  schemaType?: "WebSite" | "SoftwareApplication" | "Article";
 }
 
 const { 
   title = 'TerribleTurtles.dev', 
   description = 'A highly performant portfolio and tool-hosting platform.',
-  image = '/og-image.jpg'
+  image = '/og-image.jpg',
+  schemaType = "WebSite"
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const socialImageURL = new URL(image, Astro.url);
+const authorName = "TerribleTurtles";
 ---
 
 <!doctype html>
@@ -36,6 +41,7 @@ const socialImageURL = new URL(image, Astro.url);
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    <ClientRouter />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -55,9 +61,15 @@ const socialImageURL = new URL(image, Astro.url);
     <!-- eslint-disable astro/no-set-html-directive -->
     <script type="application/ld+json" is:inline set:html={JSON.stringify({
       "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "TerribleTurtles.dev",
-      "url": Astro.site?.toString()
+      "@type": schemaType,
+      "name": title,
+      "description": description,
+      "url": canonicalURL.toString(),
+      "image": socialImageURL.toString(),
+      "author": {
+        "@type": "Person",
+        "name": authorName
+      }
     })} />
     <!-- eslint-enable astro/no-set-html-directive -->
   </head>
@@ -92,6 +104,7 @@ const socialImageURL = new URL(image, Astro.url);
         </nav>
       </div>
     </footer>
+    <CommandPalette />
   </body>
 </html>
 
@@ -111,6 +124,12 @@ const socialImageURL = new URL(image, Astro.url);
   }
   
   header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    /* stylelint-disable-next-line declaration-property-value-allowed-list */
+    background-color: color-mix(in srgb, var(--bg-base) 80%, transparent);
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-color);
     width: 100%;
   }
