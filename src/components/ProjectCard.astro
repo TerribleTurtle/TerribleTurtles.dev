@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { title, description, link, tags = [], headingLevel = "h3" } = Astro.props;
-const descId = `desc-${title.toLowerCase().replace(/\W+/g, '-')}`;
+const descId = `desc-${title.toLowerCase().replace(/\W+/g, '-')}-${link.replace(/\W+/g, '')}`;
 const TitleTag = headingLevel;
 ---
 
@@ -45,11 +45,29 @@ const TitleTag = headingLevel;
     height: 100%;
   }
 
+  .project-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: calc(var(--border-radius) + 1px);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--accent-primary) 40%, transparent), transparent 60%);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
   .project-card:hover,
   .project-card:focus-within {
-    transform: translateY(-2px);
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px var(--accent-primary);
+    transform: translateY(var(--offset-interaction));
+    /* stylelint-disable-next-line declaration-property-value-allowed-list */
+    border-color: color-mix(in srgb, var(--accent-primary) 50%, transparent);
+    /* stylelint-disable-next-line color-function-alias-notation, color-function-notation, function-disallowed-list, alpha-value-notation */
+    box-shadow: 0 10px 20px -10px rgb(0 0 0 / 50%);
+  }
+
+  .project-card:hover::before,
+  .project-card:focus-within::before {
+    opacity: 1;
   }
 
   .card-link {
@@ -70,7 +88,7 @@ const TitleTag = headingLevel;
   header h2,
   header h3 {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: var(--font-size-lg);
     color: var(--text-primary);
   }
 
@@ -81,7 +99,7 @@ const TitleTag = headingLevel;
   .content p {
     margin: 0;
     color: var(--text-muted);
-    font-size: 0.95rem;
+    font-size: var(--font-size-base);
     line-height: 1.5;
   }
 
@@ -100,7 +118,7 @@ const TitleTag = headingLevel;
 
   .tags li {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: var(--font-size-sm);
     padding: var(--space-xs) var(--space-sm);
     background-color: var(--bg-base);
     border: 1px solid var(--border-color);

@@ -11,12 +11,12 @@ const sites = activeProjects.filter(p => p.data.type === 'site');
 ---
 
 <BaseLayout title="Home | TerribleTurtles.dev" description="Welcome to the portfolio.">
-  <section class="hero">
+  <section class="hero animate-fade-in-up delay-1">
     <h1>TerribleTurtles.dev</h1>
     <p class="subtitle">A collection of performant, purpose-built tools and sites.</p>
   </section>
 
-  <section class="bucket-section">
+  <section class="bucket-section animate-fade-in-up delay-2">
     <h2>Active Tools</h2>
     <div class="project-grid">
       {tools.map(project => (
@@ -31,7 +31,7 @@ const sites = activeProjects.filter(p => p.data.type === 'site');
     </div>
   </section>
 
-  <section class="bucket-section">
+  <section class="bucket-section animate-fade-in-up delay-3">
     <h2>Active Sites</h2>
     <div class="project-grid">
       {sites.map(project => (
@@ -49,34 +49,40 @@ const sites = activeProjects.filter(p => p.data.type === 'site');
 
 <style>
   .hero {
-    margin-bottom: 4rem;
+    margin-bottom: var(--space-2xl);
   }
   
   .hero h1 {
-    font-size: clamp(2.5rem, 5vw + 1rem, 4.5rem);
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-sm);
+    background: linear-gradient(to right, var(--text-primary), var(--text-muted));
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent; /* Fallback */
+    letter-spacing: -0.02em;
   }
   
   .subtitle {
-    font-size: clamp(1.1rem, 2vw + 0.5rem, 1.5rem);
+    font-size: var(--font-size-lg);
     color: var(--text-muted);
   }
 
   .bucket-section {
-    margin-bottom: 4rem;
+    margin-bottom: var(--space-2xl);
   }
 
   .bucket-section h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
     border-bottom: 1px solid var(--border-color);
   }
 
   .project-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--layout-card-min)), 1fr));
     gap: var(--space-lg);
   }
 

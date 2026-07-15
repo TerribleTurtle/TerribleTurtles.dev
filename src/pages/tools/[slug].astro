@@ -16,7 +16,7 @@ const { project } = Astro.props;
 const { Content } = await render(project);
 ---
 
-<BaseLayout title={`${project.data.title} | Tools`} description={project.data.description || ''}>
+<BaseLayout title={`${project.data.title} | Tools`} description={project.data.description || ''} schemaType="SoftwareApplication">
   {project.data.status === 'deprecated' && (
     <BitRotBanner message="Deprecated: Requires Update. This tool is no longer actively maintained." />
   )}
@@ -38,37 +38,37 @@ const { Content } = await render(project);
 
 <style>
   .tool-content {
-    max-width: 800px;
+    max-width: var(--layout-content-max);
     margin: 0 auto;
   }
   
   header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
     border-bottom: 1px solid var(--border-color);
   }
   
   h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-sm);
     color: var(--text-primary);
   }
   
   .description {
-    font-size: 1.2rem;
+    font-size: var(--font-size-lg);
     color: var(--text-muted);
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-md);
   }
   
   .meta {
     display: flex;
-    gap: 1rem;
+    gap: var(--space-md);
   }
   
   .status {
-    padding: 0.25rem 0.75rem;
+    padding: var(--space-xs) var(--space-sm);
     border-radius: var(--border-radius-sm);
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
     font-weight: 500;
     text-transform: uppercase;
     background-color: var(--surface-card);

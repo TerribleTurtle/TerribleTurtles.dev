@@ -1,0 +1,268 @@
+---
+import { getCollection } from 'astro:content';
+
+const readmes = await getCollection('readmes');
+const activeProjects = readmes.filter(r => r.data.status === 'active');
+
+const projects = activeProjects.map(p => ({
+  id: p.id,
+  title: p.data.title,
+  type: p.data.type,
+  url: `/${p.data.type}s/${p.id}`
+}));
+---
+
+<dialog id="command-palette" aria-label="Command Palette">
+  <div class="palette-container">
+    <div class="search-header">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="palette-search" placeholder="Search projects..." />
+      <button id="palette-close" aria-label="Close Command Palette">
+        <kbd>ESC</kbd>
+      </button>
+    </div>
+    <ul id="palette-results">
+      {projects.map(project => (
+        <li class="result-item" data-title={project.title.toLowerCase()} data-url={project.url}>
+          <a href={project.url} tabindex="-1">
+            <span class="result-title">{project.title}</span>
+            <span class="result-type">{project.type}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div id="palette-empty" class="hidden">
+      No projects found.
+    </div>
+  </div>
+</dialog>
+
+<script>
+  function setupCommandPalette() {
+    const dialog = document.getElementById('command-palette') as HTMLDialogElement;
+    const searchInput = document.getElementById('palette-search') as HTMLInputElement;
+    const closeBtn = document.getElementById('palette-close') as HTMLButtonElement;
+    const items = Array.from(document.querySelectorAll('.result-item')) as HTMLLIElement[];
+    const emptyState = document.getElementById('palette-empty') as HTMLDivElement;
+    
+    if (!dialog || !searchInput || !closeBtn) return;
+
+    let selectedIndex = -1;
+    let visibleItems = items;
+
+    function openPalette() {
+      dialog.showModal();
+      searchInput.value = '';
+      filterResults('');
+      searchInput.focus();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePalette() {
+      dialog.close();
+      document.body.style.overflow = '';
+    }
+
+    function filterResults(query: string) {
+      const q = query.toLowerCase().trim();
+      visibleItems = [];
+      
+      items.forEach(item => {
+        const title = item.dataset.title || '';
+        if (title.includes(q)) {
+          item.style.display = 'block';
+          visibleItems.push(item);
+        } else {
+          item.style.display = 'none';
+        }
+        item.classList.remove('selected');
+      });
+
+      if (visibleItems.length === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+      
+      selectedIndex = visibleItems.length > 0 ? 0 : -1;
+      updateSelection();
+    }
+
+    function updateSelection() {
+      visibleItems.forEach((item, index) => {
+        if (index === selectedIndex) {
+          item.classList.add('selected');
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+    }
+
+    // Event Listeners
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openPalette();
+      }
+    });
+
+    closeBtn.addEventListener('click', closePalette);
+    
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) {
+        closePalette();
+      }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      filterResults((e.target as HTMLInputElement).value);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (visibleItems.length === 0) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % visibleItems.length;
+        updateSelection();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + visibleItems.length) % visibleItems.length;
+        updateSelection();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (selectedIndex >= 0 && visibleItems[selectedIndex]) {
+          const url = visibleItems[selectedIndex].dataset.url;
+          if (url) window.location.href = url;
+        }
+      }
+    });
+  }
+
+  // Run on initial load and after view transitions
+  document.addEventListener('astro:page-load', setupCommandPalette);
+</script>
+
+<style>
+  dialog::backdrop {
+    background: color-mix(in srgb, var(--bg-base) 80%, transparent);
+    backdrop-filter: blur(4px);
+  }
+
+  dialog {
+    padding: 0;
+    margin: 10vh auto auto;
+    width: 90%;
+    max-width: 600px;
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    /* stylelint-disable-next-line color-function-alias-notation, color-function-notation, function-disallowed-list, alpha-value-notation */
+    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 50%);
+  }
+
+  .palette-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+  }
+
+  .search-header {
+    display: flex;
+    align-items: center;
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+    gap: var(--space-sm);
+  }
+
+  .search-header svg {
+    color: var(--text-muted);
+  }
+
+  #palette-search {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-family: var(--font-sans);
+    outline: none;
+  }
+  
+  #palette-search::placeholder {
+    color: var(--text-muted);
+  }
+
+  #palette-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--bg-base);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-muted);
+  }
+
+  #palette-results {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-sm);
+    overflow-y: auto;
+  }
+
+  .result-item {
+    border-radius: var(--border-radius-sm);
+  }
+
+  .result-item a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    text-decoration: none;
+    color: var(--text-primary);
+    border-radius: var(--border-radius-sm);
+    outline: none;
+  }
+
+  .result-item.selected a,
+  .result-item:hover a {
+    /* stylelint-disable-next-line declaration-property-value-allowed-list */
+    background-color: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+  }
+  
+  .result-title {
+    font-weight: 500;
+  }
+  
+  .result-type {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    text-transform: capitalize;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  #palette-empty {
+    padding: var(--space-xl);
+    text-align: center;
+    color: var(--text-muted);
+  }
+</style>
