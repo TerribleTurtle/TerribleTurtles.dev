@@ -14,7 +14,7 @@
 *   **Visually Hidden Accessibility:** The deprecated `clip: rect(0, 0, 0, 0)` pattern is banned. Use `clip-path: inset(50%)` to visually hide elements (like `.skip-link`) without creating visual artifacts or violating Stylelint rules.
 *   **Bleeding Edge Aesthetics (Phase 10):**
     *   **View Transitions:** Native MPA view transitions are implemented via Astro's `<ClientRouter />` (Astro 7 spec, imported from `astro:transitions`), delivering SPA-like navigation performance.
-    *   **Glassmorphism & Texture:** Tactile design is achieved via inline SVG fractal noise backgrounds and `backdrop-filter: blur(12px)` combined with `color-mix` for sticky headers.
+    *   **Glassmorphism & Texture:** Tactile design is achieved via inline SVG fractal noise backgrounds and `backdrop-filter: blur(12px)`. **CRITICAL WEBKIT RULE:** When applying `backdrop-filter` to a sticky header, NEVER apply it directly to the `<header>`. Apply it to a `::before` pseudo-element with `inset: 0`, `z-index: -1`, and `pointer-events: none` to prevent WebKit from swallowing pointer events and breaking navigation links.
     *   **Interactive Command Palette:** A global search/command palette is implemented natively via `<dialog>` without heavy UI frameworks (React/Vue), maintaining the static-first mandate.
     *   **Strict Styling Compliance:** Complex effects (glowing hover borders) use `color-mix` and strict alpha notation (e.g. `rgb(0 0 0 / 50%)`) to achieve depth without violating the "No Hex" stylelint policies.
 *   **AI Guardrails & CI/CD Pipeline (Phase 6):** The project enforces mathematical adherence to the "No Magic" rule. 
