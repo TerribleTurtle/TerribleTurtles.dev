@@ -127,11 +127,19 @@ const authorName = "TerribleTurtles";
     position: sticky;
     top: 0;
     z-index: 50;
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
     /* stylelint-disable-next-line declaration-property-value-allowed-list */
     background-color: color-mix(in srgb, var(--bg-base) 80%, transparent);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-color);
-    width: 100%;
+    z-index: -1;
+    pointer-events: none;
   }
   
   footer {
@@ -150,6 +158,7 @@ const authorName = "TerribleTurtles";
     clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
+    pointer-events: none;
   }
   
   .skip-link:focus-visible {
@@ -167,5 +176,6 @@ const authorName = "TerribleTurtles";
     padding: var(--space-sm) var(--space-md);
     z-index: 100;
     border-radius: var(--border-radius);
+    pointer-events: auto;
   }
 </style>
