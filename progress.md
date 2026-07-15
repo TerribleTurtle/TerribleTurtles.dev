@@ -18,3 +18,4 @@
 - Re-enabled `test-utility.md` and other deleted test fixtures to fix failing E2E tests, ensuring Playwright passes on the new design.
 - Re-factored ARIA attributes and CSS `color-mix` functions to perfectly pass the extremely strict ESLint and Stylelint config.
 - Conducted a multi-domain UI/UX audit (Design System, Usability, Responsive). Replaced hardcoded font sizes and margins in `CommandPalette.astro`, `DocumentLayout.astro`, `sites/index.astro`, and `tools/index.astro` with fluid CSS variables. Enhanced Command Palette touch targets and transitions.
+- Fixed a major layout bug where `html` had `display: flex` and `font-size: clamp(...)` causing double-scaling across all components on 1080p+ monitors and breaking pointer events for sticky headers.
