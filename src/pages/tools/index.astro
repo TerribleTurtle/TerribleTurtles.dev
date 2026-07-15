@@ -27,19 +27,19 @@ const tools = readmes.filter(p => p.data.type === 'tool');
 
 <style>
   .bucket-section {
-    margin-bottom: 4rem;
+    margin-bottom: var(--space-2xl);
   }
 
   .bucket-section h1 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
     border-bottom: 1px solid var(--border-color);
   }
 
   .project-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--layout-card-min)), 1fr));
     gap: var(--space-lg);
   }
 
