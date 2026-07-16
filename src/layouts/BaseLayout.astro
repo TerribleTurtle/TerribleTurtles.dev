@@ -43,6 +43,32 @@ const authorName = "TerribleTurtles";
     <meta name="generator" content={Astro.generator} />
     <script src="/scripts/trusted-types.js" is:inline></script>
     <ClientRouter />
+    <script is:inline>
+      document.addEventListener('astro:before-preparation', () => {
+        document.documentElement.classList.add('is-navigating');
+      });
+      document.addEventListener('astro:after-swap', () => {
+        document.documentElement.classList.remove('is-navigating');
+      });
+    </script>
+    <script>
+      import { navigate } from 'astro:transitions/client';
+
+      // Allow users to change their mind and click another link while loading
+      document.addEventListener('click', (e) => {
+        if (!document.documentElement.classList.contains('is-navigating')) return;
+        
+        const target = e.target as HTMLElement;
+        const a = target?.closest('a');
+        if (a && a.href && a.href !== window.location.href) {
+          e.preventDefault();
+          e.stopPropagation(); // Stop Astro's default click handler from ignoring this
+          
+          // Force a new navigation, superseding the current one
+          navigate(a.href);
+        }
+      }, { capture: true }); // Use capture to intercept before Astro's router
+    </script>
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
