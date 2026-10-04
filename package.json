@@ -28,7 +28,8 @@
     "audit:deps": "node scripts/audit-deps.mjs",
     "audit:signatures": "npm audit signatures",
     "check:live": "node scripts/live-check.mjs",
-    "check:observatory": "node scripts/observatory.mjs"
+    "check:observatory": "node scripts/observatory.mjs",
+    "check:dns": "node scripts/dns-audit.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

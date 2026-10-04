@@ -1,0 +1,6 @@
+{
+  "$comment": "Public hostnames that must resolve and answer HTTPS. Never list private subdomains.",
+  "hosts": [
+    "terribleturtles.dev"
+  ]
+}
