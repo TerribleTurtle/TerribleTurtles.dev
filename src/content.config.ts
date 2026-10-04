@@ -51,6 +51,7 @@ const pages = defineCollection({
       title: z.string().min(1),
       description: z.string().min(1),
       updated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional(),
+      legal: z.boolean().optional(),
     })
     .strict(),
 });

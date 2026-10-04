@@ -1,6 +1,7 @@
 ---
 title: "Security"
 description: "Security notes and how to report a problem."
+legal: true
 ---
 
 This site is a set of static files. It has no accounts, no database and no server-side code. It sends strict security headers, and those headers are checked by automated tests.

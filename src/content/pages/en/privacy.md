@@ -2,6 +2,7 @@
 title: "Privacy"
 description: "How this site handles data."
 updated: "2026-10-04"
+legal: true
 ---
 
 ## What this site does
