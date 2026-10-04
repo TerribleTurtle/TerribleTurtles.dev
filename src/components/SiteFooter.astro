@@ -6,7 +6,7 @@ interface Props {
   locale?: Locale;
 }
 
-/** Site footer: secondary links, licence line and font credits. */
+/** Site footer: secondary links and licence line. */
 const { locale: pathLocale } = splitLocale(Astro.url.pathname);
 const locale = Astro.props.locale ?? pathLocale;
 const year = new Date().getFullYear();
@@ -27,9 +27,6 @@ const year = new Date().getFullYear();
       <span>{t(locale, 'footer.codeLicense')}</span>
       <span aria-hidden="true">·</span>
       <span>{t(locale, 'footer.writingLicense')}</span>
-    </p>
-    <p class="credits">
-      {t(locale, 'footer.fontCreditsPrefix')}{' '}<a href="/fonts/Newsreader-OFL.txt">Newsreader</a>{' '}{t(locale, 'footer.fontCreditsAnd')}{' '}<a href="/fonts/InstrumentSans-OFL.txt">Instrument Sans</a>{' '}{t(locale, 'footer.fontCreditsSuffix')}
     </p>
   </div>
 </footer>
@@ -67,20 +64,5 @@ const year = new Date().getFullYear();
     gap: var(--space-2);
     color: var(--color-text-muted);
     font-size: var(--step-minus-1);
-  }
-
-  .credits {
-    color: var(--color-text-muted);
-    font-size: var(--step-minus-1);
-  }
-
-  .credits a {
-    color: inherit;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .credits a:hover {
-      color: var(--color-text);
-    }
   }
 </style>

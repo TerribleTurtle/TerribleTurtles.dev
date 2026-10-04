@@ -19,9 +19,6 @@ const en = {
   'footer.copyright': '© {year} TerribleTurtles',
   'footer.codeLicense': 'Code MIT',
   'footer.writingLicense': 'Writing CC BY-NC 4.0',
-  'footer.fontCreditsPrefix': 'Set in',
-  'footer.fontCreditsAnd': 'and',
-  'footer.fontCreditsSuffix': '(SIL Open Font License).',
   'status.live': 'Live',
   'status.experimental': 'Experimental',
   'status.archived': 'Archived',
@@ -52,7 +49,7 @@ const en = {
 export type UiKey = keyof typeof en;
 
 export const UI_SOURCE_HASH = {
-  es: 'cb27793244a7696074c63e2d19067885c7af87fb234065cf943c9063b44c2816',
+  es: 'bed2267ec6011ac87c03a48e47617bc592811b34c26532f46bc013d03e3eb5fb',
 } as const;
 
 const es: Record<UiKey, string> = {
@@ -69,9 +66,6 @@ const es: Record<UiKey, string> = {
   'footer.copyright': '© {year} TerribleTurtles',
   'footer.codeLicense': 'Código MIT',
   'footer.writingLicense': 'Textos CC BY-NC 4.0',
-  'footer.fontCreditsPrefix': 'Compuesto en',
-  'footer.fontCreditsAnd': 'y',
-  'footer.fontCreditsSuffix': '(SIL Open Font License).',
   'status.live': 'Activo',
   'status.experimental': 'Experimental',
   'status.archived': 'Archivado',

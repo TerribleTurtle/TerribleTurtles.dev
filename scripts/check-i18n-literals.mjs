@@ -28,9 +28,6 @@ import { fileURLToPath } from 'node:url';
 export const ALLOWLIST = new Set([
   'TerribleTurtles', // Solo developer pseudonym and primary site brand name
   'GitHub', // Third-party open source platform name
-  'Newsreader', // Font family name in the footer credit (proper name, never translated)
-  'Instrument', // "Instrument Sans" font family name in the footer credit
-  'Sans', // "Instrument Sans" font family name in the footer credit
 ]);
 
 export const DEFAULT_ALLOWLIST = ALLOWLIST;
