@@ -21,7 +21,10 @@
     "assets:icons": "node scripts/generate-icons.mjs",
     "assets:og": "node scripts/generate-og.mjs",
     "assets:screenshot": "node scripts/capture-screenshot.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "verify:dist": "node scripts/verify-dist.mjs",
+    "test:security": "playwright test --project=headers --project=chromium --project=firefox --project=webkit tests/security",
+    "verify:security": "npm run build && npm run verify:dist && playwright test"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
