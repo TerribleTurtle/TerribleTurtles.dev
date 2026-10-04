@@ -6,6 +6,7 @@ import policy from '../../security/policy.json';
 
 export const LOCALE_META = {
   en: { label: 'English', bcp47: 'en', ogLocale: 'en_US', dir: 'ltr' },
+  es: { label: 'Español', bcp47: 'es', ogLocale: 'es_ES', dir: 'ltr' },
 } as const satisfies Record<string, { label: string; bcp47: string; ogLocale: string; dir: 'ltr' | 'rtl' }>;
 
 export type Locale = keyof typeof LOCALE_META;

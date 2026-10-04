@@ -78,7 +78,7 @@
   "pages": {
     "$comment": "THE list of every HTML page the site builds, written once without a locale prefix. Each entry expands to every locale (default locale unprefixed, others under /<locale>/). Routes below pull from it via \"include\"; scripts/check-coverage.mjs fails the build if a built page or content project is missing here, or a listed page is not built.",
     "defaultLocale": "en",
-    "locales": ["en"],
+    "locales": ["en", "es"],
     "notFoundProbe": "/this-page-does-not-exist/",
     "entries": [
       { "path": "/", "kind": "home" },

@@ -40,6 +40,9 @@ const en = {
   'notFound.prose': 'There is nothing at this address.',
   'notFound.homeLink': 'Go to the home page',
   'page.lastUpdated': 'Last updated:',
+  'legal.translationNotice': 'This translation is provided for convenience. In case of discrepancy, the English version governs.',
+  'legal.englishVersion': 'English version',
+  'lang.switcherLabel': 'Language',
   'meta.defaultDescription': 'A personal archive of things I have built.',
   'meta.defaultImageAlt': 'TerribleTurtles: things I have built.',
   'meta.titleSuffix': ' | TerribleTurtles',
@@ -47,8 +50,52 @@ const en = {
 
 export type UiKey = keyof typeof en;
 
+const es: Record<UiKey, string> = {
+  'skip.main': 'Saltar al contenido principal',
+  'brand.homeLabel': 'TerribleTurtles, inicio',
+  'brand.home': 'Inicio',
+  'nav.primaryLabel': 'Principal',
+  'nav.work': 'Proyectos',
+  'nav.about': 'Sobre mí',
+  'lang.switcherLabel': 'Idioma',
+  'footer.navLabel': 'Pie de página',
+  'footer.privacy': 'Privacidad',
+  'footer.security': 'Seguridad',
+  'footer.copyright': '© {year} TerribleTurtles',
+  'footer.codeLicense': 'Código MIT',
+  'footer.writingLicense': 'Textos CC BY-NC 4.0',
+  'footer.fontCreditsPrefix': 'Compuesto en',
+  'footer.fontCreditsAnd': 'y',
+  'footer.fontCreditsSuffix': '(SIL Open Font License).',
+  'status.live': 'Activo',
+  'status.experimental': 'Experimental',
+  'status.archived': 'Archivado',
+  'home.title': "Cosas que he construido.",
+  'home.lede': 'Un archivo personal.',
+  'home.workHeading': 'Proyectos',
+  'project.allWork': 'Todos los proyectos',
+  'project.visit': 'Visitar {title}',
+  'project.source': 'Código en GitHub',
+  'project.externalSite': '(sitio externo)',
+  'project.year': 'Año',
+  'project.status': 'Estado',
+  'project.builtWith': 'Construido con',
+  'notFound.title': 'Página no encontrada',
+  'notFound.description': 'Página no encontrada.',
+  'notFound.heading': 'Página no encontrada',
+  'notFound.prose': 'No hay nada en esta dirección.',
+  'notFound.homeLink': 'Ir a la página de inicio',
+  'page.lastUpdated': 'Última actualización:',
+  'legal.translationNotice': 'Esta traducción se ofrece por comodidad. En caso de discrepancia, prevalece la versión en inglés.',
+  'legal.englishVersion': 'English version',
+  'meta.defaultDescription': 'Un archivo personal de cosas que he construido.',
+  'meta.defaultImageAlt': 'TerribleTurtles: cosas que he construido.',
+  'meta.titleSuffix': ' | TerribleTurtles',
+};
+
 export const ui: Record<Locale, Record<UiKey, string>> = {
   en,
+  es,
 };
 
 /** Returns the UI string for a locale. There is no runtime fallback: a missing key is a type error. */
