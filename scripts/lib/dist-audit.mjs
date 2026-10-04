@@ -72,6 +72,10 @@ export function checkHtml(policy, file, html) {
   const styleAttr = /<[a-z][^>]*\sstyle\s*=/i.exec(html);
   if (styleAttr) failures.push(`${file}: style= attribute at ${context(html, styleAttr.index)}`);
   if (/\shref\s*=\s*["']?\s*javascript:/i.test(html)) failures.push(`${file}: javascript: URL`);
+  // The build never emits /cdn-cgi/; it only appears when Cloudflare rewrites HTML at the edge
+  // (e.g. Email Address Obfuscation), which live-check runs this function against.
+  const cdnCgi = /\/cdn-cgi\//i.exec(html);
+  if (cdnCgi) failures.push(`${file}: Cloudflare edge-injected /cdn-cgi/ markup at ${context(html, cdnCgi.index)}`);
   for (const match of html.matchAll(FORBIDDEN_TAGS)) failures.push(`${file}: <${(match[1] ?? '').toLowerCase()}> element is forbidden`);
   for (const match of html.matchAll(RESOURCE_ATTR)) {
     const name = match[2] ?? '';

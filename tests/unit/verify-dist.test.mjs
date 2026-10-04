@@ -68,6 +68,10 @@ const failing = [
   ['HSTS removed from _headers', (d) => editFile(d, '_headers', (t) => t.replace(/^ {2}Strict-Transport-Security:.*\n/m, '')), /_headers.*Strict-Transport-Security.*missing/],
   ['a forbidden header in any _headers rule', (d) => editFile(d, '_headers', (t) => `${t}\n/x/*\n  Set-Cookie: a=b\n`), /_headers.*forbidden header Set-Cookie/],
   ['a required header detached with !', (d) => editFile(d, '_headers', (t) => `${t}\n/x/*\n  ! Content-Security-Policy\n`), /_headers.*removes required header Content-Security-Policy/],
+  // Markup Cloudflare zone features inject at the edge (live-check runs checkHtml on served pages too).
+  ['a Cloudflare email-obfuscation link', (d) => editFile(d, 'about/index.html', (h) => h.replace('</main>', '<a href="/cdn-cgi/l/email-protection#1a2b"><span class="__cf_email__" data-cfemail="1a2b">[email&#160;protected]</span></a></main>')), /\/cdn-cgi\//],
+  ['the Cloudflare email-decode script', (d) => editFile(d, 'about/index.html', (h) => h.replace('</body>', '<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>')), /<script> without an allowed type.*email-decode/],
+  ['the Cloudflare Web Analytics beacon', (d) => editFile(d, 'index.html', (h) => h.replace('</body>', '<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{"token":"x"}\'></script></body>')), /cloudflareinsights/],
 ];
 
 for (const [name, mutate, pattern] of failing) {

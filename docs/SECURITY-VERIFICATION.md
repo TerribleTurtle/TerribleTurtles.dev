@@ -64,7 +64,7 @@ GitHub Actions runs the verification pipeline automatically on every pull reques
 ## On-Demand Checks After Going Live
 
 Once deployed to Cloudflare, the live site can be evaluated externally using three commands:
-- `npm run check:live`: Queries live edge endpoints to verify deployed headers match local security policies.
+- `npm run check:live`: Queries live edge endpoints to verify deployed headers match local security policies, and checks every served page's HTML for scripts or `/cdn-cgi/` markup that Cloudflare features may inject at the edge.
 - `npm run check:observatory`: Submits the domain to Mozilla HTTP Observatory (target grade: A+).
 - `npm run check:dns -- --strict`: Performs strict verification of DNSSEC, CAA records, and mail anti-spoofing records (SPF, DMARC with p=reject).
 
