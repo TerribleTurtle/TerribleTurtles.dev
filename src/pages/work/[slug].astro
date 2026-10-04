@@ -63,6 +63,8 @@ const extraGraph: Record<string, unknown>[] = [softwareSourceCode, breadcrumbs];
 <BaseLayout
   title={`${title} | TerribleTurtles`}
   description={summary}
+  ogImage={`/og/${project.id}.png`}
+  imageAlt={`${title}: ${summary}`}
   extraGraph={extraGraph}
 >
   <article class="project">

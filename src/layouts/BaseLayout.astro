@@ -7,6 +7,7 @@ interface Props {
   title?: string;
   description?: string;
   /** Root-relative path to the social preview image (1200×630). */
+  ogImage?: string;
   image?: string;
   imageAlt?: string;
   /** Set on pages that must not be indexed (e.g. 404). */
@@ -19,6 +20,7 @@ const siteName = 'TerribleTurtles';
 const {
   title = siteName,
   description = 'A personal archive of things I have built.',
+  ogImage,
   image = '/og.png',
   imageAlt = 'TerribleTurtles: things I have built.',
   noindex = false,
@@ -31,7 +33,7 @@ if (!Astro.site) {
 
 const siteURL = Astro.site;
 const canonicalURL = new URL(Astro.url.pathname, siteURL);
-const socialImageURL = new URL(image, siteURL);
+const socialImageURL = new URL(ogImage ?? image, siteURL);
 
 // Inline JSON-LD is a non-executable data block (`application/ld+json`),
 // so it is not subject to `script-src` and does not weaken the CSP.
