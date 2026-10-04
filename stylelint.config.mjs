@@ -10,7 +10,7 @@ export default {
   rules: {
     'scale-unlimited/declaration-strict-value': [['/color/', 'background-color', 'border-color', 'fill', 'stroke'], { ignoreValues: ['transparent', 'inherit', 'initial', 'currentColor', 'none', '/^var\\(/i'] }],
     "color-named": "never",
-    "color-no-hex": [true, { ignoreProperties: ["/^--/"] }],
+    "color-no-hex": true,
     "function-disallowed-list": ["rgb", "rgba", "hsl", "hsla"],
     "declaration-property-value-allowed-list": {
       "/^color$/": ["/^var\\(/", "transparent", "inherit", "initial", "currentColor"],
