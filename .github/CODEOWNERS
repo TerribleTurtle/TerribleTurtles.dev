@@ -1,0 +1,12 @@
+# Security-critical configuration, headers, tests, scripts, and build definitions.
+# Any edits affecting security policies, headers, workflow gates, or dependencies require codeowner review.
+
+* @TerribleTurtle
+
+/.github/ @TerribleTurtle
+/public/_headers @TerribleTurtle
+/security/ @TerribleTurtle
+/tests/security/ @TerribleTurtle
+/scripts/ @TerribleTurtle
+/package-lock.json @TerribleTurtle
+/wrangler.jsonc @TerribleTurtle
