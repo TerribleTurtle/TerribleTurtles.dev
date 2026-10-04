@@ -48,14 +48,17 @@ const { Content } = await render(project);
     {
       screenshot && (
         <figure class="shot">
-          <img
-            src={`/images/work/${project.id}.jpg`}
-            alt={screenshot.alt}
-            width={screenshot.width}
-            height={screenshot.height}
-            decoding="async"
-            loading="eager"
-          />
+          <picture>
+            <source type="image/webp" srcset={`/images/work/${project.id}.webp`} />
+            <img
+              src={`/images/work/${project.id}.jpg`}
+              alt={screenshot.alt}
+              width={screenshot.width}
+              height={screenshot.height}
+              decoding="async"
+              loading="eager"
+            />
+          </picture>
         </figure>
       )
     }

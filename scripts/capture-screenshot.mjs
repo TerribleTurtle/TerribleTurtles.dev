@@ -13,6 +13,7 @@
 import { chromium } from '@playwright/test';
 import { mkdirSync, statSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { encodeWebpFromJpeg } from './encode-webp.mjs';
 
 const MAX_BYTES = 250 * 1024;
 
@@ -57,6 +58,12 @@ try {
   await page.evaluate(() => document.fonts.ready);
   mkdirSync(dirname(out), { recursive: true });
   await page.screenshot({ path: out, type: 'jpeg', quality });
+  if (out.endsWith('.jpg') || out.endsWith('.jpeg')) {
+    const webpOut = out.replace(/\.jpe?g$/i, '.webp');
+    await encodeWebpFromJpeg(page, out, webpOut, 0.8);
+    const webpBytes = statSync(webpOut).size;
+    console.log(`Saved ${webpOut}: ${(webpBytes / 1024).toFixed(1)} KB`);
+  }
 } finally {
   await browser.close();
 }
