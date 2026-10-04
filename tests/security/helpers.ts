@@ -1,7 +1,8 @@
 import type { Page, Route } from '@playwright/test';
-import { loadPolicy } from '../../scripts/lib/policy.mjs';
+import { loadPolicy, localePath } from '../../scripts/lib/policy.mjs';
 
 export const policy = loadPolicy();
+export { localePath };
 export const EMBEDDER = `http://127.0.0.1:${process.env.TT_EMBEDDER_PORT ?? '8790'}`;
 
 /** Records every `securitypolicyviolation` event (directive, blocked URI, sample) into window.__ttCspViolations. */

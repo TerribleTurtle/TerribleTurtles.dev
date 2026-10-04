@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import { policy } from './helpers';
 
 interface GraphNode {
@@ -51,20 +52,19 @@ test.describe('Structured data and social preview cards', () => {
     expect(profile?.mainEntity?.['@id']).toBe(person?.['@id']);
   });
 
-  const projects = [
-    {
-      path: '/work/spellcastersdb/',
-      id: 'spellcastersdb',
-      repo: 'https://github.com/TerribleTurtle/spellcastersdb',
-    },
-    {
-      path: '/work/spellcasters-community-api/',
-      id: 'spellcasters-community-api',
-      repo: 'https://github.com/TerribleTurtle/spellcasters-community-api',
-    },
-  ];
+  const projects = policy.pages.expanded
+    .filter((p) => p.kind === 'project' && p.id !== undefined)
+    .map((p) => {
+      const id = p.id!;
+      const mdPath = new URL(`../../src/content/projects/${id}.md`, import.meta.url);
+      const md = readFileSync(mdPath, 'utf8');
+      const repoMatch = md.match(/^repo:\s*["']?([^"'\r\n]+)["']?/m);
+      const repo = repoMatch ? repoMatch[1].trim() : undefined;
+      const ogPath = p.locale === policy.pages.defaultLocale ? `/og/${id}.png` : `/og/${p.locale}/${id}.png`;
+      return { path: p.path, id, repo, ogPath };
+    });
 
-  for (const { path, id, repo } of projects) {
+  for (const { path, repo, ogPath } of projects) {
     test(`${path} graph contains SoftwareSourceCode and BreadcrumbList, and valid og:image`, async ({
       page,
       request,
@@ -83,9 +83,8 @@ test.describe('Structured data and social preview cards', () => {
 
       const ogImage = await page.locator('meta[property="og:image"]').getAttribute('content');
       expect(ogImage).toBeTruthy();
-      expect(ogImage?.endsWith(`/og/${id}.png`)).toBe(true);
+      expect(ogImage?.endsWith(ogPath)).toBe(true);
 
-      const ogPath = `/og/${id}.png`;
       const ogResponse = await request.get(ogPath);
       expect(ogResponse.status()).toBe(200);
       expect(ogResponse.headers()['content-type']).toContain('image/png');

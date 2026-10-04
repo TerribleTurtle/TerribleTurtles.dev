@@ -1,12 +1,14 @@
 import { test, expect, type ConsoleMessage } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { policy, localePath } from '../security/helpers';
 
 /**
  * Accessibility + structure checks for every route, in both colour schemes.
  * Runs against the built site (`astro preview`, see playwright.config.ts).
  */
-const NOT_FOUND = '/this-page-does-not-exist/';
-const routes = ['/', '/about/', '/privacy/', '/security/', '/work/spellcastersdb/', '/work/spellcasters-community-api/', NOT_FOUND] as const;
+const notFoundRoutes = policy.pages.locales.map((locale) => localePath(policy.pages, locale, policy.pages.notFoundProbe));
+const notFoundSet = new Set(notFoundRoutes);
+const routes = [...policy.pages.expanded.map((p) => p.path), ...notFoundRoutes];
 const schemes = ['dark', 'light'] as const;
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
@@ -43,13 +45,13 @@ for (const route of routes) {
     page.on('console', (message: ConsoleMessage) => {
       if (message.type() !== 'error') return;
       // The 404 route legitimately answers 404; Chromium logs that for the document itself.
-      const isExpected404 = route === NOT_FOUND && message.text().includes('status of 404');
+      const isExpected404 = notFoundSet.has(route) && message.text().includes('status of 404');
       if (!isExpected404) errors.push(message.text());
     });
     page.on('pageerror', (error) => errors.push(error.message));
 
     const response = await page.goto(route);
-    expect(response?.status()).toBe(route === NOT_FOUND ? 404 : 200);
+    expect(response?.status()).toBe(notFoundSet.has(route) ? 404 : 200);
 
     await expect(page.locator('h1')).toHaveCount(1);
 
