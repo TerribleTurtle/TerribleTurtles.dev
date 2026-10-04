@@ -49,8 +49,7 @@
     { "name": "Referrer-Policy", "equals": "no-referrer" },
     { "name": "Strict-Transport-Security", "equals": "max-age=63072000; includeSubDomains; preload" },
     { "name": "X-Content-Type-Options", "equals": "nosniff" },
-    { "name": "X-Frame-Options", "equals": "DENY" },
-    { "name": "Speculation-Rules", "equals": "\"/speculationrules.json\"" }
+    { "name": "X-Frame-Options", "equals": "DENY" }
   ],
   "permissionsPolicy": {
     "$comment": "Every listed feature must be present and denied with (). Any feature with an allowlist other than () fails. Only features Chromium recognizes are listed (unknown ones log console errors, which the runtime tests reject).",
@@ -98,7 +97,6 @@
     { "class": "svg", "paths": ["/favicon.svg"], "status": 200, "contentType": "image/svg+xml" },
     { "class": "security-txt", "paths": ["/.well-known/security.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },
     { "class": "llms-txt", "paths": ["/llms.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },
-    { "class": "speculation-rules", "paths": ["/speculationrules.json"], "status": 200, "contentType": "application/speculationrules+json" },
     { "class": "sitemap", "paths": ["/sitemap-index.xml"], "status": 200, "contentType": "application/xml" },
     { "class": "robots", "paths": ["/robots.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },
     { "class": "redirect", "paths": ["/about"], "status": 307, "location": "/about/" }
@@ -114,7 +112,7 @@
     "forbiddenExtensions": [".js", ".mjs", ".cjs"],
     "allowedScriptTypes": ["application/ld+json"],
     "forbiddenStrings": ["Test Bitrot", "Fixture", "CheckModsExtended"],
-    "requiredFiles": ["_headers", "index.html", "404.html", ".well-known/security.txt", "speculationrules.json"],
+    "requiredFiles": ["_headers", "index.html", "404.html", ".well-known/security.txt"],
     "$comment_ws": "Astro 7 whitespace regression (findings.md, Rejected Approaches): text glued to an inline link.",
     "whitespaceRegressionPatterns": ["[A-Za-z0-9,;:]<a\\s", "</a>[A-Za-z0-9]"]
   },

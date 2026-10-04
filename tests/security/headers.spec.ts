@@ -51,12 +51,10 @@ test('the HTML CSP parses to exactly the policy directives (directive-by-directi
   }
 });
 
-test('response bodies: security.txt, speculation rules and the 404 page are the real files', async ({ request }) => {
+test('response bodies: security.txt and the 404 page are the real files', async ({ request }) => {
   const txt = await (await request.get('/.well-known/security.txt')).text();
   expect(txt).toContain(`Contact: ${policy.securityTxt.requiredContact}`);
   expect(txt).toMatch(/^Expires: \S+$/m);
-  const rules: unknown = JSON.parse(await (await request.get('/speculationrules.json')).text());
-  expect(rules).toHaveProperty('prerender');
   const notFound = await request.get('/this-page-does-not-exist/');
   expect(notFound.status()).toBe(404);
   expect(await notFound.text()).toContain('<h1');

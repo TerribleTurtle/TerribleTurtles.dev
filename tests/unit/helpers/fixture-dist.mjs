@@ -50,7 +50,6 @@ export function makePassingDist(policy, now) {
     '404.html': PAGE.replace('Fixture page', 'Not found'),
     'about/index.html': PAGE.replace('Fixture page', 'About'),
     '.well-known/security.txt': renderSecurityTxt(now, 200),
-    'speculationrules.json': '{"prerender":[{"where":{"href_matches":"/*"},"eagerness":"moderate"}]}',
     '_astro/site.abc123.css': 'body{font-family:serif}@font-face{src:url(/fonts/a.woff2)}',
   };
   for (const [name, content] of Object.entries(files)) writeFile(root, name, content);
