@@ -78,13 +78,13 @@ const extraGraph: Record<string, unknown>[] = [softwareSourceCode, breadcrumbs];
 
     <ul class="links">
       <li>
-        <a href={url} rel="noopener noreferrer">Visit {title}<span aria-hidden="true"> ↗</span></a>
+        <a href={url} rel="noopener noreferrer">Visit {title}<span aria-hidden="true"> ↗</span><span class="visually-hidden"> (external site)</span></a>
       </li>
       {
         repo && (
           <li>
             <a href={repo} rel="noopener noreferrer">
-              Source on GitHub<span aria-hidden="true"> ↗</span>
+              Source on GitHub<span aria-hidden="true"> ↗</span><span class="visually-hidden"> (external site)</span>
             </a>
           </li>
         )
