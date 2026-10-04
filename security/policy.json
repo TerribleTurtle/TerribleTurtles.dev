@@ -92,7 +92,7 @@
     "$comment": "Requests carrying these Host headers must (noindex) or must not (indexable) get X-Robots-Tag: noindex. Account subdomain is a placeholder; the _headers rules use :placeholders.",
     "header": "X-Robots-Tag",
     "value": "noindex",
-    "noindexHosts": ["terribleturtles-dev.example-account.workers.dev", "0123abcd-terribleturtles-dev.example-account.workers.dev"],
+    "noindexHosts": ["terribleturtles-site.example-account.workers.dev", "0123abcd-terribleturtles-site.example-account.workers.dev"],
     "indexableHosts": ["terribleturtles.dev"]
   },
   "dist": {
