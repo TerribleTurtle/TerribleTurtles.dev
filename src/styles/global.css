@@ -47,6 +47,8 @@ h3 {
   font-weight: var(--weight-regular);
   line-height: var(--leading-tight);
   text-wrap: balance;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 p,
@@ -76,9 +78,11 @@ a {
     text-underline-offset var(--duration-fast) var(--ease-out);
 }
 
-a:hover {
-  color: var(--color-text);
-  text-underline-offset: var(--underline-offset-hover);
+@media (hover: hover) and (pointer: fine) {
+  a:hover {
+    color: var(--color-text);
+    text-underline-offset: var(--underline-offset-hover);
+  }
 }
 
 /*
@@ -101,7 +105,15 @@ a:hover {
   width: 100%;
   max-width: calc(var(--measure) + var(--gutter) * 2);
   margin-inline: auto;
-  padding-inline: var(--gutter);
+  padding-inline: max(var(--gutter), env(safe-area-inset-left))
+    max(var(--gutter), env(safe-area-inset-right));
+}
+
+@media (horizontal-viewport-segments: 2) {
+  .wrap {
+    max-inline-size: calc(env(viewport-segment-width 0 0) - var(--gutter) * 2);
+    margin-inline: 0 auto;
+  }
 }
 
 main {
@@ -124,6 +136,13 @@ main:focus {
 .page-title {
   font-size: var(--step-4);
   letter-spacing: var(--tracking-tight);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.row-title {
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 /* Long-form text pages (about, privacy, security). */
@@ -162,8 +181,8 @@ main:focus {
 
 .skip-link:focus-visible {
   position: fixed;
-  inset-block-start: var(--space-3);
-  inset-inline-start: var(--space-3);
+  inset-block-start: max(var(--space-3), env(safe-area-inset-top));
+  inset-inline-start: max(var(--space-3), env(safe-area-inset-left));
   z-index: var(--z-skip-link);
   padding: var(--space-2) var(--space-4);
   background-color: var(--color-surface);

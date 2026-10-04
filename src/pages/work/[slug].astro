@@ -146,12 +146,24 @@ const extraGraph: Record<string, unknown>[] = [softwareSourceCode, breadcrumbs];
     font-size: var(--step-minus-1);
   }
 
+  .back a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--target-min);
+  }
+
   .links {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3) var(--space-5);
     padding: 0;
     list-style: none;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--target-min);
   }
 
   .shot img {
@@ -163,7 +175,7 @@ const extraGraph: Record<string, unknown>[] = [softwareSourceCode, breadcrumbs];
 
   .facts {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(var(--column-min), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--column-min)), 1fr));
     gap: var(--space-4);
     padding-block: var(--space-4);
     border-block: var(--border-hairline) solid var(--color-hairline);

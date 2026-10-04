@@ -44,6 +44,12 @@ const year = new Date().getFullYear();
     list-style: none;
   }
 
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--target-min);
+  }
+
   .colophon {
     display: flex;
     flex-wrap: wrap;
@@ -62,7 +68,9 @@ const year = new Date().getFullYear();
     color: inherit;
   }
 
-  .credits a:hover {
-    color: var(--color-text);
+  @media (hover: hover) and (pointer: fine) {
+    .credits a:hover {
+      color: var(--color-text);
+    }
   }
 </style>

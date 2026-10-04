@@ -54,6 +54,8 @@ const { projects } = Astro.props;
     font-size: var(--step-0);
     font-weight: var(--weight-medium);
     line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+    hyphens: auto;
   }
 
   /* Whole row is clickable; the accessible name stays the project title. */
@@ -66,12 +68,18 @@ const { projects } = Astro.props;
   .row-title a {
     display: inline-block;
     transition: color var(--duration-fast) var(--ease-out),
-      transform var(--duration-base) var(--ease-out);
+      translate var(--duration-base) var(--ease-out);
   }
 
-  .row:hover .row-title a {
-    color: var(--color-text);
-    transform: translateX(var(--nudge));
+  @media (hover: hover) and (pointer: fine) {
+    .row:hover .row-title a {
+      color: var(--color-text);
+      translate: var(--nudge) 0;
+    }
+
+    :dir(rtl) .row:hover .row-title a {
+      translate: var(--nudge-rtl) 0;
+    }
   }
 
   .row-summary {

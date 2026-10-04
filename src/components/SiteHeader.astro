@@ -48,6 +48,7 @@ const navItems = [
   .brand {
     display: inline-flex;
     align-items: center;
+    min-block-size: var(--target-min);
     gap: var(--space-3);
     color: var(--color-text);
     text-decoration: none;
@@ -59,16 +60,8 @@ const navItems = [
     letter-spacing: var(--tracking-tight);
   }
 
-  .brand:hover {
-    color: var(--color-text);
-  }
-
   .brand :global(.scute-mark) {
     transition: transform var(--duration-slow) var(--ease-out);
-  }
-
-  .brand:hover :global(.scute-mark) {
-    transform: rotate(var(--mark-turn));
   }
 
   ul {
@@ -79,11 +72,27 @@ const navItems = [
   }
 
   nav a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--target-min);
     text-decoration-color: transparent;
   }
 
-  nav a:hover,
   nav a[aria-current] {
     text-decoration-color: currentcolor;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .brand:hover {
+      color: var(--color-text);
+    }
+
+    .brand:hover :global(.scute-mark) {
+      transform: rotate(var(--mark-turn));
+    }
+
+    nav a:hover {
+      text-decoration-color: currentcolor;
+    }
   }
 </style>
