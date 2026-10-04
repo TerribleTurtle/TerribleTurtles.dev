@@ -1,0 +1,16 @@
+# TerribleTurtles
+
+> A personal archive of things I've built.
+
+I am a solo developer using the pseudonym TerribleTurtles. This site is a personal archive of things I have built.
+
+## Projects
+
+- [SpellcastersDB](https://terribleturtles.dev/work/spellcastersdb/): Community database and deck builder for Spellcasters Chronicles.
+- [Spellcasters Community API](https://terribleturtles.dev/work/spellcasters-community-api/): Free, open-source community API for Spellcasters Chronicles.
+
+## Pages
+
+- [About](https://terribleturtles.dev/about/): About TerribleTurtles and this archive.
+- [Privacy](https://terribleturtles.dev/privacy/): Privacy policy and edge infrastructure.
+- [Security](https://terribleturtles.dev/security/): Security architecture and vulnerability disclosure.

@@ -20,6 +20,9 @@
 /.well-known/security.txt
   Content-Type: text/plain; charset=utf-8
 
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+
 # Content-hashed build output: safe to cache forever.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
