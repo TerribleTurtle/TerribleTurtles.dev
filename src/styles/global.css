@@ -168,6 +168,12 @@ main:focus {
   font-size: var(--step-minus-1);
 }
 
+.notice {
+  margin-block-start: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--step-minus-1);
+}
+
 /* ---- Utilities ---------------------------------------------------------- */
 .visually-hidden,
 .skip-link:not(:focus-visible) {

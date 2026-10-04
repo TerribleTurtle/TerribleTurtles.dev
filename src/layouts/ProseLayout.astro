@@ -1,6 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import { splitLocale, LOCALE_META, type Locale } from '../i18n/locales';
+import { splitLocale, defaultLocale, LOCALE_META, type Locale } from '../i18n/locales';
 import { t } from '../i18n/ui';
 
 interface Props {
@@ -9,12 +9,14 @@ interface Props {
   updated?: string;
   extraGraph?: Record<string, unknown>[];
   locale?: Locale;
+  legal?: boolean;
 }
 
-const { title, description, updated, extraGraph = [] } = Astro.props;
-const { locale: pathLocale } = splitLocale(Astro.url.pathname);
+const { title, description, updated, extraGraph = [], legal = false } = Astro.props;
+const { locale: pathLocale, basePath } = splitLocale(Astro.url.pathname);
 const locale = Astro.props.locale ?? pathLocale;
 const meta = LOCALE_META[locale];
+const isNonDefaultLegal = legal && locale !== defaultLocale;
 
 const formattedUpdated = updated
   ? new Intl.DateTimeFormat(meta.bcp47, { dateStyle: 'long', timeZone: 'UTC' }).format(
@@ -30,6 +32,14 @@ const formattedUpdated = updated
   locale={locale}
 >
   <h1 class="page-title">{title}</h1>
+  {
+    isNonDefaultLegal && (
+      <p class="notice">
+        {t(locale, 'legal.translationNotice')}{' '}
+        <a href={basePath} hreflang="en" lang="en">{t(locale, 'legal.englishVersion')}</a>
+      </p>
+    )
+  }
   <div class="prose">
     {
       updated && formattedUpdated && (
