@@ -113,7 +113,7 @@
     "allowedScriptTypes": ["application/ld+json"],
     "forbiddenStrings": ["Test Bitrot", "Fixture", "CheckModsExtended"],
     "requiredFiles": ["_headers", "index.html", "404.html", ".well-known/security.txt"],
-    "$comment_ws": "Astro 7 whitespace regression (findings.md, Rejected Approaches): text glued to an inline link.",
+    "$comment_ws": "Astro 7 whitespace regression: text glued to an inline link.",
     "whitespaceRegressionPatterns": ["[A-Za-z0-9,;:]<a\\s", "</a>[A-Za-z0-9]"]
   },
   "securityTxt": {

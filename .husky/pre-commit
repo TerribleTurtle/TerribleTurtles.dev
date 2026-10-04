@@ -1,3 +1,13 @@
+# Local-only files (assistant notes, one-off runbooks, scratch output) must never be committed.
+# They are excluded locally; this also catches `git add -f`.
+blocked=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^(AGENTS\.md|CLAUDE\.md|GEMINI\.md|\.agents/|\.claude/|\.gemini/|findings[^/]*\.md|progress\.md|task_plan\.md|docs/CUTOVER\.md|docs/archive/|scratch)' || true)
+if [ -n "$blocked" ]; then
+  echo "pre-commit: local-only files are staged:" >&2
+  echo "$blocked" >&2
+  echo "Unstage them with: git restore --staged <file>" >&2
+  exit 1
+fi
+
 npx lint-staged
 npm run typecheck
 npm run check:coverage
