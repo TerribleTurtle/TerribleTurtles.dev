@@ -46,7 +46,9 @@ export default defineConfig({
     },
     // Playwright 1.61 + Firefox 151: colorScheme emulation has no effect in either direction (verified with
     // scratch diagnostics), so Firefox runs only its default light scheme; dark-scheme tests skip there explicitly.
-    { name: 'firefox', testMatch: browserSpecs, use: { ...devices['Desktop Firefox'] } },
+    // retries: 1 (Firefox only): ~1 in 600 Firefox page loads never fire `load` under Playwright 1.63 / Firefox on
+    // this harness (investigated, findings.md §11). A retried test is reported as "flaky"; a real failure fails twice.
+    { name: 'firefox', testMatch: browserSpecs, retries: 1, use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', testMatch: browserSpecs, use: { ...devices['Desktop Safari'] } },
   ],
   webServer: [
