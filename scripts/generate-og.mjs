@@ -75,8 +75,6 @@ p { margin-top: 24px; font-size: 34px; color: ${c['text-muted']}; line-height: 1
 </body></html>`;
 }
 
-mkdirSync('public/og/es', { recursive: true });
-
 /** @type {{ out: string, title: string, summary: string, titleSize: number }[]} */
 const cards = [
   {
