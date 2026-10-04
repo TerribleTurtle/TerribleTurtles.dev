@@ -92,7 +92,7 @@
   --border-hairline: 1px;
   --focus-width: 2px;
   --focus-offset: 3px;
-  --focus-offset-start: 9px;
+  --focus-offset-start: calc(var(--focus-offset) * 3); /* growth-ring start: 3x the resting offset */
   --radius-s: 2px;
   --radius-m: 6px;
   --radius-round: 50%;
