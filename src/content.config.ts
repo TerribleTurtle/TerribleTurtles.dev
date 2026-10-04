@@ -32,7 +32,7 @@ const projects = defineCollection({
     /** Pre-optimised image committed under public/images/work/. */
     screenshot: z
       .object({
-        src: z.string().startsWith('/images/work/'),
+        src: z.string().startsWith('/images/work/').optional(),
         alt: z.string().min(1),
         width: z.number().int().positive(),
         height: z.number().int().positive(),

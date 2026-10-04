@@ -7,8 +7,7 @@ year: 2026
 status: "live"
 order: 1
 disclaimer: "Unofficial fan project. Not affiliated with or endorsed by Quantic Dream."
-# Verified 2026-10-04 from the repo's package.json (next, react, typescript, tailwindcss).
-stack: ["Next.js", "React", "TypeScript", "Tailwind CSS"]
+stack: ["Next.js", "TypeScript"]
 screenshot:
   src: "/images/work/spellcastersdb.jpg"
   alt: "The SpellcastersDB home page: a \"Spellcasters Chronicles Database\" heading above cards for the Deck Builder, Unit Database and Game Guide."
