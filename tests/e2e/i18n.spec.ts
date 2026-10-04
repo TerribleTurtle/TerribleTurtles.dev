@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 import { policy, localePath } from '../security/helpers';
 
@@ -33,12 +33,31 @@ const notFoundRoutes = policy.pages.locales.map((locale) =>
 const notFoundSet = new Set(notFoundRoutes);
 const allRoutes = [...policy.pages.expanded.map((p) => p.path), ...notFoundRoutes];
 
+const defaultLocalePagesDir = new URL(
+  `../../src/content/pages/${policy.pages.defaultLocale}/`,
+  import.meta.url,
+);
+const legalSlugs = readdirSync(defaultLocalePagesDir)
+  .filter((file) => file.endsWith('.md'))
+  .filter((file) => {
+    const md = readFileSync(new URL(file, defaultLocalePagesDir), 'utf8');
+    return /^legal:\s*true\b/m.test(md);
+  })
+  .map((file) => file.replace(/\.md$/, ''))
+  .sort();
+
+if (legalSlugs.length === 0) {
+  throw new Error(`i18n.spec: found 0 legal slugs in ${defaultLocalePagesDir.pathname}`);
+}
+
+const legalBasePaths = new Set(legalSlugs.map((slug) => `/${slug}/`));
+
 test.describe('i18n legal notices (8.4.6)', () => {
   for (const locale of nonDefaultLocales) {
-    for (const legalSlug of ['privacy', 'security']) {
+    for (const legalSlug of legalSlugs) {
       const legalRoute = `/${locale}/${legalSlug}/`;
 
-      test(`es legal page ${legalRoute} has translation notice linking to English version`, async ({ page }) => {
+      test(`${locale} legal page ${legalRoute} has translation notice linking to English version`, async ({ page }) => {
         await page.goto(legalRoute);
 
         const notice = page.locator('p.notice');
@@ -58,7 +77,7 @@ test.describe('i18n legal notices (8.4.6)', () => {
     }
   }
 
-  const englishLegalRoutes = ['/privacy/', '/security/'];
+  const englishLegalRoutes = legalSlugs.map((slug) => `/${slug}/`);
   for (const route of englishLegalRoutes) {
     test(`English legal page ${route} has no notice`, async ({ page }) => {
       await page.goto(route);
@@ -66,14 +85,11 @@ test.describe('i18n legal notices (8.4.6)', () => {
     });
   }
 
-  const esNonLegalRoutes = [
-    '/es/',
-    '/es/about/',
-    '/es/work/spellcastersdb/',
-    '/es/work/spellcasters-community-api/',
-  ];
-  for (const route of esNonLegalRoutes) {
-    test(`es non-legal page ${route} has no notice`, async ({ page }) => {
+  const nonLegalRoutes = policy.pages.expanded
+    .filter((p) => p.locale !== policy.pages.defaultLocale && !legalBasePaths.has(p.basePath))
+    .map((p) => p.path);
+  for (const route of nonLegalRoutes) {
+    test(`non-legal page ${route} has no notice`, async ({ page }) => {
       await page.goto(route);
       await expect(page.locator('p.notice')).toHaveCount(0);
     });

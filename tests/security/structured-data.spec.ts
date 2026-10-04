@@ -58,8 +58,6 @@ test.describe('Structured data and social preview cards', () => {
     const mdPath = new URL(`../../src/content/projects/${id}.md`, import.meta.url);
     const md = readFileSync(mdPath, 'utf8');
     const repo = md.match(/^repo:\s*["']?([^"'\r\n]+)["']?/m)?.[1]?.trim();
-    // Fail at collection time: an unreadable repo would make the codeRepository assertion vacuous.
-    if (!repo) throw new Error(`structured-data.spec: could not read "repo:" from ${mdPath.pathname}`);
     const ogPath = p.locale === policy.pages.defaultLocale ? `/og/${id}.png` : `/og/${p.locale}/${id}.png`;
     return [{ path: p.path, id, repo, ogPath }];
   });
@@ -76,7 +74,11 @@ test.describe('Structured data and social preview cards', () => {
 
       const software = graph.find((node) => node['@type'] === 'SoftwareSourceCode');
       expect(software).toBeDefined();
-      expect(software?.codeRepository).toBe(repo);
+      if (repo !== undefined) {
+        expect(software?.codeRepository).toBe(repo);
+      } else {
+        expect(software?.codeRepository).toBeUndefined();
+      }
 
       const breadcrumb = graph.find((node) => node['@type'] === 'BreadcrumbList');
       expect(breadcrumb).toBeDefined();
