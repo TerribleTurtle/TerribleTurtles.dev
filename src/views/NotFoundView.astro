@@ -22,3 +22,11 @@ const { locale } = Astro.props;
     <p><a href={localizePath(locale, '/')}>{t(locale, 'notFound.homeLink')}</a></p>
   </div>
 </BaseLayout>
+
+<style>
+  .prose a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--target-min);
+  }
+</style>

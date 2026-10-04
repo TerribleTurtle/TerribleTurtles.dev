@@ -87,7 +87,7 @@ const ogImage = locale === defaultLocale ? `/og/${project.id}.png` : `/og/${loca
   locale={locale}
 >
   <article class="project">
-    <p class="back"><a href={localizePath(locale, '/')}><span aria-hidden="true">← </span>{t(locale, 'project.allWork')}</a></p>
+    <p class="back"><a href={localizePath(locale, '/')}><span class="back-arrow" aria-hidden="true">← </span>{t(locale, 'project.allWork')}</a></p>
 
     <header>
       <h1 class="page-title">{title}</h1>
@@ -166,6 +166,14 @@ const ogImage = locale === defaultLocale ? `/og/${project.id}.png` : `/og/${loca
     display: inline-flex;
     align-items: center;
     min-block-size: var(--target-min);
+  }
+
+  .back-arrow {
+    display: inline-block;
+  }
+
+  :dir(rtl) .back-arrow {
+    transform: scaleX(-1);
   }
 
   .links {

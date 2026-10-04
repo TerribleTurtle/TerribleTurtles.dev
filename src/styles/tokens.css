@@ -61,7 +61,7 @@
   --step-1: clamp(1.2rem, 1.12rem + 0.35vw, 1.375rem);
   --step-2: clamp(1.44rem, 1.3rem + 0.6vw, 1.75rem);
   --step-3: clamp(2rem, 1.6rem + 1.8vw, 3rem);
-  --step-4: clamp(2.5rem, 1.9rem + 2.8vw, 4rem);
+  --step-4: clamp(2rem, 1.9rem + 2.8vw, 4rem);
   --leading-tight: 1.1;
   --leading-snug: 1.35;
   --leading-body: 1.6;
@@ -92,6 +92,7 @@
   --border-hairline: 1px;
   --focus-width: 2px;
   --focus-offset: 3px;
+  --focus-offset-start: 9px;
   --radius-s: 2px;
   --radius-m: 6px;
   --radius-round: 50%;

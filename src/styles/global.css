@@ -90,7 +90,7 @@ a {
  * The resting offset is set on focusable elements; :focus-visible transitions it.
  */
 :where(a, [tabindex]) {
-  outline-offset: calc(var(--focus-offset) * 3);
+  outline-offset: var(--focus-offset-start);
 }
 
 :focus-visible {
@@ -107,6 +107,11 @@ a {
   margin-inline: auto;
   padding-inline: max(var(--gutter), env(safe-area-inset-left))
     max(var(--gutter), env(safe-area-inset-right));
+}
+
+:dir(rtl) .wrap {
+  padding-inline: max(var(--gutter), env(safe-area-inset-right))
+    max(var(--gutter), env(safe-area-inset-left));
 }
 
 @media (horizontal-viewport-segments: 2) {
@@ -194,6 +199,10 @@ main:focus {
   background-color: var(--color-surface);
   color: var(--color-text);
   border-radius: var(--radius-m);
+}
+
+:dir(rtl) .skip-link:focus-visible {
+  inset-inline-start: max(var(--space-3), env(safe-area-inset-right));
 }
 
 /* ---- Motion ------------------------------------------------------------- */
