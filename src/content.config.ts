@@ -39,8 +39,9 @@ const projects = defineCollection({
         width: z.number().int().positive(),
         height: z.number().int().positive(),
       })
+      .strict()
       .optional(),
-  }),
+  }).strict(),
 });
 
 export const collections = {
