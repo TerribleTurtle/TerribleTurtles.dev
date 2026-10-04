@@ -26,7 +26,8 @@
     "test:security": "playwright test --project=headers --project=chromium --project=firefox --project=webkit tests/security",
     "verify:security": "npm run build && npm run verify:dist && playwright test",
     "audit:deps": "node scripts/audit-deps.mjs",
-    "audit:signatures": "npm audit signatures"
+    "audit:signatures": "npm audit signatures",
+    "check:live": "node scripts/live-check.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
