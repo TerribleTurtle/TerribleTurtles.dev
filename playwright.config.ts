@@ -27,7 +27,16 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'headers', testMatch: 'security/headers.spec.ts' },
+    { name: 'headers', testMatch: ['security/headers.spec.ts', 'security/harness.spec.ts'] },
+    {
+      name: 'layout',
+      testMatch: 'layout/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: { args: ['--disable-features=LocalNetworkAccessChecks'] },
+        bypassCSP: true,
+      },
+    },
     {
       name: 'chromium',
       testMatch: browserSpecs,
