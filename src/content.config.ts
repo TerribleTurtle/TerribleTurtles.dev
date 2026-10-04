@@ -55,7 +55,20 @@ const pages = defineCollection({
     .strict(),
 });
 
+const projectsI18n = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/projects-i18n' }),
+  schema: z
+    .object({
+      title: z.string().min(1),
+      summary: z.string().min(1),
+      disclaimer: z.string().optional(),
+      screenshotAlt: z.string().min(1).optional(),
+    })
+    .strict(),
+});
+
 export const collections = {
   projects,
   pages,
+  projectsI18n,
 };

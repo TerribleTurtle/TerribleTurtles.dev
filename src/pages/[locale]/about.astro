@@ -1,0 +1,27 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ProseView from '../../views/ProseView.astro';
+import { nonDefaultLocales, type Locale } from '../../i18n/locales';
+
+export const getStaticPaths = (() => {
+  return nonDefaultLocales.map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const extraGraph: Record<string, unknown>[] = [
+  {
+    '@type': 'ProfilePage',
+    mainEntity: { '@id': 'https://terribleturtles.dev/#person' },
+  },
+];
+---
+
+<ProseView locale={locale} slug="about" extraGraph={extraGraph} />

@@ -1,12 +1,6 @@
 ---
-import { getEntry, render } from 'astro:content';
-import ProseLayout from '../layouts/ProseLayout.astro';
-import { splitLocale } from '../i18n/locales';
-
-const { locale } = splitLocale(Astro.url.pathname);
-const entry = await getEntry('pages', `${locale}/about`);
-if (!entry) throw new Error(`Missing page content for ${locale}/about`);
-const { Content } = await render(entry);
+import ProseView from '../views/ProseView.astro';
+import { defaultLocale } from '../i18n/locales';
 
 const extraGraph: Record<string, unknown>[] = [
   {
@@ -16,11 +10,4 @@ const extraGraph: Record<string, unknown>[] = [
 ];
 ---
 
-<ProseLayout
-  title={entry.data.title}
-  description={entry.data.description}
-  extraGraph={extraGraph}
-  locale={locale}
->
-  <Content />
-</ProseLayout>
+<ProseView locale={defaultLocale} slug="about" extraGraph={extraGraph} />

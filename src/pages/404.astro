@@ -1,20 +1,6 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { splitLocale, localizePath } from '../i18n/locales';
-import { t } from '../i18n/ui';
-
-const { locale } = splitLocale(Astro.url.pathname);
+import NotFoundView from '../views/NotFoundView.astro';
+import { defaultLocale } from '../i18n/locales';
 ---
 
-<BaseLayout
-  title={`${t(locale, 'notFound.title')}${t(locale, 'meta.titleSuffix')}`}
-  description={t(locale, 'notFound.description')}
-  noindex
-  locale={locale}
->
-  <h1 class="page-title">{t(locale, 'notFound.heading')}</h1>
-  <div class="prose">
-    <p>{t(locale, 'notFound.prose')}</p>
-    <p><a href={localizePath(locale, '/')}>{t(locale, 'notFound.homeLink')}</a></p>
-  </div>
-</BaseLayout>
+<NotFoundView locale={defaultLocale} />

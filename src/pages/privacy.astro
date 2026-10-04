@@ -1,19 +1,6 @@
 ---
-import { getEntry, render } from 'astro:content';
-import ProseLayout from '../layouts/ProseLayout.astro';
-import { splitLocale } from '../i18n/locales';
-
-const { locale } = splitLocale(Astro.url.pathname);
-const entry = await getEntry('pages', `${locale}/privacy`);
-if (!entry) throw new Error(`Missing page content for ${locale}/privacy`);
-const { Content } = await render(entry);
+import ProseView from '../views/ProseView.astro';
+import { defaultLocale } from '../i18n/locales';
 ---
 
-<ProseLayout
-  title={entry.data.title}
-  description={entry.data.description}
-  updated={entry.data.updated}
-  locale={locale}
->
-  <Content />
-</ProseLayout>
+<ProseView locale={defaultLocale} slug="privacy" />
