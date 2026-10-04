@@ -17,7 +17,8 @@ interface Props {
 }
 
 const { project } = Astro.props;
-const { title, summary, url, repo, year, status, disclaimer, stack, screenshot } = project.data;
+const { title, summary, url, repo, year, status, disclaimer, stack, languages, screenshot } =
+  project.data;
 const { Content } = await render(project);
 
 if (!Astro.site) {
@@ -33,7 +34,7 @@ const softwareSourceCode: Record<string, unknown> = {
   description: summary,
   url: canonicalProjectURL,
   ...(repo ? { codeRepository: repo } : {}),
-  ...(stack && stack.length > 0 ? { programmingLanguage: stack } : {}),
+  ...(languages && languages.length > 0 ? { programmingLanguage: languages } : {}),
   license: 'https://opensource.org/licenses/MIT',
   author: { '@id': personId },
   sameAs: [url],

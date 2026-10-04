@@ -8,6 +8,7 @@ status: "live"
 order: 2
 disclaimer: "Unofficial fan project. Not affiliated with or endorsed by Quantic Dream."
 stack: ["JSON", "JavaScript", "Python", "GitHub Pages"]
+languages: ["JavaScript", "Python"]
 screenshot:
   src: "/images/work/spellcasters-community-api.jpg"
   alt: "The Spellcasters Community API documentation page: endpoints and data collections for Spellcasters Chronicles."

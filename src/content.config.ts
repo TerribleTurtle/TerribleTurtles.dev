@@ -29,6 +29,8 @@ const projects = defineCollection({
     disclaimer: z.string().optional(),
     /** Only technologies verified from the project's own repo/manifest. */
     stack: z.array(z.string().min(1)).optional(),
+    /** Primary programming languages (from GitHub's languages API); feeds JSON-LD programmingLanguage. */
+    languages: z.array(z.string().min(1)).optional(),
     /** Pre-optimised image committed under public/images/work/. */
     screenshot: z
       .object({

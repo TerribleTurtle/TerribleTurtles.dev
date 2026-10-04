@@ -2,7 +2,7 @@
 
 > A personal archive of things I've built.
 
-I am a solo developer using the pseudonym TerribleTurtles. This site is a personal archive of things I have built.
+This is where I keep the things I've built. It's a static site; each project page links to the live site and its source code.
 
 ## Projects
 
@@ -11,6 +11,6 @@ I am a solo developer using the pseudonym TerribleTurtles. This site is a person
 
 ## Pages
 
-- [About](https://terribleturtles.dev/about/): About TerribleTurtles and this archive.
-- [Privacy](https://terribleturtles.dev/privacy/): Privacy policy and edge infrastructure.
-- [Security](https://terribleturtles.dev/security/): Security architecture and vulnerability disclosure.
+- [About](https://terribleturtles.dev/about/): Who runs this site and how to get in touch.
+- [Privacy](https://terribleturtles.dev/privacy/): What data this site does and doesn't collect.
+- [Security](https://terribleturtles.dev/security/): How to report a security issue.
