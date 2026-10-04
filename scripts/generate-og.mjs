@@ -15,6 +15,7 @@ import { chromium } from '@playwright/test';
 import { mkdirSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, extname } from 'node:path';
 import { paletteHex, scutePolygons } from './lib/palette.mjs';
+import { loadPolicy } from './lib/policy.mjs';
 
 const c = paletteHex('dark');
 
@@ -101,18 +102,22 @@ for (const entry of readdirSync(projectsDir)) {
   }
 }
 
-const esProjectsDir = 'src/content/projects-i18n/es';
-for (const entry of readdirSync(esProjectsDir)) {
-  if (entry.endsWith('.md')) {
-    const id = basename(entry, extname(entry));
-    const content = readFileSync(`${esProjectsDir}/${entry}`, 'utf8');
-    const { title, summary } = parseFrontmatter(content);
-    cards.push({
-      out: `public/og/es/${id}.png`,
-      title,
-      summary,
-      titleSize: 84,
-    });
+// One card per translated project, for every non-default locale in the policy.
+const { pages } = loadPolicy();
+for (const locale of pages.locales.filter((l) => l !== pages.defaultLocale)) {
+  const dir = `src/content/projects-i18n/${locale}`;
+  mkdirSync(`public/og/${locale}`, { recursive: true });
+  for (const entry of readdirSync(dir)) {
+    if (entry.endsWith('.md')) {
+      const id = basename(entry, extname(entry));
+      const { title, summary } = parseFrontmatter(readFileSync(`${dir}/${entry}`, 'utf8'));
+      cards.push({
+        out: `public/og/${locale}/${id}.png`,
+        title,
+        summary,
+        titleSize: 84,
+      });
+    }
   }
 }
 
