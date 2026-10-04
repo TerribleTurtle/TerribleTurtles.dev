@@ -1,9 +1,12 @@
 /*
- * Phase 1 placeholder: minimal reset only.
- * Phase 2 replaces this with the Deep Shell design system (tokens, type, motion).
- * No raw colors here; colors arrive with the token file.
+ * Deep Shell base styles. Colours, sizes and timings come from tokens.css only.
+ * Component-specific styles live in their .astro components (compiled to the
+ * same external stylesheet; nothing is inlined).
  */
+@import url("./tokens.css");
+@import url("./fonts.css");
 
+/* ---- Reset ------------------------------------------------------------- */
 *,
 *::before,
 *::after {
@@ -12,12 +15,21 @@
 
 html {
   scrollbar-gutter: stable;
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
-  line-height: 1.6;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
 }
 
 img,
@@ -27,8 +39,119 @@ svg {
   height: auto;
 }
 
-/* Visually hidden until focused (clip-path, never deprecated clip). */
-.skip-link {
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+}
+
+p,
+ul,
+ol,
+dl,
+figure {
+  margin: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* ---- Links & focus ------------------------------------------------------ */
+a {
+  color: var(--color-accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--border-hairline);
+  text-underline-offset: var(--underline-offset);
+  transition: color var(--duration-fast) var(--ease-out),
+    text-underline-offset var(--duration-fast) var(--ease-out);
+}
+
+a:hover {
+  color: var(--color-text);
+  text-underline-offset: var(--underline-offset-hover);
+}
+
+/*
+ * Growth-ring focus: the ring starts wide and settles inward onto the element.
+ * The resting offset is set on focusable elements; :focus-visible transitions it.
+ */
+:where(a, [tabindex]) {
+  outline-offset: calc(var(--focus-offset) * 3);
+}
+
+:focus-visible {
+  outline: var(--focus-width) solid var(--color-accent);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-s);
+  transition: outline-offset var(--duration-base) var(--ease-out);
+}
+
+/* ---- Layout ------------------------------------------------------------- */
+.wrap {
+  width: 100%;
+  max-width: calc(var(--measure) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+main {
+  flex: 1;
+  padding-block: var(--space-7) var(--space-8);
+}
+
+/* main is a programmatic skip target, not an interactive control. */
+main:focus {
+  outline: none;
+}
+
+.lede {
+  margin-block-start: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--step-1);
+  line-height: var(--leading-snug);
+}
+
+.page-title {
+  font-size: var(--step-4);
+  letter-spacing: var(--tracking-tight);
+}
+
+/* Long-form text pages (about, privacy, security). */
+.prose {
+  margin-block-start: var(--space-6);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.prose h2 {
+  margin-block-start: var(--space-5);
+  font-size: var(--step-2);
+}
+
+.prose ul {
+  padding-inline-start: var(--space-5);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.meta-note {
+  color: var(--color-text-muted);
+  font-size: var(--step-minus-1);
+}
+
+/* ---- Utilities ---------------------------------------------------------- */
+.visually-hidden,
+.skip-link:not(:focus-visible) {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -38,13 +161,32 @@ svg {
 }
 
 .skip-link:focus-visible {
-  width: auto;
-  height: auto;
-  overflow: visible;
-  clip-path: none;
+  position: fixed;
+  inset-block-start: var(--space-3);
+  inset-inline-start: var(--space-3);
+  z-index: var(--z-skip-link);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-m);
+}
+
+/* ---- Motion ------------------------------------------------------------- */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-slow);
+  animation-timing-function: var(--ease-out);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
   *,
   *::before,
   *::after {

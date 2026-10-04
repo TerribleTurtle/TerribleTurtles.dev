@@ -8,13 +8,19 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run typecheck && npm run lint:js && npm run lint:css && astro build",
+    "build": "npm run typecheck && npm run typecheck:scripts && npm run lint:js && npm run lint:css && npm run test:unit && npm run check:contrast && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
+    "typecheck:scripts": "tsc -p scripts/tsconfig.json",
     "lint:js": "eslint .",
     "lint:css": "stylelint \"**/*.{css,astro}\"",
+    "check:contrast": "node scripts/check-contrast.mjs",
     "test": "playwright test",
+    "test:unit": "node --test \"tests/unit/*.test.mjs\"",
+    "assets:icons": "node scripts/generate-icons.mjs",
+    "assets:og": "node scripts/generate-og.mjs",
+    "assets:screenshot": "node scripts/capture-screenshot.mjs",
     "prepare": "husky"
   },
   "dependencies": {
