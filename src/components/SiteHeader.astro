@@ -1,0 +1,89 @@
+---
+import ScuteMark from './ScuteMark.astro';
+
+/**
+ * Site header: mark + wordmark (home link) and the primary nav.
+ * The home page is the work index, so "Work" points to "/" and is marked as
+ * the current section on project pages.
+ */
+const pathname = Astro.url.pathname;
+
+const navItems = [
+  { href: '/', label: 'Work', current: pathname === '/' ? 'page' : pathname.startsWith('/work/') ? 'true' : undefined },
+  { href: '/about/', label: 'About', current: pathname === '/about/' ? 'page' : undefined },
+] as const;
+---
+
+<header class="site-header wrap">
+  <a class="brand" href="/" aria-label="TerribleTurtles, home">
+    <ScuteMark />
+    <span class="wordmark">TerribleTurtles</span>
+  </a>
+  <nav aria-label="Primary">
+    <ul>
+      {
+        navItems.map((item) => (
+          <li>
+            <a href={item.href} aria-current={item.current}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+    view-transition-name: site-header;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .wordmark {
+    font-size: var(--step-1);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .brand:hover {
+    color: var(--color-text);
+  }
+
+  .brand :global(.scute-mark) {
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+
+  .brand:hover :global(.scute-mark) {
+    transform: rotate(var(--mark-turn));
+  }
+
+  ul {
+    display: flex;
+    gap: var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  nav a {
+    text-decoration-color: transparent;
+  }
+
+  nav a:hover,
+  nav a[aria-current] {
+    text-decoration-color: currentcolor;
+  }
+</style>

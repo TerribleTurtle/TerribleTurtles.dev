@@ -3,7 +3,40 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Privacy | TerribleTurtles" description="How this site handles data.">
-  <h1>Privacy</h1>
-  <p>I do not run any analytics on this site.</p>
-  <p>A full privacy notice will be published here before launch.</p>
+  <h1 class="page-title">Privacy</h1>
+  <div class="prose">
+    <p class="meta-note">Last updated: <time datetime="2026-10-04">2026-10-04</time></p>
+
+    <h2>What this site does</h2>
+    <p>
+      This site is a set of static pages. It does not set cookies, run analytics, track visitors,
+      or have any forms or accounts. It does not ask for or store personal information.
+    </p>
+
+    <h2>Hosting</h2>
+    <p>
+      The site is hosted by Cloudflare. To deliver and protect the site, Cloudflare processes request
+      data such as IP addresses, which it handles under its own
+      <a href="https://www.cloudflare.com/privacypolicy/">privacy policy</a>.
+    </p>
+    <p>
+      If Cloudflare detects suspicious traffic, it may set strictly necessary security cookies to tell
+      people apart from automated traffic. Those cookies come from Cloudflare's protection systems, not
+      from this site.
+    </p>
+
+    <h2>Links to other sites</h2>
+    <p>Links to other sites, such as my projects or GitHub, lead to sites with their own privacy policies.</p>
+
+    <h2>Do Not Track and Global Privacy Control</h2>
+    <p>
+      This site does not track you, so there is nothing to opt out of. Do Not Track and Global Privacy
+      Control signals need no special handling here.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about privacy: <a href="mailto:hello@terribleturtles.dev">hello@terribleturtles.dev</a>.
+    </p>
+  </div>
 </BaseLayout>

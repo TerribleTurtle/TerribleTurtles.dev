@@ -27,6 +27,17 @@ const projects = defineCollection({
     status: z.enum(['live', 'experimental', 'archived']),
     order: z.number().int().default(100),
     disclaimer: z.string().optional(),
+    /** Only technologies verified from the project's own repo/manifest. */
+    stack: z.array(z.string().min(1)).optional(),
+    /** Pre-optimised image committed under public/images/work/. */
+    screenshot: z
+      .object({
+        src: z.string().startsWith('/images/work/'),
+        alt: z.string().min(1),
+        width: z.number().int().positive(),
+        height: z.number().int().positive(),
+      })
+      .optional(),
   }),
 });
 

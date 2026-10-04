@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import WorkList from '../components/WorkList.astro';
 
 const projects = (await getCollection('projects')).sort(
   (a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
@@ -8,20 +9,27 @@ const projects = (await getCollection('projects')).sort(
 ---
 
 <BaseLayout title="TerribleTurtles" description="A personal archive of things I have built.">
-  <h1>Things I've built.</h1>
-  <p>A personal archive.</p>
+  <h1 class="page-title">Things I've built.</h1>
+  <p class="lede">A personal archive.</p>
 
-  <section aria-labelledby="work-heading">
-    <h2 id="work-heading">Work</h2>
-    <ul>
-      {
-        projects.map((project) => (
-          <li>
-            <a href={`/work/${project.id}/`}>{project.data.title}</a>
-            <p>{project.data.summary}</p>
-          </li>
-        ))
-      }
-    </ul>
+  <section class="work" aria-labelledby="work-heading">
+    <h2 id="work-heading" class="section-label">Work</h2>
+    <WorkList projects={projects} />
   </section>
 </BaseLayout>
+
+<style>
+  .work {
+    margin-block-start: var(--space-8);
+  }
+
+  .section-label {
+    margin-block-end: var(--space-3);
+    color: var(--color-text-muted);
+    font-family: var(--font-sans);
+    font-size: var(--step-minus-1);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+</style>

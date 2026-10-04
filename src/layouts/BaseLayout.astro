@@ -1,11 +1,14 @@
 ---
 import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 
 interface Props {
   title?: string;
   description?: string;
-  /** Root-relative path to the social preview image. */
+  /** Root-relative path to the social preview image (1200×630). */
   image?: string;
+  imageAlt?: string;
   /** Set on pages that must not be indexed (e.g. 404). */
   noindex?: boolean;
 }
@@ -15,6 +18,7 @@ const {
   title = siteName,
   description = 'A personal archive of things I have built.',
   image = '/og.png',
+  imageAlt = 'TerribleTurtles: things I have built.',
   noindex = false,
 } = Astro.props;
 
@@ -25,12 +29,6 @@ if (!Astro.site) {
 const siteURL = Astro.site;
 const canonicalURL = new URL(Astro.url.pathname, siteURL);
 const socialImageURL = new URL(image, siteURL);
-const pathname = Astro.url.pathname;
-
-const primaryNav = [
-  { href: '/', label: 'Home' },
-  { href: '/about/', label: 'About' },
-];
 
 // Inline JSON-LD is a non-executable data block (`application/ld+json`),
 // so it is not subject to `script-src` and does not weaken the CSP.
@@ -64,8 +62,26 @@ const jsonLd = JSON.stringify({
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonicalURL} />
+    <meta name="color-scheme" content="dark light" />
+
+    <link
+      rel="preload"
+      href="/fonts/newsreader-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/instrument-sans-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
@@ -73,44 +89,24 @@ const jsonLd = JSON.stringify({
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={socialImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImageURL} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
     <script type="application/ld+json" is:inline set:html={jsonLd} />
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to main content</a>
-    <header class="site-header">
-      <nav aria-label="Primary">
-        <ul>
-          {
-            primaryNav.map((item) => (
-              <li>
-                <a href={item.href} aria-current={pathname === item.href ? 'page' : undefined}>
-                  {item.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-    </header>
-
-    <main id="main" tabindex="-1">
+    <SiteHeader />
+    <main id="main" tabindex="-1" class="wrap">
       <slot />
     </main>
-
-    <footer class="site-footer">
-      <nav aria-label="Footer">
-        <ul>
-          <li><a href="https://github.com/TerribleTurtle">GitHub</a></li>
-          <li><a href="/privacy/">Privacy</a></li>
-          <li><a href="/security/">Security</a></li>
-        </ul>
-      </nav>
-    </footer>
+    <SiteFooter />
   </body>
 </html>

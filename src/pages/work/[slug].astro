@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import StatusLabel from '../../components/StatusLabel.astro';
 
 export const getStaticPaths = (async () => {
   const projects = await getCollection('projects');
@@ -16,31 +17,139 @@ interface Props {
 }
 
 const { project } = Astro.props;
-const { title, summary, url, repo, year, status, disclaimer } = project.data;
+const { title, summary, url, repo, year, status, disclaimer, stack, screenshot } = project.data;
 const { Content } = await render(project);
 ---
 
 <BaseLayout title={`${title} | TerribleTurtles`} description={summary}>
-  <article>
+  <article class="project">
+    <p class="back"><a href="/"><span aria-hidden="true">← </span>All work</a></p>
+
     <header>
-      <h1>{title}</h1>
-      <p>{summary}</p>
+      <h1 class="page-title">{title}</h1>
+      <p class="lede">{summary}</p>
     </header>
 
-    <dl>
-      <dt>Year</dt>
-      <dd>{year}</dd>
-      <dt>Status</dt>
-      <dd>{status}</dd>
-    </dl>
-
-    <Content />
-
-    <ul>
-      <li><a href={url}>Visit {title}</a></li>
-      {repo && <li><a href={repo}>Source on GitHub</a></li>}
+    <ul class="links">
+      <li>
+        <a href={url} rel="noopener noreferrer">Visit {title}<span aria-hidden="true"> ↗</span></a>
+      </li>
+      {
+        repo && (
+          <li>
+            <a href={repo} rel="noopener noreferrer">
+              Source on GitHub<span aria-hidden="true"> ↗</span>
+            </a>
+          </li>
+        )
+      }
     </ul>
 
-    {disclaimer && <p>{disclaimer}</p>}
+    {
+      screenshot && (
+        <figure class="shot">
+          <img
+            src={screenshot.src}
+            alt={screenshot.alt}
+            width={screenshot.width}
+            height={screenshot.height}
+            decoding="async"
+            loading="eager"
+          />
+        </figure>
+      )
+    }
+
+    <dl class="facts">
+      <div>
+        <dt>Year</dt>
+        <dd>{year}</dd>
+      </div>
+      <div>
+        <dt>Status</dt>
+        <dd><StatusLabel status={status} /></dd>
+      </div>
+      {
+        stack && stack.length > 0 && (
+          <div>
+            <dt>Built with</dt>
+            <dd>{stack.join(', ')}</dd>
+          </div>
+        )
+      }
+    </dl>
+
+    <div class="body">
+      <Content />
+    </div>
+
+    {disclaimer && <p class="meta-note disclaimer">{disclaimer}</p>}
   </article>
 </BaseLayout>
+
+<style>
+  .project {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .back {
+    font-size: var(--step-minus-1);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .shot img {
+    width: 100%;
+    border: var(--border-hairline) solid var(--color-hairline);
+    border-radius: var(--radius-m);
+    background-color: var(--color-surface);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--column-min), 1fr));
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-block: var(--border-hairline) solid var(--color-hairline);
+  }
+
+  dt {
+    color: var(--color-text-muted);
+    font-size: var(--step-minus-1);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .body {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .body :global(ul) {
+    display: grid;
+    gap: var(--space-3);
+    padding-inline-start: var(--space-5);
+  }
+
+  .body :global(li::marker) {
+    color: var(--color-accent);
+  }
+
+  .body :global(strong) {
+    font-weight: var(--weight-semibold);
+  }
+
+  .disclaimer {
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-hairline) solid var(--color-hairline);
+  }
+</style>

@@ -7,6 +7,13 @@ year: 2026
 status: "live"
 order: 1
 disclaimer: "Unofficial fan project. Not affiliated with or endorsed by Quantic Dream."
+# Verified 2026-10-04 from the repo's package.json (next, react, typescript, tailwindcss).
+stack: ["Next.js", "React", "TypeScript", "Tailwind CSS"]
+screenshot:
+  src: "/images/work/spellcastersdb.jpg"
+  alt: "The SpellcastersDB home page: a \"Spellcasters Chronicles Database\" heading above cards for the Deck Builder, Unit Database and Game Guide."
+  width: 1440
+  height: 900
 ---
 
 I built a community database and deck builder for *Spellcasters Chronicles*. It is a Next.js application with these features:
