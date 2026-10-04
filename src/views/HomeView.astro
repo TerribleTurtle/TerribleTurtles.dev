@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WorkList from '../components/WorkList.astro';
+import { defaultLocale, LOCALE_META, type Locale } from '../i18n/locales';
+import { localizeProject } from '../i18n/projects';
+import { t } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const meta = LOCALE_META[locale];
+
+const rawProjects = await getCollection('projects');
+const allTranslations =
+  locale === defaultLocale ? [] : await getCollection('projectsI18n');
+
+const projects = await Promise.all(
+  rawProjects.map((project) => localizeProject(project, locale, allTranslations)),
+);
+
+projects.sort(
+  (a, b) =>
+    a.data.order - b.data.order ||
+    a.data.title.localeCompare(b.data.title, meta.bcp47),
+);
+---
+
+<BaseLayout title="TerribleTurtles" description={t(locale, 'meta.defaultDescription')} locale={locale}>
+  <h1 class="page-title">{t(locale, 'home.title')}</h1>
+  <p class="lede">{t(locale, 'home.lede')}</p>
+
+  <section class="work" aria-labelledby="work-heading">
+    <h2 id="work-heading" class="section-label">{t(locale, 'home.workHeading')}</h2>
+    <WorkList projects={projects} locale={locale} />
+  </section>
+</BaseLayout>
+
+<style>
+  .work {
+    margin-block-start: var(--space-8);
+  }
+
+  .section-label {
+    margin-block-end: var(--space-3);
+    color: var(--color-text-muted);
+    font-family: var(--font-sans);
+    font-size: var(--step-minus-1);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+</style>

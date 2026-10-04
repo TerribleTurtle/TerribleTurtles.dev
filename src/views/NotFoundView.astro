@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localizePath, type Locale } from '../i18n/locales';
+import { t } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<BaseLayout
+  title={`${t(locale, 'notFound.title')}${t(locale, 'meta.titleSuffix')}`}
+  description={t(locale, 'notFound.description')}
+  noindex
+  locale={locale}
+>
+  <h1 class="page-title">{t(locale, 'notFound.heading')}</h1>
+  <div class="prose">
+    <p>{t(locale, 'notFound.prose')}</p>
+    <p><a href={localizePath(locale, '/')}>{t(locale, 'notFound.homeLink')}</a></p>
+  </div>
+</BaseLayout>
+
+<style>
+  .prose a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--target-min);
+  }
+</style>

@@ -1,3 +1,4 @@
 npx lint-staged
-npm run build
-npm run audit
+npm run typecheck
+npm run check:coverage
+npm run check:i18n-literals

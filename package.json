@@ -1,5 +1,6 @@
 {
-  "name": "popular-point",
+  "name": "terribleturtles-dev",
+  "private": true,
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -7,27 +8,41 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "lint:js": "eslint .",
-    "lint:css": "stylelint \"**/*.{css,astro}\"",
-    "typecheck": "astro check",
-    "build": "npm run typecheck && npm run lint:js && npm run lint:css && astro build",
+    "build": "npm run typecheck && npm run typecheck:scripts && npm run lint:js && npm run lint:css && npm run test:unit && npm run check:contrast && npm run check:i18n-literals && astro build && node scripts/check-coverage.mjs --dist dist",
     "preview": "astro preview",
     "astro": "astro",
-    "deploy": "npm run build",
-    "test": "vitest run",
-    "audit": "start-server-and-test preview http://localhost:4321 'node scripts/audit.mjs'",
-    "prepare": "husky"
+    "typecheck": "astro check",
+    "typecheck:scripts": "tsc -p scripts/tsconfig.json",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"**/*.{css,astro}\"",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:coverage": "node scripts/check-coverage.mjs",
+    "check:i18n-literals": "node scripts/check-i18n-literals.mjs",
+    "i18n:stamp": "node scripts/i18n-stamp.mjs",
+    "test": "playwright test",
+    "test:unit": "node --test \"tests/unit/*.test.mjs\"",
+    "assets:icons": "node scripts/generate-icons.mjs",
+    "assets:og": "node scripts/generate-og.mjs",
+    "assets:screenshot": "node scripts/capture-screenshot.mjs",
+    "prepare": "husky",
+    "verify:dist": "node scripts/verify-dist.mjs",
+    "test:security": "playwright test --project=headers --project=chromium --project=firefox --project=webkit tests/security",
+    "test:mutation": "node scripts/mutation-test.mjs",
+    "verify:security": "npm run build && npm run verify:dist && npm run audit:deps && playwright test && npm run test:mutation",
+    "audit:deps": "node scripts/audit-deps.mjs",
+    "audit:signatures": "npm audit signatures",
+    "check:live": "node scripts/live-check.mjs",
+    "check:observatory": "node scripts/observatory.mjs",
+    "check:dns": "node scripts/dns-audit.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "@fontsource/fira-code": "^5.2.7",
-    "@fontsource/inter": "^5.2.8",
     "astro": "^7.0.7"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
-    "@axe-core/cli": "^4.12.1",
-    "@playwright/test": "^1.61.1",
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^26.1.1",
     "eslint": "^10.7.0",
     "eslint-plugin-astro": "^1.7.0",
@@ -36,15 +51,18 @@
     "lint-staged": "^17.0.8",
     "postcss": "^8.5.19",
     "postcss-html": "^1.8.1",
-    "start-server-and-test": "^3.0.11",
     "stylelint": "^17.14.0",
     "stylelint-config-astro": "^2.0.0",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-declaration-strict-value": "^1.11.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.64.0",
-    "vitest": "^4.1.10",
-    "wait-on": "^9.0.10"
+    "wrangler": "^4.147.0"
+  },
+  "overrides": {
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    }
   },
   "lint-staged": {
     "*.{js,ts,mjs}": "eslint",

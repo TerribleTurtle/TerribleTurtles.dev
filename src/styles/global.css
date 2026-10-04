@@ -1,88 +1,226 @@
-:root {
-  /* stylelint-disable color-no-hex */
-  --bg-base: #121212;
-  --surface-card: #1C1C1C;
-  --text-primary: #F4F4F4;
-  --text-muted: #94A3B8;
-  --accent-primary: #2A9D8F;
-  --border-color: #2E2E2E;
-  --text-tag: #CBD5E1;
-  /* stylelint-enable color-no-hex */
-  --border-radius: 8px; /* 6px to 8px range from SDD */
-  --border-radius-sm: 6px;
-  --space-xs: 0.25rem;
-  --space-sm: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
-  --space-md: clamp(1rem, 0.8rem + 1vw, 1.25rem);
-  --space-lg: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
-  --space-xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
-  --space-2xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
-  --font-size-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --font-size-lg: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-  --font-size-xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
-  --font-size-2xl: clamp(2rem, 1.8rem + 1.5vw, 3rem);
-  --font-size-4xl: clamp(3rem, 2.5rem + 3vw, 5rem);
-  --offset-interaction: -4px;
-  --layout-card-min: 20rem;
-  --layout-content-max: 50rem;
-  --font-sans: 'Inter', sans-serif;
-  --font-mono: 'Fira Code', monospace;
+/*
+ * Deep Shell base styles. Colours, sizes and timings come from tokens.css only.
+ * Component-specific styles live in their .astro components (compiled to the
+ * same external stylesheet; nothing is inlined).
+ */
+@import url("./tokens.css");
+@import url("./fonts.css");
+
+/* ---- Reset ------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-
-
 html {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  line-height: 1.6;
   scrollbar-gutter: stable;
-
-  /* Add subtle SVG noise texture */
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-  background-size: 200px;
-  background-repeat: repeat;
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  padding: 0;
-  font-size: var(--font-size-base);
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
 }
 
-* {
-  box-sizing: border-box;
+img,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--space-lg);
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
+p,
+ul,
+ol,
+dl,
+figure {
+  margin: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* ---- Links & focus ------------------------------------------------------ */
 a {
-  color: var(--accent-primary);
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  transition: text-decoration-color 0.2s ease;
+  color: var(--color-accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--border-hairline);
+  text-underline-offset: var(--underline-offset);
+  transition: color var(--duration-fast) var(--ease-out),
+    text-underline-offset var(--duration-fast) var(--ease-out);
 }
 
-*:focus-visible {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
+@media (hover: hover) and (pointer: fine) {
+  a:hover {
+    color: var(--color-text);
+    text-underline-offset: var(--underline-offset-hover);
+  }
 }
 
-a:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
+/*
+ * Growth-ring focus: the ring starts wide and settles inward onto the element.
+ * The resting offset is set on focusable elements; :focus-visible transitions it.
+ */
+:where(a, [tabindex]) {
+  outline-offset: var(--focus-offset-start);
+}
+
+:focus-visible {
+  outline: var(--focus-width) solid var(--color-accent);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-s);
+  transition: outline-offset var(--duration-base) var(--ease-out);
+}
+
+/* ---- Layout ------------------------------------------------------------- */
+.wrap {
+  width: 100%;
+  max-width: calc(var(--measure) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: max(var(--gutter), env(safe-area-inset-left))
+    max(var(--gutter), env(safe-area-inset-right));
+}
+
+:dir(rtl) .wrap {
+  padding-inline: max(var(--gutter), env(safe-area-inset-right))
+    max(var(--gutter), env(safe-area-inset-left));
+}
+
+@media (horizontal-viewport-segments: 2) {
+  .wrap {
+    max-inline-size: calc(env(viewport-segment-width 0 0) - var(--gutter) * 2);
+    margin-inline: 0 auto;
+  }
+}
+
+main {
+  flex: 1;
+  padding-block: var(--space-7) var(--space-8);
+}
+
+/* main is a programmatic skip target, not an interactive control. */
+main:focus {
+  outline: none;
+}
+
+.lede {
+  margin-block-start: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--step-1);
+  line-height: var(--leading-snug);
+}
+
+.page-title {
+  font-size: var(--step-4);
+  letter-spacing: var(--tracking-tight);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.row-title {
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* Long-form text pages (about, privacy, security). */
+.prose {
+  margin-block-start: var(--space-6);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.prose h2 {
+  margin-block-start: var(--space-5);
+  font-size: var(--step-2);
+}
+
+.prose ul {
+  padding-inline-start: var(--space-5);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.meta-note {
+  color: var(--color-text-muted);
+  font-size: var(--step-minus-1);
+}
+
+.notice {
+  margin-block-start: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--step-minus-1);
+}
+
+/* ---- Utilities ---------------------------------------------------------- */
+.visually-hidden,
+.skip-link:not(:focus-visible) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link:focus-visible {
+  position: fixed;
+  inset-block-start: max(var(--space-3), env(safe-area-inset-top));
+  inset-inline-start: max(var(--space-3), env(safe-area-inset-left));
+  z-index: var(--z-skip-link);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-m);
+}
+
+:dir(rtl) .skip-link:focus-visible {
+  inset-inline-start: max(var(--space-3), env(safe-area-inset-right));
+}
+
+/* ---- Motion ------------------------------------------------------------- */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-slow);
+  animation-timing-function: var(--ease-out);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
   *,
   *::before,
   *::after {
@@ -91,50 +229,4 @@ a:hover {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-/* Staggered Animations */
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in-up {
-  opacity: 0;
-  animation: fade-in-up 0.6s ease forwards;
-}
-
-.delay-1 { animation-delay: 0.1s; }
-.delay-2 { animation-delay: 0.2s; }
-.delay-3 { animation-delay: 0.3s; }
-
-html.is-navigating {
-  cursor: wait;
-}
-
-/* Loading bar for navigation */
-html.is-navigating::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background-color: var(--accent-primary);
-  z-index: 9999;
-  transform-origin: left;
-  animation: loading-bar 10s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
-}
-
-@keyframes loading-bar {
-  0% { transform: scaleX(0); }
-  20% { transform: scaleX(0.4); }
-  100% { transform: scaleX(0.95); }
 }

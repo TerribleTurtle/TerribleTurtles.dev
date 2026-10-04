@@ -1,208 +1,142 @@
 ---
-import { ClientRouter } from 'astro:transitions';
-import CommandPalette from '../components/CommandPalette.astro';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/inter/600.css';
-import '@fontsource/inter/700.css';
-import '@fontsource/fira-code/400.css';
-import '@fontsource/fira-code/500.css';
 import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { LOCALE_META, defaultLocale, locales, localizePath, splitLocale } from '../i18n/locales';
+import { t } from '../i18n/ui';
+
+import type { Locale } from '../i18n/locales';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Root-relative path to the social preview image (1200×630). */
+  ogImage?: string;
   image?: string;
-  schemaType?: "WebSite" | "SoftwareApplication" | "Article";
+  imageAlt?: string;
+  /** Set on pages that must not be indexed (e.g. 404). */
+  noindex?: boolean;
+  /** Extra nodes to append to the JSON-LD @graph. */
+  extraGraph?: Record<string, unknown>[];
+  locale?: Locale;
 }
 
-const { 
-  title = 'TerribleTurtles.dev', 
-  description = 'A highly performant portfolio and tool-hosting platform.',
-  image = '/og-image.jpg',
-  schemaType = "WebSite"
+const siteName = 'TerribleTurtles';
+// The locale comes from the URL, so every page gets the right lang/dir without passing props.
+const { locale: pathLocale, basePath } = splitLocale(Astro.url.pathname);
+const locale = Astro.props.locale ?? pathLocale;
+
+const {
+  title = siteName,
+  description = t(locale, 'meta.defaultDescription'),
+  ogImage,
+  image = '/og.png',
+  imageAlt = t(locale, 'meta.defaultImageAlt'),
+  noindex = false,
+  extraGraph = [],
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const socialImageURL = new URL(image, Astro.url);
-const authorName = "TerribleTurtles";
+if (!Astro.site) {
+  throw new Error('`site` must be set in astro.config.mjs for canonical and OG URLs.');
+}
+
+const siteURL = Astro.site;
+const canonicalURL = new URL(Astro.url.pathname, siteURL);
+const socialImageURL = new URL(ogImage ?? image, siteURL);
+
+const meta = LOCALE_META[locale];
+const alternates = locales.map((l) => ({ hreflang: LOCALE_META[l].bcp47, href: new URL(localizePath(l, basePath), siteURL) }));
+const xDefault = new URL(localizePath(defaultLocale, basePath), siteURL);
+
+// Inline JSON-LD is a non-executable data block (`application/ld+json`),
+// so it is not subject to `script-src` and does not weaken the CSP.
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': new URL('/#website', siteURL).toString(),
+      name: siteName,
+      url: siteURL.toString(),
+      inLanguage: locales.map((l) => LOCALE_META[l].bcp47),
+      author: { '@id': new URL('/#person', siteURL).toString() },
+    },
+    {
+      '@type': 'Person',
+      '@id': new URL('/#person', siteURL).toString(),
+      name: siteName,
+      url: siteURL.toString(),
+      sameAs: ['https://github.com/TerribleTurtle'],
+    },
+    ...extraGraph,
+  ],
+});
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={meta.bcp47} dir={meta.dir}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="canonical" href={canonicalURL} />
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
-    <meta name="title" content={title} />
     <meta name="description" content={description} />
-    <meta name="generator" content={Astro.generator} />
-    <script src="/scripts/trusted-types.js" is:inline></script>
-    <ClientRouter />
-    <script is:inline>
-      document.addEventListener('astro:before-preparation', () => {
-        document.documentElement.classList.add('is-navigating');
-      });
-      document.addEventListener('astro:after-swap', () => {
-        document.documentElement.classList.remove('is-navigating');
-      });
-    </script>
-    <script>
-      import { navigate } from 'astro:transitions/client';
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonicalURL} />
+    {
+      !noindex && locales.length > 1 && (
+        <>
+          {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+          <link rel="alternate" hreflang="x-default" href={xDefault} />
+        </>
+      )
+    }
+    <meta name="color-scheme" content="dark light" />
 
-      // Allow users to change their mind and click another link while loading
-      document.addEventListener('click', (e) => {
-        if (!document.documentElement.classList.contains('is-navigating')) return;
-        
-        const target = e.target as HTMLElement;
-        const a = target?.closest('a');
-        if (a && a.href && a.href !== window.location.href) {
-          e.preventDefault();
-          e.stopPropagation(); // Stop Astro's default click handler from ignoring this
-          
-          // Force a new navigation, superseding the current one
-          navigate(a.href);
-        }
-      }, { capture: true }); // Use capture to intercept before Astro's router
-    </script>
-    
-    <!-- Open Graph / Facebook -->
+    <link
+      rel="preload"
+      href="/fonts/newsreader-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/instrument-sans-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content={meta.ogLocale} />
+    {locales.filter((l): boolean => l !== locale).map((l) => <meta property="og:locale:alternate" content={LOCALE_META[l].ogLocale} />)}
+    <meta property="og:site_name" content={siteName} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={socialImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={socialImageURL} />
-    
-    <!-- JSON-LD -->
-    <!-- eslint-disable astro/no-set-html-directive -->
-    <script type="application/ld+json" is:inline set:html={JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": schemaType,
-      "name": title,
-      "description": description,
-      "url": canonicalURL.toString(),
-      "image": socialImageURL.toString(),
-      "author": {
-        "@type": "Person",
-        "name": authorName
-      }
-    })} />
-    <!-- eslint-enable astro/no-set-html-directive -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageURL} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+
+    <script type="application/ld+json" is:inline set:html={jsonLd} />
   </head>
   <body>
-    <a href="#main" class="skip-link">Skip to main content</a>
-    <header>
-      <div class="container">
-        <nav aria-label="Primary">
-          <!-- Header Menu: Home, Tools, Sites from SDD -->
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/tools">Tools</a></li>
-            <li><a href="/sites">Sites</a></li>
-          </ul>
-        </nav>
-      </div>
-    </header>
-    
-    <main id="main" class="container" tabindex="-1">
+    <a href="#main" class="skip-link">{t(locale, 'skip.main')}</a>
+    <SiteHeader locale={locale} />
+    <main id="main" tabindex="-1" class="wrap">
       <slot />
     </main>
-
-    <footer>
-      <div class="container">
-        <nav aria-label="Footer">
-          <!-- Footer Menu: About, Privacy, Security, Changelog / RSS from SDD -->
-          <ul>
-            <li><a href="/about">About</a></li>
-            <li><a href="/privacy">Privacy</a></li>
-            <li><a href="/security">Security</a></li>
-          </ul>
-        </nav>
-      </div>
-    </footer>
-    <CommandPalette />
+    <SiteFooter locale={locale} />
   </body>
 </html>
-
-<style>
-  main {
-    flex: 1;
-    width: 100%;
-    padding-top: var(--space-xl);
-  }
-
-  header nav ul, footer nav ul {
-    display: flex;
-    gap: var(--space-md);
-    list-style: none;
-    padding: var(--space-md) 0;
-    margin: 0;
-  }
-  
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    border-bottom: 1px solid var(--border-color);
-    width: 100%;
-  }
-
-  header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    /* stylelint-disable-next-line declaration-property-value-allowed-list */
-    background-color: color-mix(in srgb, var(--bg-base) 80%, transparent);
-    backdrop-filter: blur(12px);
-    z-index: -1;
-    pointer-events: none;
-  }
-  
-  footer {
-    border-top: 1px solid var(--border-color);
-    margin-top: auto;
-    width: 100%;
-  }
-  
-  .skip-link {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
-    pointer-events: none;
-  }
-  
-  .skip-link:focus-visible {
-    position: absolute;
-    top: var(--space-md);
-    left: var(--space-md);
-    width: auto;
-    height: auto;
-    margin: 0;
-    overflow: visible;
-    clip-path: none;
-    white-space: normal;
-    background: var(--accent-primary);
-    color: var(--bg-base);
-    padding: var(--space-sm) var(--space-md);
-    z-index: 100;
-    border-radius: var(--border-radius);
-    pointer-events: auto;
-  }
-</style>

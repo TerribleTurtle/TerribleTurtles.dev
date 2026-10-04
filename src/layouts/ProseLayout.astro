@@ -1,0 +1,53 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { splitLocale, defaultLocale, LOCALE_META, type Locale } from '../i18n/locales';
+import { t } from '../i18n/ui';
+
+interface Props {
+  title: string;
+  description: string;
+  updated?: string;
+  extraGraph?: Record<string, unknown>[];
+  locale?: Locale;
+  legal?: boolean;
+}
+
+const { title, description, updated, extraGraph = [], legal = false } = Astro.props;
+const { locale: pathLocale, basePath } = splitLocale(Astro.url.pathname);
+const locale = Astro.props.locale ?? pathLocale;
+const meta = LOCALE_META[locale];
+const isNonDefaultLegal = legal && locale !== defaultLocale;
+
+const formattedUpdated = updated
+  ? new Intl.DateTimeFormat(meta.bcp47, { dateStyle: 'long', timeZone: 'UTC' }).format(
+      new Date(`${updated}T00:00:00Z`),
+    )
+  : undefined;
+---
+
+<BaseLayout
+  title={`${title}${t(locale, 'meta.titleSuffix')}`}
+  description={description}
+  extraGraph={extraGraph}
+  locale={locale}
+>
+  <h1 class="page-title">{title}</h1>
+  {
+    isNonDefaultLegal && (
+      <p class="notice">
+        {t(locale, 'legal.translationNotice')}{' '}
+        <a href={basePath} hreflang="en" lang="en">{t(locale, 'legal.englishVersion')}</a>
+      </p>
+    )
+  }
+  <div class="prose">
+    {
+      updated && formattedUpdated && (
+        <p class="meta-note">
+          {t(locale, 'page.lastUpdated')} <time datetime={updated}>{formattedUpdated}</time>
+        </p>
+      )
+    }
+    <slot />
+  </div>
+</BaseLayout>

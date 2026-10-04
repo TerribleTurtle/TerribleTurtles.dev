@@ -1,0 +1,229 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StatusLabel from '../components/StatusLabel.astro';
+import { defaultLocale, LOCALE_META, localizePath, type Locale } from '../i18n/locales';
+import { localizeProject } from '../i18n/projects';
+import { t, format } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  project: CollectionEntry<'projects'>;
+}
+
+const { locale, project } = Astro.props;
+const meta = LOCALE_META[locale];
+
+const { url, repo, year, status, stack, languages, screenshot } = project.data;
+
+const { title, summary, disclaimer, screenshotAlt, renderable } = await localizeProject(project, locale);
+
+const { Content } = await render(renderable);
+
+if (!Astro.site) {
+  throw new Error('`site` must be set in astro.config.mjs');
+}
+
+const canonicalProjectURL = new URL(Astro.url.pathname, Astro.site).toString();
+const personId = new URL('/#person', Astro.site).toString();
+
+const softwareSourceCode: Record<string, unknown> = {
+  '@type': 'SoftwareSourceCode',
+  name: title,
+  description: summary,
+  url: canonicalProjectURL,
+  ...(repo ? { codeRepository: repo } : {}),
+  ...(languages && languages.length > 0 ? { programmingLanguage: languages } : {}),
+  license: 'https://opensource.org/licenses/MIT',
+  author: { '@id': personId },
+  sameAs: [url],
+};
+
+const breadcrumbs: Record<string, unknown> = {
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: t(locale, 'brand.home'),
+      item: new URL(localizePath(locale, '/'), Astro.site).toString(),
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: title,
+      item: canonicalProjectURL,
+    },
+  ],
+};
+
+const extraGraph: Record<string, unknown>[] = [softwareSourceCode, breadcrumbs];
+
+const formattedStack =
+  stack && stack.length > 0
+    ? new Intl.ListFormat(meta.bcp47, { style: 'narrow', type: 'conjunction' }).format(stack)
+    : undefined;
+
+const ogImage = locale === defaultLocale ? `/og/${project.id}.png` : `/og/${locale}/${project.id}.png`;
+---
+
+<BaseLayout
+  title={`${title}${t(locale, 'meta.titleSuffix')}`}
+  description={summary}
+  ogImage={ogImage}
+  imageAlt={`${title}: ${summary}`}
+  extraGraph={extraGraph}
+  locale={locale}
+>
+  <article class="project">
+    <p class="back"><a href={localizePath(locale, '/')}><span class="back-arrow" aria-hidden="true">← </span>{t(locale, 'project.allWork')}</a></p>
+
+    <header>
+      <h1 class="page-title">{title}</h1>
+      <p class="lede">{summary}</p>
+    </header>
+
+    <ul class="links">
+      <li>
+        <a href={url} rel="noopener noreferrer">{format(t(locale, 'project.visit'), { title })}<span aria-hidden="true"> ↗</span><span class="visually-hidden"> {t(locale, 'project.externalSite')}</span></a>
+      </li>
+      {
+        repo && (
+          <li>
+            <a href={repo} rel="noopener noreferrer">{t(locale, 'project.source')}<span aria-hidden="true"> ↗</span><span class="visually-hidden"> {t(locale, 'project.externalSite')}</span></a>
+          </li>
+        )
+      }
+    </ul>
+
+    {
+      screenshot && screenshotAlt && (
+        <figure class="shot">
+          <picture>
+            <source type="image/webp" srcset={`/images/work/${project.id}.webp`} />
+            <img
+              src={`/images/work/${project.id}.jpg`}
+              alt={screenshotAlt}
+              width={screenshot.width}
+              height={screenshot.height}
+              decoding="async"
+              loading="eager"
+            />
+          </picture>
+        </figure>
+      )
+    }
+
+    <dl class="facts">
+      <div>
+        <dt>{t(locale, 'project.year')}</dt>
+        <dd>{year}</dd>
+      </div>
+      <div>
+        <dt>{t(locale, 'project.status')}</dt>
+        <dd><StatusLabel status={status} locale={locale} /></dd>
+      </div>
+      {
+        formattedStack && (
+          <div>
+            <dt>{t(locale, 'project.builtWith')}</dt>
+            <dd>{formattedStack}</dd>
+          </div>
+        )
+      }
+    </dl>
+
+    <div class="body">
+      <Content />
+    </div>
+
+    {disclaimer && <p class="meta-note disclaimer">{disclaimer}</p>}
+  </article>
+</BaseLayout>
+
+<style>
+  .project {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .back {
+    font-size: var(--step-minus-1);
+  }
+
+  .back a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--target-min);
+  }
+
+  .back-arrow {
+    display: inline-block;
+  }
+
+  :dir(rtl) .back-arrow {
+    transform: scaleX(-1);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--target-min);
+  }
+
+  .shot img {
+    width: 100%;
+    border: var(--border-hairline) solid var(--color-hairline);
+    border-radius: var(--radius-m);
+    background-color: var(--color-surface);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--column-min)), 1fr));
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-block: var(--border-hairline) solid var(--color-hairline);
+  }
+
+  dt {
+    color: var(--color-text-muted);
+    font-size: var(--step-minus-1);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .body {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .body :global(ul) {
+    display: grid;
+    gap: var(--space-3);
+    padding-inline-start: var(--space-5);
+  }
+
+  .body :global(li::marker) {
+    color: var(--color-accent);
+  }
+
+  .body :global(strong) {
+    font-weight: var(--weight-semibold);
+  }
+
+  .disclaimer {
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-hairline) solid var(--color-hairline);
+  }
+</style>

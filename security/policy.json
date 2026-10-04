@@ -1,0 +1,142 @@
+{
+  "$comment": "Single source of truth for TerribleTurtles.dev security. Read by scripts/lib/policy.mjs (strict validation; a malformed file fails loudly), tests/security/*.spec.ts, scripts/verify-dist.mjs, scripts/audit-deps.mjs, scripts/live-check.mjs and scripts/observatory.mjs. Changing anything here changes what the tests demand, so every edit must be reviewed by the owner.",
+  "version": 1,
+  "csp": {
+    "$comment": "The CSP must contain EXACTLY these directives with EXACTLY these sources. Any added directive, removed directive or extra source fails.",
+    "directives": {
+      "default-src": ["'none'"],
+      "script-src": ["'none'"],
+      "style-src": ["'self'"],
+      "img-src": ["'self'"],
+      "font-src": ["'self'"],
+      "connect-src": ["'none'"],
+      "manifest-src": ["'none'"],
+      "media-src": ["'none'"],
+      "worker-src": ["'none'"],
+      "frame-src": ["'none'"],
+      "child-src": ["'none'"],
+      "object-src": ["'none'"],
+      "base-uri": ["'none'"],
+      "form-action": ["'none'"],
+      "frame-ancestors": ["'none'"],
+      "require-trusted-types-for": ["'script'"],
+      "trusted-types": ["'none'"]
+    },
+    "forbiddenTokens": [
+      "'unsafe-inline'",
+      "'unsafe-eval'",
+      "'unsafe-hashes'",
+      "'strict-dynamic'",
+      "'wasm-unsafe-eval'",
+      "'inline-speculation-rules'",
+      "'allow-duplicates'",
+      "*",
+      "http:",
+      "https:",
+      "data:",
+      "blob:",
+      "filesystem:",
+      "ws:",
+      "wss:"
+    ],
+    "$comment_allowed": "Any source expression not in this list (e.g. a host such as cdn.example.com, a nonce or a hash) is a failure.",
+    "allowedSourceExpressions": ["'none'", "'self'", "'script'"]
+  },
+  "requiredHeaders": [
+    { "name": "Cross-Origin-Opener-Policy", "equals": "same-origin" },
+    { "name": "Cross-Origin-Resource-Policy", "equals": "same-origin" },
+    { "name": "Origin-Agent-Cluster", "equals": "?1" },
+    { "name": "Referrer-Policy", "equals": "no-referrer" },
+    { "name": "Strict-Transport-Security", "equals": "max-age=63072000; includeSubDomains; preload" },
+    { "name": "X-Content-Type-Options", "equals": "nosniff" },
+    { "name": "X-Frame-Options", "equals": "DENY" }
+  ],
+  "permissionsPolicy": {
+    "$comment": "Every listed feature must be present and denied with (). Any feature with an allowlist other than () fails. Only features Chromium recognizes are listed (unknown ones log console errors, which the runtime tests reject).",
+    "deniedFeatures": [
+      "accelerometer", "autoplay", "bluetooth", "browsing-topics", "camera", "captured-surface-control",
+      "clipboard-read", "clipboard-write", "compute-pressure", "cross-origin-isolated", "display-capture",
+      "encrypted-media", "fullscreen", "gamepad", "geolocation", "gyroscope", "hid", "identity-credentials-get",
+      "idle-detection", "keyboard-map", "local-fonts", "magnetometer", "microphone", "midi", "otp-credentials",
+      "payment", "picture-in-picture", "publickey-credentials-create", "publickey-credentials-get",
+      "screen-wake-lock", "serial", "storage-access", "sync-xhr", "usb", "web-share", "window-management",
+      "xr-spatial-tracking"
+    ],
+    "forbiddenFeatures": ["interest-cohort"]
+  },
+  "forbiddenHeaders": [
+    "Set-Cookie",
+    "Access-Control-Allow-Origin",
+    "Access-Control-Allow-Credentials",
+    "X-Powered-By",
+    "Server-Timing",
+    "Content-Security-Policy-Report-Only",
+    "SourceMap",
+    "X-SourceMap"
+  ],
+  "pages": {
+    "$comment": "THE list of every HTML page the site builds, written once without a locale prefix. Each entry expands to every locale (default locale unprefixed, others under /<locale>/). Routes below pull from it via \"include\"; scripts/check-coverage.mjs fails the build if a built page or content project is missing here, or a listed page is not built.",
+    "defaultLocale": "en",
+    "locales": ["en", "es"],
+    "notFoundProbe": "/this-page-does-not-exist/",
+    "entries": [
+      { "path": "/", "kind": "home" },
+      { "path": "/about/", "kind": "page" },
+      { "path": "/privacy/", "kind": "page" },
+      { "path": "/security/", "kind": "page" },
+      { "path": "/work/spellcastersdb/", "kind": "project", "id": "spellcastersdb" },
+      { "path": "/work/spellcasters-community-api/", "kind": "project", "id": "spellcasters-community-api" }
+    ]
+  },
+  "routes": [
+    { "class": "html", "include": ["pages"], "status": 200, "contentType": "text/html; charset=utf-8" },
+    { "class": "not-found", "include": ["notFound"], "status": 404, "contentType": "text/html; charset=utf-8" },
+    { "class": "hashed-stylesheet", "discover": { "from": "/", "pattern": "<link rel=\"stylesheet\" href=\"(/_astro/[^\"]+\\.css)\"" }, "status": 200, "contentType": "text/css; charset=utf-8", "cacheControl": "public, max-age=31536000, immutable" },
+    { "class": "font", "paths": ["/fonts/newsreader-latin-wght-normal.woff2", "/fonts/instrument-sans-latin-wght-normal.woff2"], "status": 200, "contentType": "font/woff2", "cacheControl": "public, max-age=2592000" },
+    { "class": "image", "paths": ["/og.png"], "include": ["projectOgImages"], "status": 200, "contentType": "image/png" },
+    { "class": "svg", "paths": ["/favicon.svg"], "status": 200, "contentType": "image/svg+xml" },
+    { "class": "security-txt", "paths": ["/.well-known/security.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },
+    { "class": "llms-txt", "paths": ["/llms.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },
+    { "class": "sitemap", "paths": ["/sitemap-index.xml"], "status": 200, "contentType": "application/xml" },
+    { "class": "robots", "paths": ["/robots.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },
+    { "class": "redirect", "paths": ["/about"], "status": 307, "location": "/about/" }
+  ],
+  "previewHosts": {
+    "$comment": "Requests carrying these Host headers must (noindex) or must not (indexable) get X-Robots-Tag: noindex. Account subdomain is a placeholder; the _headers rules use :placeholders.",
+    "header": "X-Robots-Tag",
+    "value": "noindex",
+    "noindexHosts": ["terribleturtles-site.example-account.workers.dev", "0123abcd-terribleturtles-site.example-account.workers.dev"],
+    "indexableHosts": ["terribleturtles.dev"]
+  },
+  "dist": {
+    "forbiddenExtensions": [".js", ".mjs", ".cjs"],
+    "allowedScriptTypes": ["application/ld+json"],
+    "forbiddenStrings": ["Test Bitrot", "Fixture", "CheckModsExtended"],
+    "requiredFiles": ["_headers", "index.html", "404.html", ".well-known/security.txt"],
+    "$comment_ws": "Astro 7 whitespace regression (findings.md, Rejected Approaches): text glued to an inline link.",
+    "whitespaceRegressionPatterns": ["[A-Za-z0-9,;:]<a\\s", "</a>[A-Za-z0-9]"]
+  },
+  "securityTxt": {
+    "path": ".well-known/security.txt",
+    "requiredContact": "mailto:security@terribleturtles.dev",
+    "minDaysBeforeExpiry": 30,
+    "maxDaysBeforeExpiry": 365
+  },
+  "audit": {
+    "failOnSeverities": ["high", "critical"],
+    "allowlist": [
+      {
+        "id": "GHSA-vfj7-8cjw-p6xm",
+        "package": "braces",
+        "scope": "dev",
+        "reason": "braces<=3.0.3 stack-exhaustion DoS with no patched release; reached only via stylelint and eslint-plugin-astro globbing our own lint patterns at dev time. Never shipped; production deps have 0 vulnerabilities.",
+        "expires": "2027-01-04"
+      }
+    ]
+  },
+  "live": {
+    "origin": "https://terribleturtles.dev",
+    "httpRedirect": { "from": "http://terribleturtles.dev/", "statuses": [301, 308], "location": "https://terribleturtles.dev/" }
+  },
+  "observatory": { "host": "terribleturtles.dev", "minGrade": "A+" }
+}
