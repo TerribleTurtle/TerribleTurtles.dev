@@ -10,12 +10,17 @@ export { PolicyError };
  * @typedef {{ class: string, paths: string[], discover: Discover | undefined, status: number,
  *   contentType: string | undefined, cacheControl: string | undefined, location: string | undefined }} RouteRule
  * @typedef {{ id: string, package: string, scope: 'dev', reason: string, expires: string }} AllowEntry
+ * @typedef {'home' | 'page' | 'project'} PageKind
+ * @typedef {{ path: string, kind: PageKind, id: string | undefined }} PageEntry
+ * @typedef {{ path: string, basePath: string, locale: string, kind: PageKind, id: string | undefined }} PageRef
+ * @typedef {{ defaultLocale: string, locales: string[], notFoundProbe: string, entries: PageEntry[], expanded: PageRef[] }} Pages
  * @typedef {{
  *   version: 1,
  *   csp: { directives: Record<string, string[]>, forbiddenTokens: string[], allowedSourceExpressions: string[] },
  *   requiredHeaders: HeaderRule[],
  *   permissionsPolicy: { deniedFeatures: string[], forbiddenFeatures: string[] },
  *   forbiddenHeaders: string[],
+ *   pages: Pages,
  *   routes: RouteRule[],
  *   previewHosts: { header: string, value: string, noindexHosts: string[], indexableHosts: string[] },
  *   dist: { forbiddenExtensions: string[], allowedScriptTypes: string[], forbiddenStrings: string[],
@@ -52,12 +57,75 @@ function readCsp(raw) {
   return { directives, forbiddenTokens, allowedSourceExpressions: allowed };
 }
 
-/** @param {unknown} raw @param {number} i @returns {RouteRule} */
-function readRoute(raw, i) {
+const PAGE_KINDS = ['home', 'page', 'project'];
+/** @param {string} k @returns {k is PageKind} */
+const isPageKind = (k) => k === 'home' || k === 'page' || k === 'project';
+const ROUTE_INCLUDES = ['pages', 'notFound', 'projectOgImages'];
+
+/**
+ * Prefixes a locale-free base path for a locale (default locale stays unprefixed).
+ * @param {Pages} pages @param {string} locale @param {string} basePath
+ */
+export function localePath(pages, locale, basePath) {
+  return locale === pages.defaultLocale ? basePath : `/${locale}${basePath}`;
+}
+
+/** @param {unknown} raw @returns {Pages} */
+function readPages(raw) {
+  const m = record(raw, 'pages', ['defaultLocale', 'locales', 'notFoundProbe', 'entries']);
+  const locales = strList(m.get('locales'), 'pages.locales');
+  for (const l of locales) if (!/^[a-z]{2}(-[a-z]{2})?$/.test(l)) throw new PolicyError(`pages.locales: "${l}" is not a lowercase locale code`);
+  const defaultLocale = str(m.get('defaultLocale'), 'pages.defaultLocale');
+  if (!locales.includes(defaultLocale)) throw new PolicyError(`pages.defaultLocale: "${defaultLocale}" is not in pages.locales`);
+  const notFoundProbe = str(m.get('notFoundProbe'), 'pages.notFoundProbe');
+  /** @param {string} p @param {string} where */
+  const checkPath = (p, where) => {
+    if (!p.startsWith('/') || !p.endsWith('/')) throw new PolicyError(`${where}: path "${p}" must start and end with "/"`);
+    const first = p.split('/')[1] ?? '';
+    if (locales.includes(first)) throw new PolicyError(`${where}: path "${p}" must not carry a locale prefix (locales are added automatically)`);
+  };
+  checkPath(notFoundProbe, 'pages.notFoundProbe');
+  /** @type {Set<string>} */
+  const seen = new Set();
+  const entries = list(m.get('entries'), 'pages.entries').map((e, i) => {
+    const where = `pages.entries[${i}]`;
+    const em = record(e, where, ['path', 'kind'], ['id']);
+    const path = str(em.get('path'), `${where}.path`);
+    checkPath(path, where);
+    if (seen.has(path)) throw new PolicyError(`${where}: duplicate path "${path}"`);
+    seen.add(path);
+    const kind = str(em.get('kind'), `${where}.kind`);
+    if (!isPageKind(kind)) throw new PolicyError(`${where}.kind: "${kind}" is not one of ${PAGE_KINDS.join(', ')}`);
+    const id = optStr(em.get('id'), `${where}.id`);
+    if (kind === 'project' && id === undefined) throw new PolicyError(`${where}: project pages need an "id" (the content collection id)`);
+    if (kind !== 'project' && id !== undefined) throw new PolicyError(`${where}: only project pages take an "id"`);
+    return { path, kind, id };
+  });
+  /** @type {Pages} */
+  const pages = { defaultLocale, locales, notFoundProbe, entries, expanded: [] };
+  for (const locale of locales) {
+    for (const entry of entries) {
+      pages.expanded.push({ path: localePath(pages, locale, entry.path), basePath: entry.path, locale, kind: entry.kind, id: entry.id });
+    }
+  }
+  return pages;
+}
+
+/** @param {Pages} pages @param {string} include @returns {string[]} */
+function expandInclude(pages, include) {
+  if (include === 'pages') return pages.expanded.map((p) => p.path);
+  if (include === 'notFound') return pages.locales.map((l) => localePath(pages, l, pages.notFoundProbe));
+  return pages.expanded.filter((p) => p.kind === 'project')
+    .map((p) => (p.locale === pages.defaultLocale ? `/og/${p.id}.png` : `/og/${p.locale}/${p.id}.png`));
+}
+
+/** @param {unknown} raw @param {number} i @param {Pages} pages @returns {RouteRule} */
+function readRoute(raw, i, pages) {
   const path = `routes[${i}]`;
-  const m = record(raw, path, ['class', 'status'], ['paths', 'discover', 'contentType', 'cacheControl', 'location']);
-  const hasPaths = m.has('paths');
-  if (hasPaths === m.has('discover')) throw new PolicyError(`${path}: needs exactly one of "paths" or "discover"`);
+  const m = record(raw, path, ['class', 'status'], ['paths', 'include', 'discover', 'contentType', 'cacheControl', 'location']);
+  const hasList = m.has('paths') || m.has('include');
+  if (m.has('discover') && hasList) throw new PolicyError(`${path}: "discover" cannot be combined with "paths" or "include"`);
+  if (!hasList && !m.has('discover')) throw new PolicyError(`${path}: needs "paths"/"include" or "discover"`);
   /** @type {Discover | undefined} */
   let discover;
   if (m.has('discover')) {
@@ -65,9 +133,17 @@ function readRoute(raw, i) {
     discover = { from: str(d.get('from'), `${path}.discover.from`), pattern: str(d.get('pattern'), `${path}.discover.pattern`) };
     assertRegex(discover.pattern, `${path}.discover.pattern`);
   }
+  const paths = m.has('paths') ? strList(m.get('paths'), `${path}.paths`) : [];
+  if (m.has('include')) {
+    for (const inc of strList(m.get('include'), `${path}.include`)) {
+      if (!ROUTE_INCLUDES.includes(inc)) throw new PolicyError(`${path}.include: "${inc}" is not one of ${ROUTE_INCLUDES.join(', ')}`);
+      paths.push(...expandInclude(pages, inc));
+    }
+  }
+  if (new Set(paths).size !== paths.length) throw new PolicyError(`${path}: a path is listed twice (explicitly and via include?)`);
   return {
     class: str(m.get('class'), `${path}.class`),
-    paths: hasPaths ? strList(m.get('paths'), `${path}.paths`) : [],
+    paths,
     discover,
     status: int(m.get('status'), `${path}.status`),
     contentType: optStr(m.get('contentType'), `${path}.contentType`),
@@ -94,7 +170,7 @@ function readAllowEntry(raw, i) {
  * @returns {Policy}
  */
 export function validatePolicy(raw) {
-  const top = record(raw, '', ['version', 'csp', 'requiredHeaders', 'permissionsPolicy', 'forbiddenHeaders', 'routes',
+  const top = record(raw, '', ['version', 'csp', 'requiredHeaders', 'permissionsPolicy', 'forbiddenHeaders', 'pages', 'routes',
     'previewHosts', 'dist', 'securityTxt', 'audit', 'live', 'observatory']);
   if (top.get('version') !== 1) throw new PolicyError('version: only version 1 is supported');
 
@@ -122,6 +198,7 @@ export function validatePolicy(raw) {
   for (const s of severities) if (!['low', 'moderate', 'high', 'critical'].includes(s)) throw new PolicyError(`audit.failOnSeverities: unknown severity "${s}"`);
   const live = record(top.get('live'), 'live', ['origin', 'httpRedirect']);
   const redirect = record(live.get('httpRedirect'), 'live.httpRedirect', ['from', 'statuses', 'location']);
+  const pages = readPages(top.get('pages'));
   const obs = record(top.get('observatory'), 'observatory', ['host', 'minGrade']);
   const minGrade = str(obs.get('minGrade'), 'observatory.minGrade');
   if (!GRADES.includes(minGrade)) throw new PolicyError(`observatory.minGrade: "${minGrade}" is not one of ${GRADES.join(' ')}`);
@@ -132,7 +209,8 @@ export function validatePolicy(raw) {
     requiredHeaders,
     permissionsPolicy: { deniedFeatures, forbiddenFeatures },
     forbiddenHeaders: strList(top.get('forbiddenHeaders'), 'forbiddenHeaders'),
-    routes: list(top.get('routes'), 'routes').map(readRoute),
+    pages,
+    routes: list(top.get('routes'), 'routes').map((r, i) => readRoute(r, i, pages)),
     previewHosts: {
       header: str(ph.get('header'), 'previewHosts.header'), value: str(ph.get('value'), 'previewHosts.value'),
       noindexHosts: strList(ph.get('noindexHosts'), 'previewHosts.noindexHosts'), indexableHosts: strList(ph.get('indexableHosts'), 'previewHosts.indexableHosts'),

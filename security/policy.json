@@ -75,12 +75,26 @@
     "SourceMap",
     "X-SourceMap"
   ],
+  "pages": {
+    "$comment": "THE list of every HTML page the site builds, written once without a locale prefix. Each entry expands to every locale (default locale unprefixed, others under /<locale>/). Routes below pull from it via \"include\"; scripts/check-coverage.mjs fails the build if a built page or content project is missing here, or a listed page is not built.",
+    "defaultLocale": "en",
+    "locales": ["en"],
+    "notFoundProbe": "/this-page-does-not-exist/",
+    "entries": [
+      { "path": "/", "kind": "home" },
+      { "path": "/about/", "kind": "page" },
+      { "path": "/privacy/", "kind": "page" },
+      { "path": "/security/", "kind": "page" },
+      { "path": "/work/spellcastersdb/", "kind": "project", "id": "spellcastersdb" },
+      { "path": "/work/spellcasters-community-api/", "kind": "project", "id": "spellcasters-community-api" }
+    ]
+  },
   "routes": [
-    { "class": "html", "paths": ["/", "/about/", "/privacy/", "/security/", "/work/spellcastersdb/", "/work/spellcasters-community-api/"], "status": 200, "contentType": "text/html; charset=utf-8" },
-    { "class": "not-found", "paths": ["/this-page-does-not-exist/"], "status": 404, "contentType": "text/html; charset=utf-8" },
+    { "class": "html", "include": ["pages"], "status": 200, "contentType": "text/html; charset=utf-8" },
+    { "class": "not-found", "include": ["notFound"], "status": 404, "contentType": "text/html; charset=utf-8" },
     { "class": "hashed-stylesheet", "discover": { "from": "/", "pattern": "<link rel=\"stylesheet\" href=\"(/_astro/[^\"]+\\.css)\"" }, "status": 200, "contentType": "text/css; charset=utf-8", "cacheControl": "public, max-age=31536000, immutable" },
     { "class": "font", "paths": ["/fonts/newsreader-latin-wght-normal.woff2", "/fonts/instrument-sans-latin-wght-normal.woff2"], "status": 200, "contentType": "font/woff2", "cacheControl": "public, max-age=2592000" },
-    { "class": "image", "paths": ["/og.png", "/og/spellcastersdb.png", "/og/spellcasters-community-api.png"], "status": 200, "contentType": "image/png" },
+    { "class": "image", "paths": ["/og.png"], "include": ["projectOgImages"], "status": 200, "contentType": "image/png" },
     { "class": "svg", "paths": ["/favicon.svg"], "status": 200, "contentType": "image/svg+xml" },
     { "class": "security-txt", "paths": ["/.well-known/security.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },
     { "class": "llms-txt", "paths": ["/llms.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },

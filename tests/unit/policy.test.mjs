@@ -57,3 +57,68 @@ test('$comment keys are allowed anywhere', () => {
   raw.csp.$comment_extra = 'note';
   assert.doesNotThrow(() => validatePolicy(raw));
 });
+
+// --- Page list (single source of truth for every HTML page) ---
+
+/** @param {import('../../scripts/lib/policy.mjs').Policy} policy @param {string} cls */
+function routePaths(policy, cls) {
+  const route = policy.routes.find((r) => r.class === cls);
+  assert.ok(route, `route class ${cls} exists`);
+  return route.paths;
+}
+
+test('the committed policy still covers exactly the pages it covered before the restructure', () => {
+  const policy = loadPolicy();
+  for (const path of ['/', '/about/', '/privacy/', '/security/', '/work/spellcastersdb/', '/work/spellcasters-community-api/']) {
+    assert.ok(routePaths(policy, 'html').includes(path), `html covers ${path}`);
+  }
+  assert.ok(routePaths(policy, 'not-found').includes('/this-page-does-not-exist/'));
+  for (const path of ['/og.png', '/og/spellcastersdb.png', '/og/spellcasters-community-api.png']) {
+    assert.ok(routePaths(policy, 'image').includes(path), `image covers ${path}`);
+  }
+});
+
+test('pages expand across every locale; the default locale has no prefix', () => {
+  const raw = rawPolicy();
+  raw.pages.locales = ['en', 'es'];
+  const policy = validatePolicy(raw);
+  const about = policy.pages.expanded.filter((p) => p.basePath === '/about/');
+  assert.deepEqual(about.map((p) => [p.path, p.locale]), [['/about/', 'en'], ['/es/about/', 'es']]);
+  assert.ok(policy.pages.expanded.some((p) => p.path === '/es/' && p.kind === 'home'));
+});
+
+test('route includes expand from the page list (html, not-found, project og images)', () => {
+  const raw = rawPolicy();
+  raw.pages.locales = ['en', 'es'];
+  const policy = validatePolicy(raw);
+  assert.deepEqual(routePaths(policy, 'html'), policy.pages.expanded.map((p) => p.path));
+  assert.deepEqual(routePaths(policy, 'not-found'), ['/this-page-does-not-exist/', '/es/this-page-does-not-exist/']);
+  const images = routePaths(policy, 'image');
+  assert.ok(images.includes('/og.png'), 'explicit paths are kept');
+  assert.ok(images.includes('/og/spellcastersdb.png'));
+  assert.ok(images.includes('/og/es/spellcastersdb.png'));
+});
+
+/** @type {Array<[string, (p: Record<string, any>) => void, RegExp]>} */
+const malformedPages = [
+  ['page path without slashes', (p) => { p.pages.entries.push({ path: 'about', kind: 'page' }); }, /path/],
+  ['duplicate page path', (p) => { p.pages.entries.push({ path: '/about/', kind: 'page' }); }, /duplicate/],
+  ['project page without an id', (p) => { p.pages.entries.push({ path: '/work/x/', kind: 'project' }); }, /id/],
+  ['unknown page kind', (p) => { p.pages.entries.push({ path: '/x/', kind: 'blog' }); }, /kind/],
+  ['default locale not in locales', (p) => { p.pages.defaultLocale = 'fr'; }, /defaultLocale/],
+  ['page path carries a locale prefix', (p) => { p.pages.locales = ['en', 'es']; p.pages.entries.push({ path: '/es/x/', kind: 'page' }); }, /locale prefix/],
+  ['unknown route include', (p) => { p.routes[0].include = ['everything']; }, /include/],
+  ['include combined with discover', (p) => { p.routes[2].include = ['pages']; }, /discover/],
+];
+
+for (const [name, mutate, message] of malformedPages) {
+  test(`a malformed page list fails loudly: ${name}`, () => {
+    const raw = rawPolicy();
+    mutate(raw);
+    assert.throws(() => validatePolicy(raw), (error) => {
+      assert.ok(error instanceof PolicyError, 'expected a PolicyError');
+      assert.match(error.message, message);
+      return true;
+    });
+  });
+}
