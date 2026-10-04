@@ -16,6 +16,6 @@ screenshot:
   height: 900
 ---
 
-A free, open-source JSON API of community-gathered game data for Spellcasters Chronicles: heroes, units, spells, titans, consumables, upgrades and infusions.
+I first built the Spellcasters Community API to power SpellcastersDB, then split it out so anyone in the community could use the same data.
 
-It's static JSON served from GitHub Pages, so anyone can use it in their own apps and tools without a key or sign-up. Anyone can contribute fixes and new data through the repository. SpellcastersDB is built on it.
+It's free, open-source JSON covering heroes, units, spells, titans, consumables, upgrades and infusions, served as static files from GitHub Pages. There are no keys and no accounts. Anyone can submit corrections and new data through the repository.
