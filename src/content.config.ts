@@ -1,17 +1,35 @@
 import { defineCollection } from 'astro:content';
-import { z } from 'astro:schema';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
-const readmes = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/readmes' }),
+/**
+ * Content source switch (build-time only).
+ *
+ * `process.env` is read here on purpose: this file runs in Node at build time,
+ * and `TT_CONTENT` is non-secret build configuration, not a runtime value.
+ * Setting `TT_CONTENT=fixtures` swaps the loader to `tests/fixtures/projects`
+ * so E2E tests never depend on (or leak) fixtures in production content.
+ * Any other value, or no value, uses the real content.
+ */
+const useFixtures = process.env.TT_CONTENT === 'fixtures';
+const projectsBase = useFixtures ? './tests/fixtures/projects' : './src/content/projects';
+
+const projects = defineCollection({
+  loader: glob({ pattern: '*.md', base: projectsBase }),
   schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    type: z.enum(['tool', 'site']),
-    status: z.enum(['active', 'deprecated', 'archived']).default('active'),
+    title: z.string().min(1),
+    /** One line, shown in the work index. */
+    summary: z.string().min(1),
+    /** Live site. */
+    url: z.url(),
+    repo: z.url().optional(),
+    year: z.number().int(),
+    status: z.enum(['live', 'experimental', 'archived']),
+    order: z.number().int().default(100),
+    disclaimer: z.string().optional(),
   }),
 });
 
 export const collections = {
-  readmes,
+  projects,
 };

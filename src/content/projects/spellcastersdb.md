@@ -1,17 +1,15 @@
 ---
 title: "SpellcastersDB"
-description: "I built a community database and deck builder for Spellcasters Chronicles."
-type: "site"
-status: "active"
+summary: "Community database and deck builder for Spellcasters Chronicles."
+url: "https://www.spellcastersdb.com/"
+repo: "https://github.com/TerribleTurtle/spellcastersdb"
+year: 2026
+status: "live"
+order: 1
+disclaimer: "Unofficial fan project. Not affiliated with or endorsed by Quantic Dream."
 ---
 
-I built a community database and deck builder for Spellcasters Chronicles.
-
-[Visit SpellcastersDB](https://www.spellcastersdb.com/) • [View on GitHub](https://github.com/TerribleTurtle/spellcastersdb)
-
-## Project Overview
-
-SpellcastersDB is a Next.js application that serves as a community resource for the game *Spellcasters Chronicles*. It features:
+I built a community database and deck builder for *Spellcasters Chronicles*. It is a Next.js application with these features:
 
 - **The Archive**: A searchable, filterable database of all Units, Spells, Titans, and Spellcasters.
 - **Knowledge Tracker**: An interactive calculator that connects to the community API to plan unlocks, track owned entities, and forecast daily progression.
