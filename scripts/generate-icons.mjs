@@ -7,10 +7,13 @@
  * Usage: node scripts/generate-icons.mjs
  */
 import { chromium } from '@playwright/test';
-import { readFileSync, writeFileSync } from 'node:fs';
-import { paletteHex } from './lib/palette.mjs';
+import { writeFileSync } from 'node:fs';
+import { paletteHex, renderFaviconSvg } from './lib/palette.mjs';
 
-const svg = readFileSync('public/favicon.svg', 'utf8');
+// 1. Write public/favicon.svg from tokens.css
+const svg = renderFaviconSvg();
+writeFileSync('public/favicon.svg', svg, 'utf8');
+
 const svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 const dark = paletteHex('dark');
 
@@ -59,4 +62,6 @@ try {
   await browser.close();
 }
 
-console.log('Wrote public/favicon.ico (32×32 PNG-in-ICO) and public/apple-touch-icon.png (180×180).');
+console.log(
+  'Wrote public/favicon.svg, public/favicon.ico (32×32 PNG-in-ICO), and public/apple-touch-icon.png (180×180).',
+);
