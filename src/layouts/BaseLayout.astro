@@ -2,6 +2,8 @@
 import '../styles/global.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { LOCALE_META, defaultLocale, locales, localizePath, splitLocale } from '../i18n/locales';
+import { t } from '../i18n/ui';
 
 interface Props {
   title?: string;
@@ -35,6 +37,12 @@ const siteURL = Astro.site;
 const canonicalURL = new URL(Astro.url.pathname, siteURL);
 const socialImageURL = new URL(ogImage ?? image, siteURL);
 
+// The locale comes from the URL, so every page gets the right lang/dir without passing props.
+const { locale, basePath } = splitLocale(Astro.url.pathname);
+const meta = LOCALE_META[locale];
+const alternates = locales.map((l) => ({ hreflang: LOCALE_META[l].bcp47, href: new URL(localizePath(l, basePath), siteURL) }));
+const xDefault = new URL(localizePath(defaultLocale, basePath), siteURL);
+
 // Inline JSON-LD is a non-executable data block (`application/ld+json`),
 // so it is not subject to `script-src` and does not weaken the CSP.
 const jsonLd = JSON.stringify({
@@ -45,6 +53,7 @@ const jsonLd = JSON.stringify({
       '@id': new URL('/#website', siteURL).toString(),
       name: siteName,
       url: siteURL.toString(),
+      inLanguage: locales.map((l) => LOCALE_META[l].bcp47),
       author: { '@id': new URL('/#person', siteURL).toString() },
     },
     {
@@ -60,7 +69,7 @@ const jsonLd = JSON.stringify({
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={meta.bcp47} dir={meta.dir}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -68,6 +77,14 @@ const jsonLd = JSON.stringify({
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonicalURL} />
+    {
+      !noindex && locales.length > 1 && (
+        <>
+          {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+          <link rel="alternate" hreflang="x-default" href={xDefault} />
+        </>
+      )
+    }
     <meta name="color-scheme" content="dark light" />
 
     <link
@@ -90,6 +107,8 @@ const jsonLd = JSON.stringify({
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content={meta.ogLocale} />
+    {locales.filter((l): boolean => l !== locale).map((l) => <meta property="og:locale:alternate" content={LOCALE_META[l].ogLocale} />)}
     <meta property="og:site_name" content={siteName} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
@@ -108,7 +127,7 @@ const jsonLd = JSON.stringify({
     <script type="application/ld+json" is:inline set:html={jsonLd} />
   </head>
   <body>
-    <a href="#main" class="skip-link">Skip to main content</a>
+    <a href="#main" class="skip-link">{t(locale, 'skip.main')}</a>
     <SiteHeader />
     <main id="main" tabindex="-1" class="wrap">
       <slot />
