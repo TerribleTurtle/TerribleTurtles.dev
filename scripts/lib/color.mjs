@@ -134,16 +134,51 @@ export function resolveColorValue(val, primitives) {
 }
 
 /**
- * Extract every `--token: light-dark(...)` declaration, resolving `var(--palette-...)`
- * references against defined primitives in the same stylesheet.
+ * Remove all `@media ... { ... }` blocks from the css string.
  * @param {string} css
+ * @returns {string}
+ */
+export function stripMediaBlocks(css) {
+  let result = '';
+  let i = 0;
+  while (i < css.length) {
+    const mediaIdx = css.indexOf('@media', i);
+    if (mediaIdx === -1) {
+      result += css.slice(i);
+      break;
+    }
+    result += css.slice(i, mediaIdx);
+    const braceIdx = css.indexOf('{', mediaIdx);
+    if (braceIdx === -1) {
+      break;
+    }
+    let depth = 1;
+    let j = braceIdx + 1;
+    while (j < css.length && depth > 0) {
+      if (css[j] === '{') depth++;
+      else if (css[j] === '}') depth--;
+      j++;
+    }
+    i = j;
+  }
+  return result;
+}
+
+/**
+ * Extract every `--token: light-dark(...)` declaration, resolving `var(--palette-...)`
+ * references against defined primitives in the same stylesheet or provided primitives map.
+ * When called on a full stylesheet (no externalPrimitives), media query blocks are stripped
+ * so base `:root` tokens are returned without being overwritten by media overrides.
+ * @param {string} css
+ * @param {Map<string, Oklch>} [externalPrimitives]
  * @returns {Map<string, SchemePair>}
  */
-export function parseLightDarkTokens(css) {
-  const primitives = parsePrimitives(css);
+export function parseLightDarkTokens(css, externalPrimitives) {
+  const primitives = externalPrimitives ?? parsePrimitives(css);
+  const code = externalPrimitives !== undefined ? css : stripMediaBlocks(css);
   /** @type {Map<string, SchemePair>} */
   const tokens = new Map();
-  for (const [, name, light, dark] of css.matchAll(LIGHT_DARK_RE)) {
+  for (const [, name, light, dark] of code.matchAll(LIGHT_DARK_RE)) {
     if (name === undefined || light === undefined || dark === undefined) {
       continue;
     }
@@ -154,4 +189,27 @@ export function parseLightDarkTokens(css) {
   }
   return tokens;
 }
+
+/**
+ * Extract token overrides defined under `@media (prefers-contrast: more)`.
+ * @param {string} css
+ * @returns {Map<string, SchemePair>}
+ */
+export function parsePrefersContrastMoreTokens(css) {
+  const match = /@media\s*\(\s*prefers-contrast:\s*more\s*\)\s*\{/.exec(css);
+  if (!match) return new Map();
+  const startIdx = match.index + match[0].length;
+  let depth = 1;
+  let i = startIdx;
+  while (i < css.length && depth > 0) {
+    if (css[i] === '{') depth++;
+    else if (css[i] === '}') depth--;
+    i++;
+  }
+  const block = css.slice(startIdx, i - 1);
+  const primitives = parsePrimitives(css);
+  return parseLightDarkTokens(block, primitives);
+}
+
+
 

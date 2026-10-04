@@ -12,6 +12,8 @@ import {
   relativeLuminance,
   contrastRatio,
   parseLightDarkTokens,
+  stripMediaBlocks,
+  parsePrefersContrastMoreTokens,
 } from '../../scripts/lib/color.mjs';
 
 /** @param {number} actual @param {number} expected @param {number} tolerance */
@@ -83,4 +85,38 @@ test('parseLightDarkTokens resolves primitives referenced via var()', () => {
     dark: { l: 0.17, c: 0.012, h: 160 },
   });
 });
+
+test('stripMediaBlocks removes nested @media blocks leaving base styles', () => {
+  const css = `
+    :root { --a: 1; }
+    @media (prefers-contrast: more) {
+      :root { --a: 2; }
+    }
+    body { color: red; }`;
+  const stripped = stripMediaBlocks(css);
+  assert.match(stripped, /--a: 1;/);
+  assert.match(stripped, /body \{ color: red; \}/);
+  assert.ok(!stripped.includes('--a: 2;'));
+});
+
+test('parsePrefersContrastMoreTokens parses overrides from media block', () => {
+  const css = `
+    :root {
+      --palette-moss-400: oklch(60% 0.03 150);
+      --palette-moss-500: oklch(52% 0.03 150);
+      --color-hairline: light-dark(oklch(84% 0.03 150), oklch(35% 0.03 150));
+    }
+    @media (prefers-contrast: more) {
+      :root {
+        --color-hairline: light-dark(var(--palette-moss-400), var(--palette-moss-500));
+      }
+    }`;
+  const overrides = parsePrefersContrastMoreTokens(css);
+  assert.equal(overrides.size, 1);
+  assert.deepEqual(overrides.get('--color-hairline'), {
+    light: { l: 0.6, c: 0.03, h: 150 },
+    dark: { l: 0.52, c: 0.03, h: 150 },
+  });
+});
+
 
