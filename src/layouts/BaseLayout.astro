@@ -5,6 +5,8 @@ import SiteFooter from '../components/SiteFooter.astro';
 import { LOCALE_META, defaultLocale, locales, localizePath, splitLocale } from '../i18n/locales';
 import { t } from '../i18n/ui';
 
+import type { Locale } from '../i18n/locales';
+
 interface Props {
   title?: string;
   description?: string;
@@ -16,15 +18,20 @@ interface Props {
   noindex?: boolean;
   /** Extra nodes to append to the JSON-LD @graph. */
   extraGraph?: Record<string, unknown>[];
+  locale?: Locale;
 }
 
 const siteName = 'TerribleTurtles';
+// The locale comes from the URL, so every page gets the right lang/dir without passing props.
+const { locale: pathLocale, basePath } = splitLocale(Astro.url.pathname);
+const locale = Astro.props.locale ?? pathLocale;
+
 const {
   title = siteName,
-  description = 'A personal archive of things I have built.',
+  description = t(locale, 'meta.defaultDescription'),
   ogImage,
   image = '/og.png',
-  imageAlt = 'TerribleTurtles: things I have built.',
+  imageAlt = t(locale, 'meta.defaultImageAlt'),
   noindex = false,
   extraGraph = [],
 } = Astro.props;
@@ -37,8 +44,6 @@ const siteURL = Astro.site;
 const canonicalURL = new URL(Astro.url.pathname, siteURL);
 const socialImageURL = new URL(ogImage ?? image, siteURL);
 
-// The locale comes from the URL, so every page gets the right lang/dir without passing props.
-const { locale, basePath } = splitLocale(Astro.url.pathname);
 const meta = LOCALE_META[locale];
 const alternates = locales.map((l) => ({ hreflang: LOCALE_META[l].bcp47, href: new URL(localizePath(l, basePath), siteURL) }));
 const xDefault = new URL(localizePath(defaultLocale, basePath), siteURL);
@@ -128,10 +133,10 @@ const jsonLd = JSON.stringify({
   </head>
   <body>
     <a href="#main" class="skip-link">{t(locale, 'skip.main')}</a>
-    <SiteHeader />
+    <SiteHeader locale={locale} />
     <main id="main" tabindex="-1" class="wrap">
       <slot />
     </main>
-    <SiteFooter />
+    <SiteFooter locale={locale} />
   </body>
 </html>

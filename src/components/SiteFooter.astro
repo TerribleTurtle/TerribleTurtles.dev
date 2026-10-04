@@ -1,26 +1,35 @@
 ---
+import { splitLocale, localizePath, type Locale } from '../i18n/locales';
+import { t, format } from '../i18n/ui';
+
+interface Props {
+  locale?: Locale;
+}
+
 /** Site footer: secondary links, licence line and font credits. */
+const { locale: pathLocale } = splitLocale(Astro.url.pathname);
+const locale = Astro.props.locale ?? pathLocale;
 const year = new Date().getFullYear();
 ---
 
 <footer class="wrap">
   <div class="site-footer">
-    <nav aria-label="Footer">
+    <nav aria-label={t(locale, 'footer.navLabel')}>
       <ul>
         <li><a href="https://github.com/TerribleTurtle">GitHub</a></li>
-        <li><a href="/privacy/">Privacy</a></li>
-        <li><a href="/security/">Security</a></li>
+        <li><a href={localizePath(locale, '/privacy/')}>{t(locale, 'footer.privacy')}</a></li>
+        <li><a href={localizePath(locale, '/security/')}>{t(locale, 'footer.security')}</a></li>
       </ul>
     </nav>
     <p class="colophon">
-      <span>© {year} TerribleTurtles</span>
+      <span>{format(t(locale, 'footer.copyright'), { year })}</span>
       <span aria-hidden="true">·</span>
-      <span>Code MIT</span>
+      <span>{t(locale, 'footer.codeLicense')}</span>
       <span aria-hidden="true">·</span>
-      <span>Writing CC BY-NC 4.0</span>
+      <span>{t(locale, 'footer.writingLicense')}</span>
     </p>
     <p class="credits">
-      Set in <a href="/fonts/Newsreader-OFL.txt">Newsreader</a> and <a href="/fonts/InstrumentSans-OFL.txt">Instrument Sans</a> (SIL Open Font License).
+      {t(locale, 'footer.fontCreditsPrefix')}{' '}<a href="/fonts/Newsreader-OFL.txt">Newsreader</a>{' '}{t(locale, 'footer.fontCreditsAnd')}{' '}<a href="/fonts/InstrumentSans-OFL.txt">Instrument Sans</a>{' '}{t(locale, 'footer.fontCreditsSuffix')}
     </p>
   </div>
 </footer>

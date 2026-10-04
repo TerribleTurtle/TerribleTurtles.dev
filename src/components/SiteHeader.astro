@@ -1,25 +1,32 @@
 ---
 import ScuteMark from './ScuteMark.astro';
+import { splitLocale, localizePath, type Locale } from '../i18n/locales';
+import { t } from '../i18n/ui';
+
+interface Props {
+  locale?: Locale;
+}
 
 /**
  * Site header: mark + wordmark (home link) and the primary nav.
  * The home page is the work index, so "Work" points to "/" and is marked as
  * the current section on project pages.
  */
-const pathname = Astro.url.pathname;
+const { locale: pathLocale, basePath } = splitLocale(Astro.url.pathname);
+const locale = Astro.props.locale ?? pathLocale;
 
 const navItems = [
-  { href: '/', label: 'Work', current: pathname === '/' ? 'page' : pathname.startsWith('/work/') ? 'true' : undefined },
-  { href: '/about/', label: 'About', current: pathname === '/about/' ? 'page' : undefined },
+  { href: localizePath(locale, '/'), label: t(locale, 'nav.work'), current: basePath === '/' ? 'page' : basePath.startsWith('/work/') ? 'true' : undefined },
+  { href: localizePath(locale, '/about/'), label: t(locale, 'nav.about'), current: basePath === '/about/' ? 'page' : undefined },
 ] as const;
 ---
 
 <header class="site-header wrap">
-  <a class="brand" href="/" aria-label="TerribleTurtles, home">
+  <a class="brand" href={localizePath(locale, '/')} aria-label={t(locale, 'brand.homeLabel')}>
     <ScuteMark />
     <span class="wordmark">TerribleTurtles</span>
   </a>
-  <nav aria-label="Primary">
+  <nav aria-label={t(locale, 'nav.primaryLabel')}>
     <ul>
       {
         navItems.map((item) => (

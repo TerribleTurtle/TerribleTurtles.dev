@@ -1,5 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { splitLocale, type Locale } from '../i18n/locales';
+import { t } from '../i18n/ui';
 
 /**
  * Project status as text plus a small dot. The text carries the meaning;
@@ -9,20 +11,23 @@ type Status = CollectionEntry<'projects'>['data']['status'];
 
 interface Props {
   status: Status;
+  locale?: Locale;
 }
 
-const labels: Record<Status, string> = {
-  live: 'Live',
-  experimental: 'Experimental',
-  archived: 'Archived',
-};
-
 const { status } = Astro.props;
+const { locale: pathLocale } = splitLocale(Astro.url.pathname);
+const locale = Astro.props.locale ?? pathLocale;
+
+const statusKeys: Record<Status, 'status.live' | 'status.experimental' | 'status.archived'> = {
+  live: 'status.live',
+  experimental: 'status.experimental',
+  archived: 'status.archived',
+};
 ---
 
 <span class="status">
   <span class:list={['dot', `dot-${status}`]} aria-hidden="true"></span>
-  {labels[status]}
+  {t(locale, statusKeys[status])}
 </span>
 
 <style>

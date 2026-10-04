@@ -1,13 +1,17 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import StatusLabel from './StatusLabel.astro';
+import { splitLocale, localizePath, type Locale } from '../i18n/locales';
 
 /** The work index: one hairline-divided row per project. Reads fine with a single entry. */
 interface Props {
   projects: CollectionEntry<'projects'>[];
+  locale?: Locale;
 }
 
 const { projects } = Astro.props;
+const { locale: pathLocale } = splitLocale(Astro.url.pathname);
+const locale = Astro.props.locale ?? pathLocale;
 ---
 
 <ul class="work-list">
@@ -15,13 +19,13 @@ const { projects } = Astro.props;
     projects.map((project) => (
       <li class="row">
         <h3 class="row-title">
-          <a href={`/work/${project.id}/`}>{project.data.title}</a>
+          <a href={localizePath(locale, `/work/${project.id}/`)}>{project.data.title}</a>
         </h3>
         <p class="row-summary">{project.data.summary}</p>
         <p class="row-meta">
           <span>{project.data.year}</span>
           <span aria-hidden="true">·</span>
-          <StatusLabel status={project.data.status} />
+          <StatusLabel status={project.data.status} locale={locale} />
         </p>
       </li>
     ))

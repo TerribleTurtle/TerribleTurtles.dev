@@ -3,6 +3,8 @@ import type { GetStaticPaths } from 'astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import StatusLabel from '../../components/StatusLabel.astro';
+import { LOCALE_META, splitLocale, localizePath } from '../../i18n/locales';
+import { t, format } from '../../i18n/ui';
 
 export const getStaticPaths = (async () => {
   const projects = await getCollection('projects');
@@ -17,6 +19,9 @@ interface Props {
 }
 
 const { project } = Astro.props;
+const { locale } = splitLocale(Astro.url.pathname);
+const meta = LOCALE_META[locale];
+
 const { title, summary, url, repo, year, status, disclaimer, stack, languages, screenshot } =
   project.data;
 const { Content } = await render(project);
@@ -46,8 +51,8 @@ const breadcrumbs: Record<string, unknown> = {
     {
       '@type': 'ListItem',
       position: 1,
-      name: 'Home',
-      item: new URL('/', Astro.site).toString(),
+      name: t(locale, 'brand.home'),
+      item: new URL(localizePath(locale, '/'), Astro.site).toString(),
     },
     {
       '@type': 'ListItem',
@@ -59,17 +64,23 @@ const breadcrumbs: Record<string, unknown> = {
 };
 
 const extraGraph: Record<string, unknown>[] = [softwareSourceCode, breadcrumbs];
+
+const formattedStack =
+  stack && stack.length > 0
+    ? new Intl.ListFormat(meta.bcp47, { style: 'narrow', type: 'conjunction' }).format(stack)
+    : undefined;
 ---
 
 <BaseLayout
-  title={`${title} | TerribleTurtles`}
+  title={`${title}${t(locale, 'meta.titleSuffix')}`}
   description={summary}
   ogImage={`/og/${project.id}.png`}
   imageAlt={`${title}: ${summary}`}
   extraGraph={extraGraph}
+  locale={locale}
 >
   <article class="project">
-    <p class="back"><a href="/"><span aria-hidden="true">← </span>All work</a></p>
+    <p class="back"><a href={localizePath(locale, '/')}><span aria-hidden="true">← </span>{t(locale, 'project.allWork')}</a></p>
 
     <header>
       <h1 class="page-title">{title}</h1>
@@ -78,14 +89,12 @@ const extraGraph: Record<string, unknown>[] = [softwareSourceCode, breadcrumbs];
 
     <ul class="links">
       <li>
-        <a href={url} rel="noopener noreferrer">Visit {title}<span aria-hidden="true"> ↗</span><span class="visually-hidden"> (external site)</span></a>
+        <a href={url} rel="noopener noreferrer">{format(t(locale, 'project.visit'), { title })}<span aria-hidden="true"> ↗</span><span class="visually-hidden"> {t(locale, 'project.externalSite')}</span></a>
       </li>
       {
         repo && (
           <li>
-            <a href={repo} rel="noopener noreferrer">
-              Source on GitHub<span aria-hidden="true"> ↗</span><span class="visually-hidden"> (external site)</span>
-            </a>
+            <a href={repo} rel="noopener noreferrer">{t(locale, 'project.source')}<span aria-hidden="true"> ↗</span><span class="visually-hidden"> {t(locale, 'project.externalSite')}</span></a>
           </li>
         )
       }
@@ -111,18 +120,18 @@ const extraGraph: Record<string, unknown>[] = [softwareSourceCode, breadcrumbs];
 
     <dl class="facts">
       <div>
-        <dt>Year</dt>
+        <dt>{t(locale, 'project.year')}</dt>
         <dd>{year}</dd>
       </div>
       <div>
-        <dt>Status</dt>
-        <dd><StatusLabel status={status} /></dd>
+        <dt>{t(locale, 'project.status')}</dt>
+        <dd><StatusLabel status={status} locale={locale} /></dd>
       </div>
       {
-        stack && stack.length > 0 && (
+        formattedStack && (
           <div>
-            <dt>Built with</dt>
-            <dd>{stack.join(', ')}</dd>
+            <dt>{t(locale, 'project.builtWith')}</dt>
+            <dd>{formattedStack}</dd>
           </div>
         )
       }

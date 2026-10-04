@@ -2,19 +2,25 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import WorkList from '../components/WorkList.astro';
+import { splitLocale, LOCALE_META } from '../i18n/locales';
+import { t } from '../i18n/ui';
+
+const { locale } = splitLocale(Astro.url.pathname);
 
 const projects = (await getCollection('projects')).sort(
-  (a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
+  (a, b) =>
+    a.data.order - b.data.order ||
+    a.data.title.localeCompare(b.data.title, LOCALE_META[locale].bcp47),
 );
 ---
 
-<BaseLayout title="TerribleTurtles" description="A personal archive of things I have built.">
-  <h1 class="page-title">Things I've built.</h1>
-  <p class="lede">A personal archive.</p>
+<BaseLayout title="TerribleTurtles" description={t(locale, 'meta.defaultDescription')} locale={locale}>
+  <h1 class="page-title">{t(locale, 'home.title')}</h1>
+  <p class="lede">{t(locale, 'home.lede')}</p>
 
   <section class="work" aria-labelledby="work-heading">
-    <h2 id="work-heading" class="section-label">Work</h2>
-    <WorkList projects={projects} />
+    <h2 id="work-heading" class="section-label">{t(locale, 'home.workHeading')}</h2>
+    <WorkList projects={projects} locale={locale} />
   </section>
 </BaseLayout>
 
