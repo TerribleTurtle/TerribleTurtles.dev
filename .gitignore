@@ -1,11 +1,19 @@
-# build output
-dist/
-
-# generated types
-.astro/
-
 # dependencies
 node_modules/
+
+# build / generated output
+dist/
+out/
+.astro/
+.wrangler/
+coverage/
+
+# test output
+playwright-report/
+test-results/
+
+# local scratch space
+scratch/
 
 # logs
 *.log
@@ -25,12 +33,3 @@ Thumbs.db
 # IDE settings
 .idea/
 .vscode/
-
-# build / test output
-dist/
-out/
-coverage/
-playwright-report/
-test-results/
-.astro/
-.wrangler

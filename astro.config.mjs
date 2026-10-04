@@ -2,15 +2,24 @@
 import { defineConfig, passthroughImageService } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
+const site = 'https://terribleturtles.dev';
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://terribleturtles.dev',
+  site,
   output: 'static',
+  trailingSlash: 'always',
   build: {
-    inlineStylesheets: 'always'
+    format: 'directory',
+    // External stylesheets only, so the CSP can use `style-src 'self'` without 'unsafe-inline'.
+    inlineStylesheets: 'never',
   },
   image: {
-    service: passthroughImageService()
+    service: passthroughImageService(),
   },
-  integrations: [sitemap()]
+  integrations: [
+    sitemap({
+      filter: (page) => !/\/404\/?$/.test(new URL(page).pathname),
+    }),
+  ],
 });
