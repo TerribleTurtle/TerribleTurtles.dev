@@ -1,24 +1,18 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry, render } from 'astro:content';
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { splitLocale } from '../i18n/locales';
+
+const { locale } = splitLocale(Astro.url.pathname);
+const entry = await getEntry('pages', `${locale}/security`);
+if (!entry) throw new Error(`Missing page content for ${locale}/security`);
+const { Content } = await render(entry);
 ---
 
-<BaseLayout title="Security | TerribleTurtles" description="Security notes and how to report a problem.">
-  <h1 class="page-title">Security</h1>
-  <div class="prose">
-    <p>
-      This site is a set of static files. It has no accounts, no database and no server-side code. It
-      sends strict security headers, and those headers are checked by automated tests.
-    </p>
-
-    <h2>Reporting a problem</h2>
-    <p>
-      If you find a security issue, please email{' '}
-      <a href="mailto:security@terribleturtles.dev">security@terribleturtles.dev</a>. Contact details are
-      also published in <a href="/.well-known/security.txt">security.txt</a>.
-    </p>
-    <p>
-      My projects on other subdomains and sites are separate. Reports about them are welcome at the same
-      address.
-    </p>
-  </div>
-</BaseLayout>
+<ProseLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  locale={locale}
+>
+  <Content />
+</ProseLayout>

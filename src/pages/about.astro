@@ -1,5 +1,12 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry, render } from 'astro:content';
+import ProseLayout from '../layouts/ProseLayout.astro';
+import { splitLocale } from '../i18n/locales';
+
+const { locale } = splitLocale(Astro.url.pathname);
+const entry = await getEntry('pages', `${locale}/about`);
+if (!entry) throw new Error(`Missing page content for ${locale}/about`);
+const { Content } = await render(entry);
 
 const extraGraph: Record<string, unknown>[] = [
   {
@@ -9,18 +16,11 @@ const extraGraph: Record<string, unknown>[] = [
 ];
 ---
 
-<BaseLayout
-  title="About | TerribleTurtles"
-  description="About TerribleTurtles and this site."
+<ProseLayout
+  title={entry.data.title}
+  description={entry.data.description}
   extraGraph={extraGraph}
+  locale={locale}
 >
-  <h1 class="page-title">About</h1>
-  <div class="prose">
-    <p>I'm TerribleTurtles. I build things when something seems worth making.</p>
-    <p>
-      My code is on <a href="https://github.com/TerribleTurtle">GitHub</a>, including{' '}
-      <a href="https://github.com/TerribleTurtle/TerribleTurtles.dev">the source for this site</a>.
-    </p>
-    <p>You can reach me at <a href="mailto:hello@terribleturtles.dev">hello@terribleturtles.dev</a>.</p>
-  </div>
-</BaseLayout>
+  <Content />
+</ProseLayout>

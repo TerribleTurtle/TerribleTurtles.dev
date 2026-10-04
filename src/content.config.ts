@@ -44,6 +44,18 @@ const projects = defineCollection({
   }).strict(),
 });
 
+const pages = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/pages' }),
+  schema: z
+    .object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      updated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional(),
+    })
+    .strict(),
+});
+
 export const collections = {
   projects,
+  pages,
 };
