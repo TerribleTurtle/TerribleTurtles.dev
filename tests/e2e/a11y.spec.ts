@@ -77,3 +77,93 @@ for (const route of routes) {
     expect(errors).toEqual([]);
   });
 }
+
+for (const route of routes) {
+  test(`tab-order: ${route} visits every visible link in DOM order with focus outline`, async ({ page, browserName }) => {
+    test.skip(
+      browserName === 'webkit',
+      'Playwright Windows WebKit does not move focus on Tab; verified in chromium + firefox',
+    );
+
+    await page.goto(route);
+
+    const linkCount = await page.evaluate(() => document.querySelectorAll('a[href]').length);
+    expect(linkCount).toBeGreaterThan(0);
+
+    const visitedIndices: number[] = [];
+    let returnedToEndTarget = false;
+
+    for (let step = 0; step < linkCount + 5; step++) {
+      await page.keyboard.press('Tab');
+
+      const info = await page.evaluate(() => {
+        const active = document.activeElement;
+        if (!active) {
+          return { isBody: false, isSkipLink: false, linkIndex: -1, outlineStyle: 'none', outlineWidth: 0 };
+        }
+        const links = Array.from(document.querySelectorAll('a[href]'));
+        const linkIndex = links.indexOf(active as HTMLAnchorElement);
+        const style = window.getComputedStyle(active);
+        const outlineWidthPx = parseFloat(style.outlineWidth) || 0;
+        return {
+          isBody: active === document.body,
+          isSkipLink: active.classList.contains('skip-link'),
+          linkIndex,
+          outlineStyle: style.outlineStyle,
+          outlineWidth: outlineWidthPx,
+        };
+      });
+
+      if (info.linkIndex !== -1) {
+        expect(
+          info.outlineStyle !== 'none' && info.outlineWidth > 0,
+          `link at index ${info.linkIndex} must have a visible focus outline`,
+        ).toBe(true);
+
+        if (visitedIndices.length < linkCount) {
+          visitedIndices.push(info.linkIndex);
+        } else if (info.isSkipLink) {
+          returnedToEndTarget = true;
+          break;
+        }
+      } else if (info.isBody) {
+        returnedToEndTarget = true;
+        break;
+      }
+    }
+
+    const expectedIndices = Array.from({ length: linkCount }, (_, i) => i);
+    expect(visitedIndices).toEqual(expectedIndices);
+
+    if (browserName === 'chromium') {
+      expect(returnedToEndTarget, 'focus must return to body or skip link at end').toBe(true);
+    } else {
+      // In headless Firefox on Windows, pressing Tab at the document boundary does not wrap without browser chrome.
+      // Confirm there is no keyboard trap by verifying Shift+Tab moves focus backward to the preceding link.
+      await page.keyboard.press('Shift+Tab');
+      const prevIndex = await page.evaluate(() => {
+        const links = Array.from(document.querySelectorAll('a[href]'));
+        return links.indexOf(document.activeElement as HTMLAnchorElement);
+      });
+      expect(prevIndex).toBe(linkCount - 2);
+    }
+  });
+}
+
+test.describe('forced-colors mode', () => {
+  for (const route of routes) {
+    test(`axe: ${route} has no violations with forcedColors active`, async ({ page, browserName }) => {
+      test.skip(browserName !== 'chromium', 'forced-colors axe checks run in chromium');
+      await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+      await page.goto(route);
+      const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+      const summary = results.violations.map((v) => ({
+        id: v.id,
+        impact: v.impact,
+        nodes: v.nodes.map((n) => n.target.join(' ')),
+      }));
+      expect(summary).toEqual([]);
+    });
+  }
+});
+

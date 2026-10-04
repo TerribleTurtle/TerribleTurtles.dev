@@ -10,6 +10,8 @@
  */
 const colorFunctions = ['rgb', 'rgba', 'hsl', 'hsla', 'hwb', 'lab', 'lch', 'oklab', 'oklch', 'color', 'color-mix', 'light-dark'];
 const safeKeywords = ['transparent', 'inherit', 'initial', 'currentcolor', 'currentColor', 'none'];
+/** CSS system colour keywords allowed for forced-colors high contrast mode. */
+const systemColors = ['CanvasText', 'GrayText', 'Canvas'];
 
 export default {
   plugins: ['stylelint-declaration-strict-value'],
@@ -17,17 +19,17 @@ export default {
   rules: {
     'scale-unlimited/declaration-strict-value': [
       ['/^(color|.+-color)$/', 'fill', 'stroke'],
-      { ignoreValues: [...safeKeywords, '/^var\\(/i'] },
+      { ignoreValues: [...safeKeywords, ...systemColors, '/^var\\(/i'] },
     ],
     'color-named': 'never',
     'color-no-hex': true,
     'function-disallowed-list': colorFunctions,
     'declaration-property-value-allowed-list': {
-      '/^color$/': ['/^var\\(/', 'transparent', 'inherit', 'initial', 'currentcolor', 'currentColor'],
-      '/^background-color$/': ['/^var\\(/', ...safeKeywords],
-      '/^border-color$/': ['/^var\\(/', ...safeKeywords],
-      '/^fill$/': ['/^var\\(/', ...safeKeywords],
-      '/^stroke$/': ['/^var\\(/', ...safeKeywords],
+      '/^color$/': ['/^var\\(/', 'transparent', 'inherit', 'initial', 'currentcolor', 'currentColor', ...systemColors],
+      '/^background-color$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
+      '/^border-color$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
+      '/^fill$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
+      '/^stroke$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
     },
     'selector-pseudo-class-no-unknown': [true, { ignorePseudoClasses: ['global'] }],
   },

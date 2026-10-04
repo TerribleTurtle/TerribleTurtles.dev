@@ -35,4 +35,11 @@ const { class: className } = Astro.props;
     stroke-width: var(--mark-stroke);
     stroke-linejoin: round;
   }
+
+  @media (forced-colors: active) {
+    .scute-mark {
+      forced-color-adjust: none;
+      stroke: CanvasText;
+    }
+  }
 </style>

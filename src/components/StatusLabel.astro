@@ -47,4 +47,19 @@ const { status } = Astro.props;
   .dot-archived {
     border-color: var(--color-text-muted);
   }
+
+  @media (forced-colors: active) {
+    .dot {
+      forced-color-adjust: none;
+      border-color: CanvasText;
+    }
+
+    .dot-live {
+      background-color: CanvasText;
+    }
+
+    .dot-archived {
+      border-color: GrayText;
+    }
+  }
 </style>
