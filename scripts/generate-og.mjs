@@ -74,7 +74,7 @@ p { margin-top: 24px; font-size: 34px; color: ${c['text-muted']}; line-height: 1
 </body></html>`;
 }
 
-mkdirSync('public/og', { recursive: true });
+mkdirSync('public/og/es', { recursive: true });
 
 /** @type {{ out: string, title: string, summary: string, titleSize: number }[]} */
 const cards = [
@@ -94,6 +94,21 @@ for (const entry of readdirSync(projectsDir)) {
     const { title, summary } = parseFrontmatter(content);
     cards.push({
       out: `public/og/${id}.png`,
+      title,
+      summary,
+      titleSize: 84,
+    });
+  }
+}
+
+const esProjectsDir = 'src/content/projects-i18n/es';
+for (const entry of readdirSync(esProjectsDir)) {
+  if (entry.endsWith('.md')) {
+    const id = basename(entry, extname(entry));
+    const content = readFileSync(`${esProjectsDir}/${entry}`, 'utf8');
+    const { title, summary } = parseFrontmatter(content);
+    cards.push({
+      out: `public/og/es/${id}.png`,
       title,
       summary,
       titleSize: 84,
