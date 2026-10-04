@@ -1,93 +1,27 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ProjectCard from '../components/ProjectCard.astro';
 
-const readmes = await getCollection('readmes');
-const activeProjects = readmes.filter(r => r.data.status === 'active');
-
-const tools = activeProjects.filter(p => p.data.type === 'tool');
-const sites = activeProjects.filter(p => p.data.type === 'site');
+const projects = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
+);
 ---
 
-<BaseLayout title="Home | TerribleTurtles.dev" description="Welcome to the portfolio.">
-  <section class="hero animate-fade-in-up delay-1">
-    <h1>TerribleTurtles.dev</h1>
-    <p class="subtitle">A collection of performant, purpose-built tools and sites.</p>
-  </section>
+<BaseLayout title="TerribleTurtles" description="A personal archive of things I have built.">
+  <h1>Things I've built.</h1>
+  <p>A personal archive.</p>
 
-  <section class="bucket-section animate-fade-in-up delay-2">
-    <h2>Active Tools</h2>
-    <div class="project-grid">
-      {tools.map(project => (
-        <ProjectCard 
-          title={project.data.title} 
-          description={project.data.description || ''} 
-          link={`/tools/${project.id}`} 
-          tags={['tool', 'active']} 
-        />
-      ))}
-      {tools.length === 0 && <p class="empty-state">No active tools found.</p>}
-    </div>
-  </section>
-
-  <section class="bucket-section animate-fade-in-up delay-3">
-    <h2>Active Sites</h2>
-    <div class="project-grid">
-      {sites.map(project => (
-        <ProjectCard 
-          title={project.data.title} 
-          description={project.data.description || ''} 
-          link={`/sites/${project.id}`} 
-          tags={['site', 'active']} 
-        />
-      ))}
-      {sites.length === 0 && <p class="empty-state">No active sites found.</p>}
-    </div>
+  <section aria-labelledby="work-heading">
+    <h2 id="work-heading">Work</h2>
+    <ul>
+      {
+        projects.map((project) => (
+          <li>
+            <a href={`/work/${project.id}/`}>{project.data.title}</a>
+            <p>{project.data.summary}</p>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 </BaseLayout>
-
-<style>
-  .hero {
-    margin-bottom: var(--space-2xl);
-  }
-  
-  .hero h1 {
-    font-size: var(--font-size-4xl);
-    margin-bottom: var(--space-sm);
-    background: linear-gradient(to right, var(--text-primary), var(--text-muted));
-    /* stylelint-disable-next-line property-no-vendor-prefix */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent; /* Fallback */
-    letter-spacing: -0.02em;
-  }
-  
-  .subtitle {
-    font-size: var(--font-size-lg);
-    color: var(--text-muted);
-  }
-
-  .bucket-section {
-    margin-bottom: var(--space-2xl);
-  }
-
-  .bucket-section h2 {
-    font-size: var(--font-size-2xl);
-    margin-bottom: var(--space-lg);
-    padding-bottom: var(--space-sm);
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--layout-card-min)), 1fr));
-    gap: var(--space-lg);
-  }
-
-  .empty-state {
-    color: var(--text-muted);
-    font-style: italic;
-  }
-</style>

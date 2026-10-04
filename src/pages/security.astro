@@ -1,9 +1,9 @@
 ---
-import DocumentLayout from '../layouts/DocumentLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<DocumentLayout title="Security | TerribleTurtles" description="Security architecture of TerribleTurtles.">
+<BaseLayout title="Security | TerribleTurtles" description="Security notes for this site.">
   <h1>Security</h1>
-  <p>The TerribleTurtles platform itself is built on a 100% static architecture and served directly from Cloudflare's global edge network.</p>
-  <p>There are no databases to inject and no runtime secrets to leak. It sits behind Enterprise-grade DDoS protection and strict Content Security Policies.</p>
-</DocumentLayout>
+  <p>This site is a set of static files. It has no database, no accounts and no server-side code.</p>
+  <p>Security contact details will be published here before launch.</p>
+</BaseLayout>
