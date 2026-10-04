@@ -52,17 +52,17 @@ test.describe('Structured data and social preview cards', () => {
     expect(profile?.mainEntity?.['@id']).toBe(person?.['@id']);
   });
 
-  const projects = policy.pages.expanded
-    .filter((p) => p.kind === 'project' && p.id !== undefined)
-    .map((p) => {
-      const id = p.id!;
-      const mdPath = new URL(`../../src/content/projects/${id}.md`, import.meta.url);
-      const md = readFileSync(mdPath, 'utf8');
-      const repoMatch = md.match(/^repo:\s*["']?([^"'\r\n]+)["']?/m);
-      const repo = repoMatch ? repoMatch[1].trim() : undefined;
-      const ogPath = p.locale === policy.pages.defaultLocale ? `/og/${id}.png` : `/og/${p.locale}/${id}.png`;
-      return { path: p.path, id, repo, ogPath };
-    });
+  const projects = policy.pages.expanded.flatMap((p) => {
+    const id = p.id;
+    if (p.kind !== 'project' || id === undefined) return [];
+    const mdPath = new URL(`../../src/content/projects/${id}.md`, import.meta.url);
+    const md = readFileSync(mdPath, 'utf8');
+    const repo = md.match(/^repo:\s*["']?([^"'\r\n]+)["']?/m)?.[1]?.trim();
+    // Fail at collection time: an unreadable repo would make the codeRepository assertion vacuous.
+    if (!repo) throw new Error(`structured-data.spec: could not read "repo:" from ${mdPath.pathname}`);
+    const ogPath = p.locale === policy.pages.defaultLocale ? `/og/${id}.png` : `/og/${p.locale}/${id}.png`;
+    return [{ path: p.path, id, repo, ogPath }];
+  });
 
   for (const { path, repo, ogPath } of projects) {
     test(`${path} graph contains SoftwareSourceCode and BreadcrumbList, and valid og:image`, async ({

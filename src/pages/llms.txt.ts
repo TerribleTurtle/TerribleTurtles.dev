@@ -9,7 +9,8 @@ const PAGES = `## Pages
 `;
 
 export const GET: APIRoute = async (context) => {
-  const site = context.site ?? new URL('https://terribleturtles.dev');
+  const site = context.site;
+  if (!site) throw new Error('`site` must be set in astro.config.mjs');
   const projects = await getCollection('projects');
   projects.sort((a, b) => a.data.order - b.data.order);
 
