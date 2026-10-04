@@ -69,3 +69,18 @@ test('parseLightDarkTokens extracts light and dark values per custom property', 
   });
   assert.equal(tokens.size, 2);
 });
+
+test('parseLightDarkTokens resolves primitives referenced via var()', () => {
+  const css = `
+    :root {
+      --palette-bone-100: oklch(97% 0.01 85);
+      --palette-carapace-900: oklch(17% 0.012 160);
+      --color-bg: light-dark(var(--palette-bone-100), var(--palette-carapace-900));
+    }`;
+  const tokens = parseLightDarkTokens(css);
+  assert.deepEqual(tokens.get('--color-bg'), {
+    light: { l: 0.97, c: 0.01, h: 85 },
+    dark: { l: 0.17, c: 0.012, h: 160 },
+  });
+});
+

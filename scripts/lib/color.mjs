@@ -91,21 +91,67 @@ export function contrastRatio(first, second) {
   return Math.round(ratio * 100) / 100;
 }
 
-const LIGHT_DARK_RE = /(--[\w-]+)\s*:\s*light-dark\(\s*(oklch\([^)]*\))\s*,\s*(oklch\([^)]*\))\s*\)/g;
+const PRIMITIVE_RE = /(--palette-[\w-]+)\s*:\s*(oklch\([^)]*\))/g;
+const LIGHT_DARK_RE =
+  /(--[\w-]+)\s*:\s*light-dark\(\s*(oklch\([^)]*\)|var\([^)]*\))\s*,\s*(oklch\([^)]*\)|var\([^)]*\))\s*\)/g;
 
 /**
- * Extract every `--token: light-dark(oklch(...), oklch(...))` declaration.
+ * Extract primitive `--palette-*` custom property declarations.
+ * @param {string} css
+ * @returns {Map<string, Oklch>}
+ */
+export function parsePrimitives(css) {
+  /** @type {Map<string, Oklch>} */
+  const primitives = new Map();
+  for (const [, name, val] of css.matchAll(PRIMITIVE_RE)) {
+    if (name !== undefined && val !== undefined) {
+      primitives.set(name, parseOklch(val));
+    }
+  }
+  return primitives;
+}
+
+/**
+ * Resolve a color value that is an `oklch(...)` expression or a `var(--...)` reference.
+ * @param {string} val
+ * @param {Map<string, Oklch>} primitives
+ * @returns {Oklch}
+ */
+export function resolveColorValue(val, primitives) {
+  const trimmed = val.trim();
+  if (trimmed.startsWith('var(')) {
+    const varMatch = /^var\(\s*(--[\w-]+)\s*\)$/.exec(trimmed);
+    if (!varMatch || !varMatch[1]) {
+      throw new Error(`Malformed var() expression: "${trimmed}"`);
+    }
+    const color = primitives.get(varMatch[1]);
+    if (!color) {
+      throw new Error(`Unresolved primitive token: "${varMatch[1]}"`);
+    }
+    return color;
+  }
+  return parseOklch(trimmed);
+}
+
+/**
+ * Extract every `--token: light-dark(...)` declaration, resolving `var(--palette-...)`
+ * references against defined primitives in the same stylesheet.
  * @param {string} css
  * @returns {Map<string, SchemePair>}
  */
 export function parseLightDarkTokens(css) {
+  const primitives = parsePrimitives(css);
   /** @type {Map<string, SchemePair>} */
   const tokens = new Map();
   for (const [, name, light, dark] of css.matchAll(LIGHT_DARK_RE)) {
     if (name === undefined || light === undefined || dark === undefined) {
       continue;
     }
-    tokens.set(name, { light: parseOklch(light), dark: parseOklch(dark) });
+    tokens.set(name, {
+      light: resolveColorValue(light, primitives),
+      dark: resolveColorValue(dark, primitives),
+    });
   }
   return tokens;
 }
+

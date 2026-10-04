@@ -10,25 +10,46 @@
 :root {
   color-scheme: dark light;
 
-  /* ---- Colour ---------------------------------------------------------- */
+  /*
+   * ---- Primitives ------------------------------------------------------
+   * Primitive palette: the ONLY place raw oklch() values appear in the codebase.
+   */
+  --palette-carapace-900: oklch(17% 0.012 160deg);
+  --palette-carapace-800: oklch(21% 0.014 160deg);
+  --palette-bone-100: oklch(97% 0.01 85deg);
+  --palette-bone-200: oklch(94% 0.014 85deg);
+  --palette-bone-300: oklch(92% 0.012 90deg);
+  --palette-bone-400: oklch(73% 0.016 110deg);
+  --palette-umber-900: oklch(25% 0.02 60deg);
+  --palette-umber-800: oklch(42% 0.02 70deg);
+  --palette-umber-700: oklch(46% 0.02 70deg);
+  --palette-ochre-400: oklch(80% 0.09 75deg);
+  --palette-ochre-500: oklch(66% 0.11 72deg);
+  --palette-ochre-600: oklch(48% 0.095 65deg);
+  --palette-moss-200: oklch(84% 0.03 150deg);
+  --palette-moss-400: oklch(60% 0.03 150deg);
+  --palette-moss-500: oklch(52% 0.03 150deg);
+  --palette-moss-700: oklch(35% 0.03 150deg);
 
-  /* Carapace: page background. */
-  --color-bg: light-dark(oklch(97% 0.01 85deg), oklch(17% 0.012 160deg));
+  /* ---- Semantic Colour -------------------------------------------------- */
+
+  /* Carapace / bone: page background. */
+  --color-bg: light-dark(var(--palette-bone-100), var(--palette-carapace-900));
 
   /* Slightly lifted surface (skip link, code, figure frame). */
-  --color-surface: light-dark(oklch(94% 0.014 85deg), oklch(21% 0.014 160deg));
+  --color-surface: light-dark(var(--palette-bone-200), var(--palette-carapace-800));
 
   /* Bone / umber: primary text. */
-  --color-text: light-dark(oklch(25% 0.02 60deg), oklch(92% 0.012 90deg));
+  --color-text: light-dark(var(--palette-umber-900), var(--palette-bone-300));
 
   /* Secondary text (summaries, meta, footer). */
-  --color-text-muted: light-dark(oklch(46% 0.02 70deg), oklch(73% 0.016 110deg));
+  --color-text-muted: light-dark(var(--palette-umber-700), var(--palette-bone-400));
 
   /* Ochre: links, mark, focus ring, status dot. */
-  --color-accent: light-dark(oklch(48% 0.095 65deg), oklch(80% 0.09 75deg));
+  --color-accent: light-dark(var(--palette-ochre-600), var(--palette-ochre-400));
 
   /* Moss: decorative hairline dividers (not used as the only cue for anything). */
-  --color-hairline: light-dark(oklch(84% 0.03 150deg), oklch(35% 0.03 150deg));
+  --color-hairline: light-dark(var(--palette-moss-200), var(--palette-moss-700));
 
   /* ---- Typography ------------------------------------------------------ */
   --font-serif: "Newsreader", "Newsreader Fallback", georgia, serif;

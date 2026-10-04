@@ -32,6 +32,9 @@ export default {
       '/^stroke$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
     },
     'selector-pseudo-class-no-unknown': [true, { ignorePseudoClasses: ['global'] }],
+    'declaration-property-value-disallowed-list': {
+      '/.+/': ['/var\\(--palette-/'],
+    },
   },
   overrides: [
     {
@@ -39,6 +42,7 @@ export default {
       files: ['src/styles/tokens.css'],
       rules: {
         'function-disallowed-list': colorFunctions.filter((fn) => fn !== 'oklch' && fn !== 'light-dark'),
+        'declaration-property-value-disallowed-list': null,
       },
     },
   ],
