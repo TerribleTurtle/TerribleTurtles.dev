@@ -3,6 +3,7 @@ title: "Privacidad"
 description: "Cómo este sitio gestiona los datos."
 updated: "2026-10-04"
 legal: true
+source: "f2b278922cba94a9f528eaa165f75a87575072d9ee7630c4dda65f5f4be50eb4"
 ---
 
 ## Qué hace este sitio

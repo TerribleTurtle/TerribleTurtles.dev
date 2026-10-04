@@ -2,6 +2,7 @@
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { hashSource } from '../../../scripts/lib/i18n-stale.mjs';
 
 /** @typedef {import('../../../scripts/lib/policy.mjs').Policy} Policy */
 
@@ -44,17 +45,27 @@ export function makePassingTree(policy) {
   const pageEntries = policy.pages.entries.filter((e) => e.kind === 'page');
   for (const entry of pageEntries) {
     const slug = entry.path.replace(/^\/+|\/+$/g, '');
+    const enContent = `---\ntitle: "${slug}"\ndescription: "desc"\n---\nBody`;
+    const enHash = hashSource(enContent);
     for (const locale of policy.pages.locales) {
-      writeTreeFile(root, `src/content/pages/${locale}/${slug}.md`, `---\ntitle: "${slug}"\ndescription: "desc"\n---\nBody`);
+      if (locale === policy.pages.defaultLocale) {
+        writeTreeFile(root, `src/content/pages/${locale}/${slug}.md`, enContent);
+      } else {
+        writeTreeFile(root, `src/content/pages/${locale}/${slug}.md`, `---\ntitle: "${slug}"\ndescription: "desc"\nsource: "${enHash}"\n---\nBody`);
+      }
     }
   }
 
   // Project markdown and assets
   const projectEntries = policy.pages.entries.filter((e) => e.kind === 'project' && e.id !== undefined);
+  /** @type {Map<string, string>} */
+  const projectHashes = new Map();
   for (const entry of projectEntries) {
     const id = entry.id;
     if (!id) continue;
-    writeTreeFile(root, `src/content/projects/${id}.md`, `---\ntitle: "${id}"\nscreenshot:\n  alt: "shot"\n---\nBody`);
+    const enContent = `---\ntitle: "${id}"\nscreenshot:\n  alt: "shot"\n---\nBody`;
+    projectHashes.set(id, hashSource(enContent));
+    writeTreeFile(root, `src/content/projects/${id}.md`, enContent);
     writeTreeFile(root, `public/og/${id}.png`, 'png-bytes');
     writeTreeFile(root, `public/images/work/${id}.jpg`, 'jpg-bytes');
     writeTreeFile(root, `public/images/work/${id}.webp`, 'webp-bytes');
@@ -66,10 +77,28 @@ export function makePassingTree(policy) {
     for (const entry of projectEntries) {
       const id = entry.id;
       if (!id) continue;
-      writeTreeFile(root, `src/content/projects-i18n/${locale}/${id}.md`, `---\ntitle: "${id}"\nsummary: "summary"\n---\nBody`);
+      const enHash = projectHashes.get(id) ?? '';
+      writeTreeFile(root, `src/content/projects-i18n/${locale}/${id}.md`, `---\ntitle: "${id}"\nsummary: "summary"\nsource: "${enHash}"\n---\nBody`);
     }
   }
   writeTreeFile(root, 'src/content/projects-i18n/.gitkeep', '');
+
+  // UI dictionary with source hashes
+  const enUiInner = `\n  'brand.home': 'Home',\n`;
+  const enUiHash = hashSource(enUiInner);
+  const hashLines = nonDefaultLocales.map((l) => `  ${l}: '${enUiHash}',`).join('\n');
+  const uiContent = [
+    `// Stale-translation check hashes the normalised text between 'const en = {' and '} as const;'.`,
+    `const en = {${enUiInner}} as const;`,
+    ``,
+    `export type UiKey = keyof typeof en;`,
+    ``,
+    `export const UI_SOURCE_HASH = {`,
+    hashLines,
+    `} as const;`,
+    ``,
+  ].join('\n');
+  writeTreeFile(root, 'src/i18n/ui.ts', uiContent);
 
   // Clean security file
   const realPolicy = readFileSync(new URL('../../../security/policy.json', import.meta.url), 'utf8');

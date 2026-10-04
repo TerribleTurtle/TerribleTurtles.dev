@@ -5,6 +5,7 @@
  */
 import type { Locale } from './locales';
 
+// Stale-translation check hashes the normalised text between 'const en = {' and '} as const;'.
 const en = {
   'skip.main': 'Skip to main content',
   'brand.homeLabel': 'TerribleTurtles, home',
@@ -49,6 +50,10 @@ const en = {
 } as const;
 
 export type UiKey = keyof typeof en;
+
+export const UI_SOURCE_HASH = {
+  es: 'cb27793244a7696074c63e2d19067885c7af87fb234065cf943c9063b44c2816',
+} as const;
 
 const es: Record<UiKey, string> = {
   'skip.main': 'Saltar al contenido principal',

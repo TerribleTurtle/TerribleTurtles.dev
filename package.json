@@ -18,6 +18,7 @@
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:coverage": "node scripts/check-coverage.mjs",
     "check:i18n-literals": "node scripts/check-i18n-literals.mjs",
+    "i18n:stamp": "node scripts/i18n-stamp.mjs",
     "test": "playwright test",
     "test:unit": "node --test \"tests/unit/*.test.mjs\"",
     "assets:icons": "node scripts/generate-icons.mjs",
