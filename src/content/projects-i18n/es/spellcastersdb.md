@@ -2,10 +2,10 @@
 title: "SpellcastersDB"
 summary: "Base de datos comunitaria y creador de mazos para Spellcasters Chronicles."
 disclaimer: "Proyecto no oficial de fans. No está afiliado con Quantic Dream ni respaldado por ellos."
-screenshotAlt: "Página de inicio de SpellcastersDB: un encabezado \"Spellcasters Chronicles Database\" sobre tarjetas para el Creador de Mazos, la Base de Datos de Unidades y la Guía del Juego."
+screenshotAlt: "Página de inicio de SpellcastersDB: un encabezado \"Spellcasters Chronicles Database\" sobre tarjetas para Deck Builder, Unit Database y Game Guide."
 ---
 
-Cuando se lanzó *Spellcasters Chronicles*, vi la oportunidad de construir algo que los jugadores pudieran usar de inmediato. SpellcastersDB es una base de datos comunitaria no oficial y creador de mazos.
+Cuando se lanzó *Spellcasters Chronicles*, vi la oportunidad de construir algo que los jugadores pudieran usar de inmediato. SpellcastersDB es una base de datos comunitaria no oficial y un creador de mazos.
 
 La parte a la que dediqué más tiempo es **The Forge**, un creador de mazos que comprueba las reglas del mazo mientras lo construyes y genera enlaces cortos para compartir.
 
