@@ -110,3 +110,22 @@
   --nudge-rtl: -2px;
   --mark-turn: -8deg;
 }
+
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-muted: light-dark(var(--palette-umber-800), var(--palette-bone-300));
+    --color-hairline: light-dark(var(--palette-moss-400), var(--palette-moss-500));
+  }
+}
+
+@media (forced-colors: active) {
+  :root {
+    --color-bg: Canvas;
+    --color-surface: Canvas;
+    --color-text: CanvasText;
+    --color-text-muted: GrayText;
+    --color-accent: CanvasText;
+    --color-hairline: GrayText;
+  }
+}
+

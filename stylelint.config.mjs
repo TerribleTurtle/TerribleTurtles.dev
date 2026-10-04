@@ -19,17 +19,17 @@ export default {
   rules: {
     'scale-unlimited/declaration-strict-value': [
       ['/^(color|.+-color)$/', 'fill', 'stroke'],
-      { ignoreValues: [...safeKeywords, ...systemColors, '/^var\\(/i'] },
+      { ignoreValues: [...safeKeywords, '/^var\\(/i'] },
     ],
     'color-named': 'never',
     'color-no-hex': true,
     'function-disallowed-list': colorFunctions,
     'declaration-property-value-allowed-list': {
-      '/^color$/': ['/^var\\(/', 'transparent', 'inherit', 'initial', 'currentcolor', 'currentColor', ...systemColors],
-      '/^background-color$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
-      '/^border-color$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
-      '/^fill$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
-      '/^stroke$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
+      '/^color$/': ['/^var\\(/', 'transparent', 'inherit', 'initial', 'currentcolor', 'currentColor'],
+      '/^background-color$/': ['/^var\\(/', ...safeKeywords],
+      '/^border-color$/': ['/^var\\(/', ...safeKeywords],
+      '/^fill$/': ['/^var\\(/', ...safeKeywords],
+      '/^stroke$/': ['/^var\\(/', ...safeKeywords],
     },
     'selector-pseudo-class-no-unknown': [true, { ignorePseudoClasses: ['global'] }],
     'declaration-property-value-disallowed-list': {
@@ -38,11 +38,22 @@ export default {
   },
   overrides: [
     {
-      // The single source of raw colour values.
+      // The single source of raw colour values, primitives, and system colours.
       files: ['src/styles/tokens.css'],
       rules: {
         'function-disallowed-list': colorFunctions.filter((fn) => fn !== 'oklch' && fn !== 'light-dark'),
         'declaration-property-value-disallowed-list': null,
+        'scale-unlimited/declaration-strict-value': [
+          ['/^(color|.+-color)$/', 'fill', 'stroke'],
+          { ignoreValues: [...safeKeywords, ...systemColors, '/^var\\(/i'] },
+        ],
+        'declaration-property-value-allowed-list': {
+          '/^color$/': ['/^var\\(/', 'transparent', 'inherit', 'initial', 'currentcolor', 'currentColor', ...systemColors],
+          '/^background-color$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
+          '/^border-color$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
+          '/^fill$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
+          '/^stroke$/': ['/^var\\(/', ...safeKeywords, ...systemColors],
+        },
       },
     },
   ],
