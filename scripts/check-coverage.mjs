@@ -73,6 +73,45 @@ export function discoverSourcePages(root, policy) {
     if (rel === '404.astro' || rel.endsWith('/404.astro')) continue;
 
     const parts = rel.split('/');
+    if (parts[0] === '[locale]') {
+      const rest = parts.slice(1).join('/');
+      for (const loc of nonDefaultLocales) {
+        if (rest === 'index.astro') {
+          const basePath = '/';
+          discovered.push({
+            path: localePath(policy.pages, loc, basePath),
+            basePath,
+            locale: loc,
+            sourceFile: rel,
+          });
+        } else if (rest === 'work/[slug].astro') {
+          for (const id of projectIds) {
+            const basePath = `/work/${id}/`;
+            discovered.push({
+              path: localePath(policy.pages, loc, basePath),
+              basePath,
+              locale: loc,
+              sourceFile: rel,
+            });
+          }
+        } else {
+          let basePath = '';
+          if (rest.endsWith('/index.astro')) {
+            basePath = `/${rest.slice(0, -'/index.astro'.length)}/`;
+          } else {
+            basePath = `/${rest.slice(0, -'.astro'.length)}/`;
+          }
+          discovered.push({
+            path: localePath(policy.pages, loc, basePath),
+            basePath,
+            locale: loc,
+            sourceFile: rel,
+          });
+        }
+      }
+      continue;
+    }
+
     let locale = policy.pages.defaultLocale;
     let relInLocale = rel;
     if (parts.length > 1 && nonDefaultLocales.includes(parts[0])) {
@@ -162,6 +201,29 @@ export function checkCoverage({ root, policy, distDir }) {
   for (const policyId of policyProjectIds) {
     if (!contentIdSet.has(policyId)) {
       failures.push(`Policy project id "${policyId}" has no content file in src/content/projects`);
+    }
+  }
+
+  // 2b. Content prose pages (src/content/pages/<locale>/<slug>.md)
+  const pageEntries = policy.pages.entries.filter((e) => e.kind === 'page');
+  for (const entry of pageEntries) {
+    const slug = entry.path.replace(/^\/+|\/+$/g, '');
+    for (const locale of policy.pages.locales) {
+      const mdPath = join(root, 'src', 'content', 'pages', locale, `${slug}.md`);
+      if (!existsSync(mdPath)) {
+        failures.push(`Missing content page for "${entry.path}" in locale "${locale}": src/content/pages/${locale}/${slug}.md`);
+      }
+    }
+  }
+
+  // 2c. Project i18n content (src/content/projects-i18n/<locale>/<id>.md)
+  const nonDefaultLocales = policy.pages.locales.filter((l) => l !== policy.pages.defaultLocale);
+  for (const locale of nonDefaultLocales) {
+    for (const id of contentIds) {
+      const mdPath = join(root, 'src', 'content', 'projects-i18n', locale, `${id}.md`);
+      if (!existsSync(mdPath)) {
+        failures.push(`Missing project i18n translation for "${id}" in locale "${locale}": src/content/projects-i18n/${locale}/${id}.md`);
+      }
     }
   }
 

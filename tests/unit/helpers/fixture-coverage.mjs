@@ -33,6 +33,22 @@ export function makePassingTree(policy) {
   writeTreeFile(root, 'src/pages/404.astro', '<p>404</p>');
   writeTreeFile(root, 'src/pages/llms.txt.ts', 'export const GET = () => new Response("llms");');
 
+  // Locale routes
+  writeTreeFile(root, 'src/pages/[locale]/index.astro', '<p>Home</p>');
+  writeTreeFile(root, 'src/pages/[locale]/about.astro', '<p>About</p>');
+  writeTreeFile(root, 'src/pages/[locale]/privacy.astro', '<p>Privacy</p>');
+  writeTreeFile(root, 'src/pages/[locale]/security.astro', '<p>Security</p>');
+  writeTreeFile(root, 'src/pages/[locale]/work/[slug].astro', '<p>Work</p>');
+
+  // Content prose pages for all locales
+  const pageEntries = policy.pages.entries.filter((e) => e.kind === 'page');
+  for (const entry of pageEntries) {
+    const slug = entry.path.replace(/^\/+|\/+$/g, '');
+    for (const locale of policy.pages.locales) {
+      writeTreeFile(root, `src/content/pages/${locale}/${slug}.md`, `---\ntitle: "${slug}"\ndescription: "desc"\n---\nBody`);
+    }
+  }
+
   // Project markdown and assets
   const projectEntries = policy.pages.entries.filter((e) => e.kind === 'project' && e.id !== undefined);
   for (const entry of projectEntries) {
@@ -43,6 +59,17 @@ export function makePassingTree(policy) {
     writeTreeFile(root, `public/images/work/${id}.jpg`, 'jpg-bytes');
     writeTreeFile(root, `public/images/work/${id}.webp`, 'webp-bytes');
   }
+
+  // Project i18n translations for non-default locales
+  const nonDefaultLocales = policy.pages.locales.filter((l) => l !== policy.pages.defaultLocale);
+  for (const locale of nonDefaultLocales) {
+    for (const entry of projectEntries) {
+      const id = entry.id;
+      if (!id) continue;
+      writeTreeFile(root, `src/content/projects-i18n/${locale}/${id}.md`, `---\ntitle: "${id}"\nsummary: "summary"\n---\nBody`);
+    }
+  }
+  writeTreeFile(root, 'src/content/projects-i18n/.gitkeep', '');
 
   // Clean security file
   const realPolicy = readFileSync(new URL('../../../security/policy.json', import.meta.url), 'utf8');

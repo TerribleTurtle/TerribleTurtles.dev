@@ -144,6 +144,65 @@ test('discoverSourcePages handles non-default locale pages under src/pages/<loca
   }
 });
 
+test('discoverSourcePages expands [locale] dynamic routes across non-default locales', () => {
+  const root = makePassingTree(policy);
+  try {
+    /** @type {Policy} */
+    const multiPolicy = {
+      ...policy,
+      pages: {
+        ...policy.pages,
+        locales: ['en', 'es'],
+      },
+    };
+    const pages = discoverSourcePages(root, multiPolicy);
+    const esAbout = pages.find((p) => p.path === '/es/about/');
+    assert.ok(esAbout, 'should find /es/about/ from [locale]/about.astro');
+    assert.equal(esAbout?.locale, 'es');
+    assert.equal(esAbout?.basePath, '/about/');
+
+    const esHome = pages.find((p) => p.path === '/es/');
+    assert.ok(esHome, 'should find /es/ from [locale]/index.astro');
+
+    const esProject = pages.find((p) => p.path === '/es/work/spellcastersdb/');
+    assert.ok(esProject, 'should find /es/work/spellcastersdb/ from [locale]/work/[slug].astro');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('checkCoverage fails when a content prose page in src/content/pages/<locale>/<slug>.md is missing', () => {
+  const failures = checkSourceWith((root) => {
+    unlinkSync(join(root, 'src', 'content', 'pages', 'en', 'about.md'));
+  });
+  assert.ok(
+    failures.some((f) => f.includes('about') && f.includes('content/pages')),
+    `expected failure mentioning missing content page, got ${JSON.stringify(failures)}`,
+  );
+});
+
+test('checkCoverage fails when a project i18n translation is missing for a non-default locale', () => {
+  /** @type {Policy} */
+  const multiPolicy = {
+    ...policy,
+    pages: {
+      ...policy.pages,
+      locales: ['en', 'es'],
+    },
+  };
+  const root = makePassingTree(multiPolicy);
+  try {
+    unlinkSync(join(root, 'src', 'content', 'projects-i18n', 'es', 'spellcastersdb.md'));
+    const failures = checkCoverage({ root, policy: multiPolicy });
+    assert.ok(
+      failures.some((f) => f.includes('spellcastersdb') && f.includes('projects-i18n')),
+      `expected failure mentioning missing project i18n file, got ${JSON.stringify(failures)}`,
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('checkCoverage with dist fails when 404.html is missing from dist root', () => {
   const failures = checkDistWith((_root, dist) => {
     unlinkSync(join(dist, '404.html'));
