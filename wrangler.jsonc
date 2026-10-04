@@ -2,7 +2,7 @@
   // Workers Static Assets only: there is deliberately NO `main` Worker script (pure static site).
   // Security headers live in public/_headers, never here.
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "terribleturtles-site",
+  "name": "terribleturtles-dev",
   // Must not be later than the workerd bundled with the installed wrangler (workerd 1.20261001.x).
   "compatibility_date": "2026-10-01",
   "assets": {
