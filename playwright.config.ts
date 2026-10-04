@@ -28,7 +28,15 @@ export default defineConfig({
   },
   projects: [
     { name: 'headers', testMatch: 'security/headers.spec.ts' },
-    { name: 'chromium', testMatch: browserSpecs, use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      testMatch: browserSpecs,
+      // Chromium's Local Network Access check blocks 127.0.0.1:8787 -> 127.0.0.1:8790 (the local "attacker" origin).
+      // Disabling it in the harness makes cross-origin attacks reach the CSP, which must then block them itself.
+      use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--disable-features=LocalNetworkAccessChecks'] } },
+    },
+    // Playwright 1.61 + Firefox 151: colorScheme emulation has no effect in either direction (verified with
+    // scratch diagnostics), so Firefox runs only its default light scheme; dark-scheme tests skip there explicitly.
     { name: 'firefox', testMatch: browserSpecs, use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', testMatch: browserSpecs, use: { ...devices['Desktop Safari'] } },
   ],

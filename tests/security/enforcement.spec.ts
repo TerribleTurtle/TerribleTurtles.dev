@@ -28,12 +28,15 @@ const pwnedIs = (marker: string) => async (page: Page) => (await pwned(page)) ==
 
 const attacks: Attack[] = [
   { name: 'inline <script> in the HTML', directive: SCRIPT, injection: { where: 'main', html: "<script>window.__ttPwned='inline-script'</script>" }, succeeded: pwnedIs('inline-script') },
-  { name: 'inline event-handler attribute', directive: SCRIPT, injection: { where: 'main', html: `<img src="/favicon.svg" alt="" onload="window.__ttPwned='inline-handler'">` }, succeeded: pwnedIs('inline-handler') },
+  // onclick + explicit click (not img onload): Firefox reports handler violations when the event fires, so a
+  // network-timed onload made this flaky under parallel load.
+  { name: 'inline event-handler attribute', directive: SCRIPT, injection: { where: 'main', html: `<button id="tt-handler" type="button" onclick="window.__ttPwned='inline-handler'">x</button>` }, act: (p) => p.click('#tt-handler'), succeeded: pwnedIs('inline-handler') },
   { name: 'external <script> from another origin', directive: SCRIPT, injection: { where: 'main', html: `<script src="${EMBEDDER}/evil.js"></script>` }, succeeded: pwnedIs('external-script') },
-  { name: 'javascript: URL', directive: SCRIPT, injection: { where: 'main', html: `<a id="tt-js" href="javascript:window.__ttPwned='javascript-url'">x</a>` }, act: (p) => p.click('#tt-js'), succeeded: pwnedIs('javascript-url') },
+  // void(): a javascript: URL that evaluates to a string REPLACES the document in Chromium/Firefox (fresh global).
+  { name: 'javascript: URL', directive: SCRIPT, injection: { where: 'main', html: `<a id="tt-js" href="javascript:void(window.__ttPwned='javascript-url')">x</a>` }, act: (p) => p.click('#tt-js'), succeeded: pwnedIs('javascript-url') },
   { name: 'injected <style> block', directive: /^style-src/, injection: { where: 'head', html: '<style>#main{outline:13px solid red}</style>' }, succeeded: outlineIs13('#main') },
   { name: 'style= attribute', directive: /^style-src/, injection: { where: 'main', html: '<p id="tt-styled" style="outline:13px solid red">x</p>' }, succeeded: outlineIs13('#tt-styled') },
-  { name: 'cross-origin <iframe>', directive: /^(frame-src|child-src)/, injection: { where: 'main', html: `<iframe id="tt-frame" title="x" src="${EMBEDDER}/inner"></iframe>` }, succeeded: async (p) => (await p.frameLocator('#tt-frame').locator('h1').count()) === 1 },
+  { name: 'cross-origin <iframe>', directive: /^(frame-src|child-src)/, injection: { where: 'main', html: `<iframe id="tt-frame" title="x" src="${EMBEDDER}/inner"></iframe>` }, succeeded: async (p) => (await frameHeadings(p, '#tt-frame')).includes('control frame') },
   { name: 'cross-origin image', directive: /^img-src/, injection: { where: 'main', html: `<img id="tt-img" alt="" src="${EMBEDDER}/pixel.svg">` }, succeeded: async (p) => (await p.locator('#tt-img').evaluate((el) => (el instanceof HTMLImageElement ? el.naturalWidth : 0))) === 7 },
   { name: '<base> URL hijack', directive: /^base-uri/, injection: { where: 'head', html: `<base href="${EMBEDDER}/">` }, succeeded: async (p) => (await p.evaluate(() => document.baseURI)).startsWith(EMBEDDER) },
   { name: 'form submitting to another origin', directive: /^form-action/, injection: { where: 'main', html: `<form action="${EMBEDDER}/collect" method="get"><button id="tt-submit">send</button></form>` }, act: (p) => p.evaluate(() => document.querySelector('form')?.requestSubmit()), succeeded: async (p) => p.url().startsWith(EMBEDDER) },
@@ -84,27 +87,44 @@ for (const attack of attacks) {
   });
 }
 
-/** Opens the cross-origin embedder page that iframes the site, returns the h1 count inside the victim frame. */
-async function frameSite(page: Page, baseURL: string | undefined): Promise<number> {
+/**
+ * Heading texts inside an iframe, read WITHOUT auto-waiting: a frame blocked by CSP may never get a content
+ * document (WebKit), and frameLocator would then wait until the test times out.
+ */
+async function frameHeadings(page: Page, selector: string): Promise<string[]> {
+  const frame = await (await page.locator(selector).elementHandle())?.contentFrame();
+  if (!frame) return [];
+  // WebKit: a CSP-refused frame has no document and evaluate() never settles. A frame that cannot answer in 3s
+  // rendered nothing; the positive controls prove a really-rendered frame answers well within that time.
+  const read = frame.evaluate(() => [...document.querySelectorAll('h1')].map((h) => h.textContent?.trim() ?? '')).catch((): string[] => []);
+  const silent = new Promise<string[]>((resolve) => setTimeout(() => resolve([]), 3_000));
+  return Promise.race([read, silent]);
+}
+
+/** The home page's own H1. Matching it (not "any h1") matters: Firefox fills a refused frame with its own error page, which has an h1. */
+const SITE_HOME_H1 = "Things I've built.";
+
+/** Opens the cross-origin embedder page that iframes the site, returns the heading texts inside the victim frame. */
+async function frameSite(page: Page, baseURL: string | undefined): Promise<string[]> {
   const target = new URL('/', baseURL).href;
   const victimResponse = page.waitForResponse((r) => r.url() === target);
   await page.goto(`${EMBEDDER}/frame?target=${encodeURIComponent(target)}`);
   expect((await victimResponse).status(), 'the site was really requested by the frame').toBe(200);
   await expect(page.frameLocator('#control').locator('h1'), 'positive control frame renders').toHaveText('control frame');
   await expect.poll(() => page.evaluate(() => window.__victimLoads ?? 0), { message: 'victim iframe finished loading' }).toBeGreaterThan(0);
-  const frame = await (await page.locator('#victim').elementHandle())?.contentFrame();
-  return frame ? frame.locator('h1').count() : 0;
+  return frameHeadings(page, '#victim');
 }
 
 test('blocks: cross-origin framing of the site (frame-ancestors / X-Frame-Options)', async ({ page, baseURL }) => {
   const consoleLines: string[] = [];
   page.on('console', (m) => consoleLines.push(m.text()));
-  expect(await frameSite(page, baseURL), 'site content rendered inside a cross-origin frame').toBe(0);
+  const headings = await frameSite(page, baseURL);
+  expect(headings, 'site content rendered inside a cross-origin frame').not.toContain(SITE_HOME_H1);
   // frame-ancestors fires no DOM event; the console text is secondary evidence only (wording differs per engine).
-  test.info().annotations.push({ type: 'console', description: consoleLines.filter((l) => /frame/i.test(l)).join(' | ') || '(none)' });
+  test.info().annotations.push({ type: 'frame', description: `headings in refused frame: ${JSON.stringify(headings)}; console: ${consoleLines.filter((l) => /frame/i.test(l)).join(' | ') || '(none)'}` });
 });
 
 test('control (CSP + XFO stripped, framing must work): cross-origin framing', async ({ page, baseURL }) => {
   await serveWithInjection(page, '/', undefined, true);
-  expect(await frameSite(page, baseURL)).toBe(1);
+  expect(await frameSite(page, baseURL)).toContain(SITE_HOME_H1);
 });

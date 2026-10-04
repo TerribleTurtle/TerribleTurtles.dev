@@ -13,6 +13,8 @@ const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 for (const colorScheme of schemes) {
   test.describe(`${colorScheme} scheme`, () => {
     test.use({ colorScheme });
+    // Skipped before any browser context exists (a late skip tripped a Playwright/Firefox context-close protocol error).
+    test.skip(({ browserName }) => browserName === 'firefox' && colorScheme === 'dark', 'Playwright 1.61 / Firefox 151: colorScheme emulation has no effect; dark is covered in chromium + webkit');
 
     for (const route of routes) {
       test(`axe: ${route} has no WCAG 2.2 AA violations`, async ({ page }) => {
@@ -36,7 +38,7 @@ for (const colorScheme of schemes) {
 }
 
 for (const route of routes) {
-  test(`structure: ${route} has one h1, a working skip link and no console errors`, async ({ page }) => {
+  test(`structure: ${route} has one h1, a working skip link and no console errors`, async ({ page, browserName }) => {
     const errors: string[] = [];
     page.on('console', (message: ConsoleMessage) => {
       if (message.type() !== 'error') return;
@@ -57,7 +59,15 @@ for (const route of routes) {
     await expect(page.locator('main#main')).toHaveCount(1);
 
     // Keyboard: the skip link is the first tab stop and moves focus to <main>.
-    await page.keyboard.press('Tab');
+    if (browserName === 'webkit') {
+      // Playwright's Windows WebKit never moves focus on Tab or Alt+Tab (activeElement stays <body>; verified with a
+      // scratch diagnostic). Real keyboard order is proven in chromium + firefox; here assert it is first in focus order.
+      const firstFocusable = await page.evaluate(() => document.querySelector('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])')?.className ?? '');
+      expect(firstFocusable).toBe('skip-link');
+      await skip.focus();
+    } else {
+      await page.keyboard.press('Tab');
+    }
     await expect(skip).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.locator('main#main')).toBeFocused();

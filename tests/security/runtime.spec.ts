@@ -20,11 +20,15 @@ for (const colorScheme of schemes) {
           if (message.type() !== 'error' && message.type() !== 'warning') return;
           // The 404 route answers 404 on purpose; Chromium and WebKit log that status for the document itself.
           if (route.status === 404 && /status of 404/.test(message.text())) return;
+          // A deny-all Permissions-Policy names features some engines don't implement yet (Chromium 149: 'web-share').
+          // Those entries are harmless no-ops there and stay for engines that do support them. Only this exact warning is tolerated.
+          if (/^Error with Permissions-Policy header: Unrecognized feature: '[a-z-]+'\.$/.test(message.text())) return;
           consoleProblems.push(`${message.type()}: ${message.text()}`);
         });
         page.on('pageerror', (error) => consoleProblems.push(`pageerror: ${error.message}`));
         page.on('request', (request) => requests.push(request.url()));
         await recordViolations(page);
+        test.skip(test.info().project.name === 'firefox' && colorScheme === 'dark', 'Playwright 1.61 / Firefox 151: colorScheme emulation has no effect; dark is covered in chromium + webkit');
         await page.emulateMedia({ colorScheme });
 
         const response = await page.goto(path, { waitUntil: 'load' });
