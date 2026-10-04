@@ -11,6 +11,8 @@ interface Props {
   imageAlt?: string;
   /** Set on pages that must not be indexed (e.g. 404). */
   noindex?: boolean;
+  /** Extra nodes to append to the JSON-LD @graph. */
+  extraGraph?: Record<string, unknown>[];
 }
 
 const siteName = 'TerribleTurtles';
@@ -20,6 +22,7 @@ const {
   image = '/og.png',
   imageAlt = 'TerribleTurtles: things I have built.',
   noindex = false,
+  extraGraph = [],
 } = Astro.props;
 
 if (!Astro.site) {
@@ -49,6 +52,7 @@ const jsonLd = JSON.stringify({
       url: siteURL.toString(),
       sameAs: ['https://github.com/TerribleTurtle'],
     },
+    ...extraGraph,
   ],
 });
 ---

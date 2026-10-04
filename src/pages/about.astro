@@ -1,8 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const extraGraph: Record<string, unknown>[] = [
+  {
+    '@type': 'ProfilePage',
+    mainEntity: { '@id': 'https://terribleturtles.dev/#person' },
+  },
+];
 ---
 
-<BaseLayout title="About | TerribleTurtles" description="About TerribleTurtles and this site.">
+<BaseLayout
+  title="About | TerribleTurtles"
+  description="About TerribleTurtles and this site."
+  extraGraph={extraGraph}
+>
   <h1 class="page-title">About</h1>
   <div class="prose">
     <p>I'm TerribleTurtles. This is where I keep the things I've built.</p>
