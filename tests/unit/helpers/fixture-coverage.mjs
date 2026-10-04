@@ -27,18 +27,14 @@ export function makePassingTree(policy) {
 
   // Standard Astro pages
   writeTreeFile(root, 'src/pages/index.astro', '<p>Home</p>');
-  writeTreeFile(root, 'src/pages/about.astro', '<p>About</p>');
-  writeTreeFile(root, 'src/pages/privacy.astro', '<p>Privacy</p>');
-  writeTreeFile(root, 'src/pages/security.astro', '<p>Security</p>');
+  writeTreeFile(root, 'src/pages/[slug].astro', '<p>Prose</p>');
   writeTreeFile(root, 'src/pages/work/[slug].astro', '<p>Work</p>');
   writeTreeFile(root, 'src/pages/404.astro', '<p>404</p>');
   writeTreeFile(root, 'src/pages/llms.txt.ts', 'export const GET = () => new Response("llms");');
 
   // Locale routes
   writeTreeFile(root, 'src/pages/[locale]/index.astro', '<p>Home</p>');
-  writeTreeFile(root, 'src/pages/[locale]/about.astro', '<p>About</p>');
-  writeTreeFile(root, 'src/pages/[locale]/privacy.astro', '<p>Privacy</p>');
-  writeTreeFile(root, 'src/pages/[locale]/security.astro', '<p>Security</p>');
+  writeTreeFile(root, 'src/pages/[locale]/[slug].astro', '<p>Prose</p>');
   writeTreeFile(root, 'src/pages/[locale]/work/[slug].astro', '<p>Work</p>');
 
   // Content prose pages for all locales

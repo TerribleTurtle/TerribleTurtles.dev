@@ -1,0 +1,28 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import ProseView from '../views/ProseView.astro';
+import { defaultLocale } from '../i18n/locales';
+
+export const getStaticPaths = (async () => {
+  const pages = await getCollection('pages');
+  const prefix = `${defaultLocale}/`;
+  return pages
+    .filter((entry) => entry.id.startsWith(prefix))
+    .map((entry) => {
+      const slug = entry.id.slice(prefix.length);
+      return {
+        params: { slug },
+        props: { slug },
+      };
+    });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<ProseView locale={defaultLocale} slug={slug} />

@@ -27,6 +27,21 @@ export function discoverProjectContentIds(root) {
 }
 
 /**
+ * Reads all prose page slugs from src/content/pages/<locale>/*.md.
+ * @param {string} root
+ * @param {string} locale
+ * @returns {string[]}
+ */
+export function discoverPageSlugs(root, locale) {
+  const dir = join(root, 'src', 'content', 'pages', locale);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((file) => file.endsWith('.md'))
+    .map((file) => file.slice(0, -3))
+    .sort();
+}
+
+/**
  * Recursively lists all files in a directory.
  * @param {string} dir
  * @returns {string[]}
@@ -95,6 +110,17 @@ export function discoverSourcePages(root, policy) {
               sourceFile: rel,
             });
           }
+        } else if (rest === '[slug].astro') {
+          const slugs = discoverPageSlugs(root, loc);
+          for (const slug of slugs) {
+            const basePath = `/${slug}/`;
+            discovered.push({
+              path: localePath(policy.pages, loc, basePath),
+              basePath,
+              locale: loc,
+              sourceFile: rel,
+            });
+          }
         } else {
           let basePath = '';
           if (rest.endsWith('/index.astro')) {
@@ -131,6 +157,17 @@ export function discoverSourcePages(root, policy) {
     } else if (relInLocale === 'work/[slug].astro') {
       for (const id of projectIds) {
         const basePath = `/work/${id}/`;
+        discovered.push({
+          path: localePath(policy.pages, locale, basePath),
+          basePath,
+          locale,
+          sourceFile: rel,
+        });
+      }
+    } else if (relInLocale === '[slug].astro') {
+      const slugs = discoverPageSlugs(root, locale);
+      for (const slug of slugs) {
+        const basePath = `/${slug}/`;
         discovered.push({
           path: localePath(policy.pages, locale, basePath),
           basePath,

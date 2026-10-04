@@ -1,6 +1,7 @@
 ---
 title: "About"
 description: "About TerribleTurtles and this site."
+profilePage: true
 ---
 
 I'm TerribleTurtles. I build things when something seems worth making.

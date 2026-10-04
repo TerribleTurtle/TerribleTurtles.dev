@@ -6,15 +6,23 @@ import type { Locale } from '../i18n/locales';
 interface Props {
   locale: Locale;
   slug: string;
-  extraGraph?: Record<string, unknown>[];
 }
 
-const { locale, slug, extraGraph = [] } = Astro.props;
+const { locale, slug } = Astro.props;
 
 const entry = await getEntry('pages', `${locale}/${slug}`);
 if (!entry) {
   throw new Error(`Missing page content for ${locale}/${slug}`);
 }
+
+const extraGraph: Record<string, unknown>[] = entry.data.profilePage
+  ? [
+      {
+        '@type': 'ProfilePage',
+        mainEntity: { '@id': 'https://terribleturtles.dev/#person' },
+      },
+    ]
+  : [];
 
 const { Content } = await render(entry);
 ---

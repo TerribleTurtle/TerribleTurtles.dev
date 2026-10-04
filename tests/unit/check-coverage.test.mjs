@@ -63,7 +63,7 @@ test('checkCoverage fails when a source page is missing from policy.pages.expand
 
 test('checkCoverage fails when an expanded page has no source in src/pages', () => {
   const failures = checkSourceWith((root) => {
-    unlinkSync(join(root, 'src/pages/about.astro'));
+    unlinkSync(join(root, 'src/pages/[slug].astro'));
   });
   assert.ok(failures.some((f) => f.includes('/about/')), `expected failure mentioning /about/, got ${JSON.stringify(failures)}`);
 });
@@ -157,7 +157,7 @@ test('discoverSourcePages expands [locale] dynamic routes across non-default loc
     };
     const pages = discoverSourcePages(root, multiPolicy);
     const esAbout = pages.find((p) => p.path === '/es/about/');
-    assert.ok(esAbout, 'should find /es/about/ from [locale]/about.astro');
+    assert.ok(esAbout, 'should find /es/about/ from [locale]/[slug].astro');
     assert.equal(esAbout?.locale, 'es');
     assert.equal(esAbout?.basePath, '/about/');
 
@@ -222,6 +222,102 @@ test('checkCoverage with dist fails when dist contains an unexpected page', () =
     writeTreeFile(dist, 'surprise/index.html', '<p>boo</p>');
   });
   assert.ok(failures.some((f) => f.includes('/surprise/')), `expected failure mentioning /surprise/, got ${JSON.stringify(failures)}`);
+});
+
+test('discoverSourcePages discovers prose pages from [slug].astro and src/content/pages/<defaultLocale>/*.md', () => {
+  const root = makePassingTree(policy);
+  try {
+    const pages = discoverSourcePages(root, policy);
+    const aboutPage = pages.find((p) => p.path === '/about/');
+    assert.ok(aboutPage, 'should find /about/ from [slug].astro');
+    assert.equal(aboutPage?.sourceFile, '[slug].astro');
+    assert.equal(aboutPage?.locale, 'en');
+    assert.equal(aboutPage?.basePath, '/about/');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('discoverSourcePages discovers non-default locale prose pages from [locale]/[slug].astro', () => {
+  /** @type {Policy} */
+  const multiPolicy = {
+    ...policy,
+    pages: {
+      ...policy.pages,
+      locales: ['en', 'es'],
+    },
+  };
+  const root = makePassingTree(multiPolicy);
+  try {
+    const pages = discoverSourcePages(root, multiPolicy);
+    const esAbout = pages.find((p) => p.path === '/es/about/');
+    assert.ok(esAbout, 'should find /es/about/ from [locale]/[slug].astro');
+    assert.equal(esAbout?.sourceFile, '[locale]/[slug].astro');
+    assert.equal(esAbout?.locale, 'es');
+    assert.equal(esAbout?.basePath, '/about/');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('discoverSourcePages still discovers explicit .astro pages outside [slug].astro', () => {
+  const root = makePassingTree(policy);
+  try {
+    writeTreeFile(root, 'src/pages/custom.astro', '<p>Custom</p>');
+    const pages = discoverSourcePages(root, policy);
+    const custom = pages.find((p) => p.path === '/custom/');
+    assert.ok(custom, 'should find /custom/');
+    assert.equal(custom?.sourceFile, 'custom.astro');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('checkCoverage fails when a new md file has no policy entry', () => {
+  const failures = checkSourceWith((root) => {
+    writeTreeFile(
+      root,
+      'src/content/pages/en/extra-page.md',
+      '---\ntitle: "Extra"\ndescription: "Extra"\n---\nExtra body',
+    );
+  });
+  assert.ok(
+    failures.some((f) => f.includes('/extra-page/')),
+    `expected failure mentioning /extra-page/, got ${JSON.stringify(failures)}`,
+  );
+});
+
+test('checkCoverage fails when a policy page entry has no md file', () => {
+  /** @type {import('../../scripts/lib/policy.mjs').PageKind} */
+  const kind = 'page';
+  /** @type {Policy} */
+  const customPolicy = {
+    ...policy,
+    pages: {
+      ...policy.pages,
+      entries: [
+        ...policy.pages.entries,
+        { path: '/missing-page/', kind, id: undefined },
+      ],
+      expanded: [
+        ...policy.pages.expanded,
+        { path: '/missing-page/', basePath: '/missing-page/', locale: policy.pages.defaultLocale, kind, id: undefined },
+        ...policy.pages.locales
+          .filter((l) => l !== policy.pages.defaultLocale)
+          .map((l) => ({ path: `/${l}/missing-page/`, basePath: '/missing-page/', locale: l, kind, id: undefined })),
+      ],
+    },
+  };
+  const root = makePassingTree(policy);
+  try {
+    const failures = checkCoverage({ root, policy: customPolicy });
+    assert.ok(
+      failures.some((f) => f.includes('/missing-page/')),
+      `expected failure mentioning /missing-page/, got ${JSON.stringify(failures)}`,
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('checkCoverage CLI exits 0 on passing tree and 1 on failing tree', () => {
