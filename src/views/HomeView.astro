@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import WorkList from '../components/WorkList.astro';
 import { defaultLocale, LOCALE_META, type Locale } from '../i18n/locales';
+import { localizeProject } from '../i18n/projects';
 import { t } from '../i18n/ui';
 
 interface Props {
@@ -17,21 +18,7 @@ const allTranslations =
   locale === defaultLocale ? [] : await getCollection('projectsI18n');
 
 const projects = await Promise.all(
-  rawProjects.map(async (project) => {
-    if (locale === defaultLocale) return project;
-    const translation = allTranslations.find((t) => t.id === `${locale}/${project.id}`);
-    if (!translation) {
-      throw new Error(`Missing project translation for "${project.id}" in locale "${locale}"`);
-    }
-    return {
-      ...project,
-      data: {
-        ...project.data,
-        title: translation.data.title,
-        summary: translation.data.summary,
-      },
-    };
-  }),
+  rawProjects.map((project) => localizeProject(project, locale, allTranslations)),
 );
 
 projects.sort(

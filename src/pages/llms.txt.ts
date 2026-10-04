@@ -1,12 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
-
-const PAGES = `## Pages
-
-- [About](https://terribleturtles.dev/about/): Who runs this site and how to get in touch.
-- [Privacy](https://terribleturtles.dev/privacy/): What data this site does and doesn't collect.
-- [Security](https://terribleturtles.dev/security/): How to report a security issue.
-`;
+import policy from '../../security/policy.json';
+import { defaultLocale } from '../i18n/locales';
 
 export const GET: APIRoute = async (context) => {
   const site = context.site;
@@ -19,6 +14,24 @@ export const GET: APIRoute = async (context) => {
     return `- [${p.data.title}](${url}): ${p.data.summary}`;
   });
 
+  const allPages = await getCollection('pages');
+  const pagesBySlug = new Map(
+    allPages
+      .filter((p) => p.id.startsWith(`${defaultLocale}/`))
+      .map((p) => [p.id.slice(defaultLocale.length + 1), p]),
+  );
+
+  const pageEntries = policy.pages.entries.filter((entry) => entry.kind === 'page');
+  const pageLines = pageEntries.map((entry) => {
+    const slug = entry.path.replace(/^\/|\/$/g, '');
+    const page = pagesBySlug.get(slug);
+    if (!page) {
+      throw new Error(`Missing page content for ${defaultLocale}/${slug}`);
+    }
+    const url = new URL(entry.path, site).toString();
+    return `- [${page.data.title}](${url}): ${page.data.description}`;
+  });
+
   const text = `# TerribleTurtles
 
 > A personal archive of things I've built.
@@ -29,7 +42,10 @@ This is where I keep the things I've built. It's a static site; each project pag
 
 ${projectLines.join('\n')}
 
-${PAGES}`;
+## Pages
+
+${pageLines.join('\n')}
+`;
 
   return new Response(text, {
     headers: {

@@ -1,8 +1,9 @@
 ---
-import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StatusLabel from '../components/StatusLabel.astro';
 import { defaultLocale, LOCALE_META, localizePath, type Locale } from '../i18n/locales';
+import { localizeProject } from '../i18n/projects';
 import { t, format } from '../i18n/ui';
 
 interface Props {
@@ -15,21 +16,9 @@ const meta = LOCALE_META[locale];
 
 const { url, repo, year, status, stack, languages, screenshot } = project.data;
 
-const translation =
-  locale === defaultLocale
-    ? undefined
-    : (await getCollection('projectsI18n')).find((t) => t.id === `${locale}/${project.id}`);
+const { title, summary, disclaimer, screenshotAlt, renderable } = await localizeProject(project, locale);
 
-if (locale !== defaultLocale && !translation) {
-  throw new Error(`Missing translation for project "${project.id}" in locale "${locale}"`);
-}
-
-const title = translation?.data.title ?? project.data.title;
-const summary = translation?.data.summary ?? project.data.summary;
-const disclaimer = translation?.data.disclaimer ?? project.data.disclaimer;
-const screenshotAlt = translation?.data.screenshotAlt ?? screenshot?.alt;
-
-const { Content } = await render(translation ?? project);
+const { Content } = await render(renderable);
 
 if (!Astro.site) {
   throw new Error('`site` must be set in astro.config.mjs');
