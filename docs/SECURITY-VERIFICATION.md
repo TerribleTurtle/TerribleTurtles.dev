@@ -4,7 +4,7 @@
 
 This verification suite proves:
 - Security headers are present on every route and strictly match the repository policy.
-- Real web browsers enforce the Content Security Policy, permissions boundaries, and frame sandboxing.
+- Real web browsers enforce the Content Security Policy, Trusted Types and anti-framing rules.
 - Build artifacts in `dist/` contain zero first-party JavaScript, zero inline scripts, zero inline style attributes, and valid metadata.
 - No third-party network requests, cookies, or persistent storage items are created when pages load.
 
@@ -24,7 +24,7 @@ This command executes five verification stages in sequence:
 1. `build`: Compiles the Astro project into static HTML and CSS while executing unit tests and contrast checks.
 2. `verify:dist`: Directly inspects the generated output in `dist/` on disk to ensure no JavaScript files exist, no unauthorized script tags are present, no inline styles exist, and `.well-known/security.txt` is present and valid.
 3. `audit:deps`: Scans all project dependencies against known vulnerability databases, ensuring zero production vulnerabilities.
-4. Playwright test suite: Boots a local static web server with production headers to test Chromium, Firefox, and WebKit for header compliance, browser policy enforcement, runtime console hygiene, and accessibility (WCAG 2.1 AAA).
+4. Playwright test suite: Boots a local static web server with production headers to test Chromium, Firefox, and WebKit for header compliance, browser policy enforcement, runtime console hygiene, and accessibility (axe-core, WCAG 2.2 AA).
 5. `test:mutation`: Validates the verification harness itself by introducing deliberate security defects and confirming the test suite catches every single one.
 
 ## The Mutation Test
@@ -51,7 +51,7 @@ Summary: All 12 mutations caught (baseline clean).
 
 ## Reading Results in GitHub
 
-GitHub Actions runs the verification pipeline automatically on every push and pull request under the **Actions** tab:
+GitHub Actions runs the verification pipeline automatically on every pull request and every push to `main` under the **Actions** tab:
 - **Green checkmark**: All verification checks passed. The commit meets all security and quality gates.
 - **Red X**: A check failed. Click the run to open the job details; the failing step name reveals which layer caught the defect (`build`, `verify:dist`, `audit:deps`, Playwright tests, or `audit:signatures`). If browser tests fail, debugging artifacts (`test-results/` and `playwright-report/`) are uploaded automatically and retained for 7 days.
 
@@ -66,7 +66,7 @@ GitHub Actions runs the verification pipeline automatically on every push and pu
 Once deployed to Cloudflare, the live site can be evaluated externally using three commands:
 - `npm run check:live`: Queries live edge endpoints to verify deployed headers match local security policies.
 - `npm run check:observatory`: Submits the domain to Mozilla HTTP Observatory (target grade: A+).
-- `npm run check:dns -- --strict`: Performs strict verification of DNSSEC, CAA records, and defensive mail records (SPF, DMARC, DKIM null records).
+- `npm run check:dns -- --strict`: Performs strict verification of DNSSEC, CAA records, and mail anti-spoofing records (SPF, DMARC with p=reject).
 
 ## The Golden Rule
 
