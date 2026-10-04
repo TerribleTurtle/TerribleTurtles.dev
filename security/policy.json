@@ -76,13 +76,14 @@
     "X-SourceMap"
   ],
   "routes": [
-    { "class": "html", "paths": ["/", "/about/", "/privacy/", "/security/", "/work/spellcastersdb/"], "status": 200, "contentType": "text/html; charset=utf-8" },
+    { "class": "html", "paths": ["/", "/about/", "/privacy/", "/security/", "/work/spellcastersdb/", "/work/spellcasters-community-api/"], "status": 200, "contentType": "text/html; charset=utf-8" },
     { "class": "not-found", "paths": ["/this-page-does-not-exist/"], "status": 404, "contentType": "text/html; charset=utf-8" },
     { "class": "hashed-stylesheet", "discover": { "from": "/", "pattern": "<link rel=\"stylesheet\" href=\"(/_astro/[^\"]+\\.css)\"" }, "status": 200, "contentType": "text/css; charset=utf-8", "cacheControl": "public, max-age=31536000, immutable" },
     { "class": "font", "paths": ["/fonts/newsreader-latin-wght-normal.woff2", "/fonts/instrument-sans-latin-wght-normal.woff2"], "status": 200, "contentType": "font/woff2", "cacheControl": "public, max-age=2592000" },
-    { "class": "image", "paths": ["/og.png"], "status": 200, "contentType": "image/png" },
+    { "class": "image", "paths": ["/og.png", "/og/spellcastersdb.png", "/og/spellcasters-community-api.png"], "status": 200, "contentType": "image/png" },
     { "class": "svg", "paths": ["/favicon.svg"], "status": 200, "contentType": "image/svg+xml" },
     { "class": "security-txt", "paths": ["/.well-known/security.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },
+    { "class": "llms-txt", "paths": ["/llms.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },
     { "class": "speculation-rules", "paths": ["/speculationrules.json"], "status": 200, "contentType": "application/speculationrules+json" },
     { "class": "sitemap", "paths": ["/sitemap-index.xml"], "status": 200, "contentType": "application/xml" },
     { "class": "robots", "paths": ["/robots.txt"], "status": 200, "contentType": "text/plain; charset=utf-8" },

@@ -11,7 +11,7 @@ import { defineConfig, devices } from '@playwright/test';
 const externalBaseURL = process.env.TT_BASE_URL;
 const baseURL = externalBaseURL ?? 'http://127.0.0.1:8787';
 const embedderPort = process.env.TT_EMBEDDER_PORT ?? '8790';
-const browserSpecs = ['e2e/**/*.spec.ts', 'security/enforcement.spec.ts', 'security/runtime.spec.ts'];
+const browserSpecs = ['e2e/**/*.spec.ts', 'security/enforcement.spec.ts', 'security/runtime.spec.ts', 'security/structured-data.spec.ts'];
 
 export default defineConfig({
   testDir: './tests',

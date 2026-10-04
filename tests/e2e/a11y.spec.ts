@@ -6,7 +6,7 @@ import AxeBuilder from '@axe-core/playwright';
  * Runs against the built site (`astro preview`, see playwright.config.ts).
  */
 const NOT_FOUND = '/this-page-does-not-exist/';
-const routes = ['/', '/about/', '/privacy/', '/security/', '/work/spellcastersdb/', NOT_FOUND] as const;
+const routes = ['/', '/about/', '/privacy/', '/security/', '/work/spellcastersdb/', '/work/spellcasters-community-api/', NOT_FOUND] as const;
 const schemes = ['dark', 'light'] as const;
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
