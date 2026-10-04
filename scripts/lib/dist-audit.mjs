@@ -76,6 +76,12 @@ export function checkHtml(policy, file, html) {
   // (e.g. Email Address Obfuscation), which live-check runs this function against.
   const cdnCgi = /\/cdn-cgi\//i.exec(html);
   if (cdnCgi) failures.push(`${file}: Cloudflare edge-injected /cdn-cgi/ markup at ${context(html, cdnCgi.index)}`);
+  // The host serves HTML as bare `text/html`, so the encoding must be declared in the document, inside
+  // the 1024-byte window browsers prescan for it (WHATWG HTML, "prescan a byte stream").
+  const metaCharset = /<meta charset="utf-8"\s*\/?>/i.exec(html);
+  if (!metaCharset || Buffer.byteLength(html.slice(0, metaCharset.index + metaCharset[0].length), 'utf8') > 1024) {
+    failures.push(`${file}: <meta charset="utf-8"> missing from the first 1024 bytes`);
+  }
   for (const match of html.matchAll(FORBIDDEN_TAGS)) failures.push(`${file}: <${(match[1] ?? '').toLowerCase()}> element is forbidden`);
   for (const match of html.matchAll(RESOURCE_ATTR)) {
     const name = match[2] ?? '';
@@ -134,6 +140,12 @@ export async function auditDist(distDir, policy, now) {
     if (ext === '.html') failures.push(...checkHtml(policy, file, text));
     if (ext === '.css') {
       for (const match of text.matchAll(CSS_EXTERNAL)) failures.push(`${file}: external url() in CSS at ${context(text, match.index)}`);
+    }
+    // The host serves CSS and robots.txt without a charset parameter; keeping them ASCII makes the
+    // encoding irrelevant (HTML declares it with <meta charset>, checked in checkHtml).
+    if (ext === '.css' || file === 'robots.txt') {
+      const nonAscii = /[^\x00-\x7f]/.exec(text);
+      if (nonAscii) failures.push(`${file}: non-ASCII character at ${context(text, nonAscii.index)} (served without a charset)`);
     }
   }
   if (files.includes('_headers')) failures.push(...checkHeadersFile(policy, await readFile(join(distDir, '_headers'), 'utf8')));

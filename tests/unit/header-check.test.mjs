@@ -85,3 +85,29 @@ test('checkRoute enforces status, content type, cache control and redirect locat
   const wrongLocation = { status: 307, headers: { ...goodHeaders(), location: '/elsewhere/' } };
   assert.match(checkRoute(policy, redirect, '/about', wrongLocation).join('\n'), /Location/);
 });
+
+/**
+ * @param {string} contentType
+ * @returns {import('../../scripts/lib/policy.mjs').RouteRule}
+ */
+function routeWith(contentType) {
+  return { class: 'probe', paths: ['/x/'], discover: undefined, status: 200, contentType, cacheControl: undefined, location: undefined };
+}
+
+test('a bare policy content type accepts the bare type or charset=utf-8, nothing else', () => {
+  const route = routeWith('text/html');
+  /** @param {string} ct */
+  const run = (ct) => checkRoute(policy, route, '/x/', { status: 200, headers: { ...goodHeaders(), 'content-type': ct } }).join('\n');
+  assert.equal(run('text/html'), '');
+  assert.equal(run('text/html; charset=utf-8'), '');
+  assert.equal(run('text/html;charset=UTF-8'), '');
+  assert.match(run('text/html; charset=iso-8859-1'), /Content-Type/);
+  assert.match(run('text/plain'), /Content-Type/);
+  assert.match(run('text/html; charset=utf-8; foo=bar'), /Content-Type/);
+});
+
+test('a policy content type that names a charset stays exact', () => {
+  const route = routeWith('text/plain; charset=utf-8');
+  const bare = checkRoute(policy, route, '/x/', { status: 200, headers: { ...goodHeaders(), 'content-type': 'text/plain' } });
+  assert.match(bare.join('\n'), /Content-Type/);
+});

@@ -72,6 +72,11 @@ const failing = [
   ['a Cloudflare email-obfuscation link', (d) => editFile(d, 'about/index.html', (h) => h.replace('</main>', '<a href="/cdn-cgi/l/email-protection#1a2b"><span class="__cf_email__" data-cfemail="1a2b">[email&#160;protected]</span></a></main>')), /\/cdn-cgi\//],
   ['the Cloudflare email-decode script', (d) => editFile(d, 'about/index.html', (h) => h.replace('</body>', '<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>')), /<script> without an allowed type.*email-decode/],
   ['the Cloudflare Web Analytics beacon', (d) => editFile(d, 'index.html', (h) => h.replace('</body>', '<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{"token":"x"}\'></script></body>')), /cloudflareinsights/],
+  // The host serves HTML/CSS/robots.txt without a charset parameter, so the files must carry it themselves.
+  ['HTML without <meta charset="utf-8">', (d) => editFile(d, 'about/index.html', (h) => h.replace('<meta charset="utf-8">', '')), /meta charset/],
+  ['<meta charset> after the first 1024 bytes', (d) => editFile(d, 'index.html', (h) => h.replace('<meta charset="utf-8">', `<!--${'x'.repeat(1100)}--><meta charset="utf-8">`)), /meta charset/],
+  ['non-ASCII CSS', (d) => writeFile(d, '_astro/x.css', 'a::after{content:"\u2197"}'), /x\.css: non-ASCII/],
+  ['non-ASCII robots.txt', (d) => writeFile(d, 'robots.txt', 'User-agent: *\n# caf\u00e9\n'), /robots\.txt: non-ASCII/],
 ];
 
 for (const [name, mutate, pattern] of failing) {

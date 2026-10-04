@@ -128,6 +128,22 @@ export function checkGlobalHeaders(policy, headers) {
 }
 
 /**
+ * A policy content type without a charset (e.g. `text/html`) accepts the bare type or `; charset=utf-8`:
+ * production Workers Static Assets serves the bare type while wrangler dev adds the charset, and
+ * verify-dist proves those files declare their encoding (meta charset) or are ASCII. A policy value
+ * that names a charset must match exactly.
+ * @param {string} expected
+ * @param {string | undefined} actual
+ */
+function contentTypeMatches(expected, actual) {
+  if (actual === undefined) return false;
+  if (actual === expected) return true;
+  if (expected.includes(';')) return false;
+  const parts = actual.split(';').map((part) => part.trim().toLowerCase());
+  return parts.length === 2 && parts[0] === expected.toLowerCase() && parts[1] === 'charset=utf-8';
+}
+
+/**
  * Checks one response against its route class plus all global header rules.
  * @param {Policy} policy
  * @param {RouteRule} route
@@ -140,8 +156,12 @@ export function checkRoute(policy, route, path, result) {
   /** @type {string[]} */
   const failures = [];
   if (result.status !== route.status) failures.push(`status ${result.status}, expected ${route.status}`);
+  if (route.contentType !== undefined) {
+    const actual = h.get('content-type');
+    if (!contentTypeMatches(route.contentType, actual)) failures.push(`Content-Type is "${actual ?? '(absent)'}", expected "${route.contentType}"`);
+  }
   /** @type {Array<[string, string | undefined]>} */
-  const exact = [['Content-Type', route.contentType], ['Cache-Control', route.cacheControl], ['Location', route.location]];
+  const exact = [['Cache-Control', route.cacheControl], ['Location', route.location]];
   for (const [name, expected] of exact) {
     if (expected === undefined) continue;
     const actual = h.get(name.toLowerCase());
