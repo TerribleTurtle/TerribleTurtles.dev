@@ -1,3 +1,4 @@
 npx lint-staged
 npm run typecheck
 npm run check:coverage
+npm run check:i18n-literals

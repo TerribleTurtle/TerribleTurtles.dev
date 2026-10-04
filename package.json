@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run typecheck && npm run typecheck:scripts && npm run lint:js && npm run lint:css && npm run test:unit && npm run check:contrast && astro build && node scripts/check-coverage.mjs --dist dist",
+    "build": "npm run typecheck && npm run typecheck:scripts && npm run lint:js && npm run lint:css && npm run test:unit && npm run check:contrast && npm run check:i18n-literals && astro build && node scripts/check-coverage.mjs --dist dist",
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
@@ -17,6 +17,7 @@
     "lint:css": "stylelint \"**/*.{css,astro}\"",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:coverage": "node scripts/check-coverage.mjs",
+    "check:i18n-literals": "node scripts/check-i18n-literals.mjs",
     "test": "playwright test",
     "test:unit": "node --test \"tests/unit/*.test.mjs\"",
     "assets:icons": "node scripts/generate-icons.mjs",
