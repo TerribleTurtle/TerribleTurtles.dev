@@ -24,7 +24,9 @@
     "prepare": "husky",
     "verify:dist": "node scripts/verify-dist.mjs",
     "test:security": "playwright test --project=headers --project=chromium --project=firefox --project=webkit tests/security",
-    "verify:security": "npm run build && npm run verify:dist && playwright test"
+    "verify:security": "npm run build && npm run verify:dist && playwright test",
+    "audit:deps": "node scripts/audit-deps.mjs",
+    "audit:signatures": "npm audit signatures"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
