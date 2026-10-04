@@ -27,7 +27,8 @@
     "verify:security": "npm run build && npm run verify:dist && playwright test",
     "audit:deps": "node scripts/audit-deps.mjs",
     "audit:signatures": "npm audit signatures",
-    "check:live": "node scripts/live-check.mjs"
+    "check:live": "node scripts/live-check.mjs",
+    "check:observatory": "node scripts/observatory.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
