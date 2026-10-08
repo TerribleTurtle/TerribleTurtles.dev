@@ -60,6 +60,7 @@ GitHub Actions runs the verification pipeline automatically on every pull reques
 - **Firefox dark mode emulation**: Due to an upstream bug in Playwright's Firefox color-scheme emulation, dark mode tests are skipped on Firefox. Dark mode rendering and token adherence are verified in Chromium and WebKit, while Firefox verifies the light mode baseline.
 - **WebKit skip-link navigation**: Playwright on Windows WebKit does not shift keyboard focus on synthetic Tab key presses. Physical tab navigation is verified in Chromium and Firefox, while WebKit verifies skip-link positioning and programmatic focus order.
 - **Braces development advisory**: The `braces` library has an upstream advisory with no patched release. It is used strictly for dev-time lint pattern globbing and is never deployed. It is allowlisted until `2027-01-04`; the audit will automatically fail after that date if an update is not applied.
+- **Sharp development advisory**: The `sharp` library (CVE-2026-96889, GHSA-wq5f-xc86-pv6w) pulled via `wrangler` -> `miniflare` -> `sharp` has an upstream vulnerability in its bundled `librsvg` dependency. It is used strictly in local dev tooling and is never deployed to production static assets. It is allowlisted until `2027-04-08`; the audit will automatically fail after that date if an update is not applied.
 
 ## On-Demand Checks After Going Live
 
