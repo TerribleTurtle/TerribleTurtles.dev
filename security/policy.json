@@ -131,6 +131,13 @@
         "scope": "dev",
         "reason": "braces<=3.0.3 stack-exhaustion DoS with no patched release; reached only via stylelint and eslint-plugin-astro globbing our own lint patterns at dev time. Never shipped; production deps have 0 vulnerabilities.",
         "expires": "2027-01-04"
+      },
+      {
+        "id": "GHSA-wq5f-xc86-pv6w",
+        "package": "sharp",
+        "scope": "dev",
+        "reason": "Vulnerability in librsvg dependency (CVE-2026-96889). Pulled via wrangler -> miniflare -> sharp. Dev-only tool, never shipped to production assets.",
+        "expires": "2027-04-08"
       }
     ]
   },
