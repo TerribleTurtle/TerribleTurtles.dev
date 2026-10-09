@@ -373,22 +373,10 @@ export function findLiterals(source, file = '', allowlist = ALLOWLIST) {
  */
 export function findAstroFiles(dir) {
   if (!existsSync(dir)) return [];
-  /** @type {string[]} */
-  const results = [];
-  /** @param {string} current */
-  function walk(current) {
-    const entries = readdirSync(current, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = join(current, entry.name);
-      if (entry.isDirectory()) {
-        walk(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.astro')) {
-        results.push(fullPath);
-      }
-    }
-  }
-  walk(dir);
-  return results.sort();
+  return readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.astro'))
+    .map((entry) => join(entry.parentPath, entry.name))
+    .sort();
 }
 
 /**

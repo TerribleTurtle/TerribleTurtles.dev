@@ -57,7 +57,7 @@ export function updateUiSourceHash(content, locale, hash) {
 
   const blockFull = blockMatch[0];
   const blockInner = blockMatch[1];
-  const entryRegex = new RegExp(`(^|\\n)(\\s*)(['"]?${locale}['"]?\\s*:\\s*)['"][^'"]*['"]`);
+  const entryRegex = new RegExp(`(^|\\n)(\\s*)(['"]?${RegExp.escape(locale)}['"]?\\s*:\\s*)['"][^'"]*['"]`);
   if (entryRegex.test(blockInner)) {
     const updatedInner = blockInner.replace(entryRegex, `$1$2$3'${hash}'`);
     return content.replace(blockFull, `export const UI_SOURCE_HASH = {${updatedInner}} as const;`);

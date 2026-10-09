@@ -7,7 +7,7 @@
     "noEmit": true,
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "target": "es2022",
+    "target": "esnext",
     "types": ["node"],
     "skipLibCheck": true
   },

@@ -48,22 +48,9 @@ export function discoverPageSlugs(root, locale) {
  */
 function listFilesRecursive(dir) {
   if (!existsSync(dir)) return [];
-  /** @type {string[]} */
-  const files = [];
-  /** @param {string} current */
-  function walk(current) {
-    const entries = readdirSync(current, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = join(current, entry.name);
-      if (entry.isDirectory()) {
-        walk(fullPath);
-      } else if (entry.isFile()) {
-        files.push(fullPath);
-      }
-    }
-  }
-  walk(dir);
-  return files;
+  return readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => join(entry.parentPath, entry.name));
 }
 
 /**
