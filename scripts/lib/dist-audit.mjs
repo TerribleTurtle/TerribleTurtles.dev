@@ -20,7 +20,7 @@ const CSS_EXTERNAL = /(?:url\(\s*["']?\s*|@import\s+["'])(?:[a-z][a-z0-9+.-]*:|\
  * @returns {string | undefined}
  */
 function attr(tag, name) {
-  const match = new RegExp(`\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i').exec(tag);
+  const match = new RegExp(`\\s${RegExp.escape(name)}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i').exec(tag);
   return match ? (match[1] ?? match[2] ?? match[3] ?? '') : undefined;
 }
 

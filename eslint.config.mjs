@@ -10,6 +10,17 @@ export default [
   {
     files: ['**/*.astro'],
     rules: {
+      'astro/no-set-html-directive': 'error',
+      'astro/no-unsafe-inline-scripts': 'error',
+      'astro/no-unused-css-selector': 'error',
+      'astro/no-set-text-directive': 'error',
+      'astro/prefer-class-list-directive': 'error',
+    },
+  },
+  {
+    // BaseLayout uses set:html strictly for static, serialized JSON-LD schema metadata
+    files: ['src/layouts/BaseLayout.astro'],
+    rules: {
       'astro/no-set-html-directive': 'off',
     },
   },
