@@ -85,7 +85,8 @@
       { "path": "/privacy/", "kind": "page" },
       { "path": "/security/", "kind": "page" },
       { "path": "/work/spellcastersdb/", "kind": "project", "id": "spellcastersdb" },
-      { "path": "/work/spellcasters-community-api/", "kind": "project", "id": "spellcasters-community-api" }
+      { "path": "/work/spellcasters-community-api/", "kind": "project", "id": "spellcasters-community-api" },
+      { "path": "/work/clonebay/", "kind": "project", "id": "clonebay" }
     ]
   },
   "routes": [
