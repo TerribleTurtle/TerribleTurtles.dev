@@ -47,7 +47,7 @@
     { "name": "Cross-Origin-Resource-Policy", "equals": "same-origin" },
     { "name": "Origin-Agent-Cluster", "equals": "?1" },
     { "name": "Referrer-Policy", "equals": "no-referrer" },
-    { "name": "Strict-Transport-Security", "equals": "max-age=63072000; includeSubDomains; preload" },
+    { "name": "Strict-Transport-Security", "equals": "max-age=63072000" },
     { "name": "X-Content-Type-Options", "equals": "nosniff" },
     { "name": "X-Frame-Options", "equals": "DENY" }
   ],
