@@ -56,7 +56,7 @@
     "stylelint-config-standard": "40.0.0",
     "stylelint-declaration-strict-value": "1.12.1",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.71.1",
+    "typescript-eslint": "8.71.2",
     "wrangler": "4.149.0"
   },
   "overrides": {
