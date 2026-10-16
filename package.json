@@ -62,7 +62,8 @@
   "overrides": {
     "eslint-plugin-jsx-a11y": {
       "eslint": "$eslint"
-    }
+    },
+    "playwright-core": "$@playwright/test"
   },
   "lint-staged": {
     "*.{js,ts,mjs}": "eslint",
