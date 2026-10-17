@@ -13,7 +13,7 @@ Interactive tools live on their own subdomains as separate projects, so the main
 
 ## Prerequisites
 
-- Node.js `>=22.12.0`
+- Node.js `>=24.16.0`
 
 ## Commands
 
