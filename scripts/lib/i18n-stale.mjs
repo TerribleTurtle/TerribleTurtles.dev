@@ -166,3 +166,80 @@ export function findStale({ root, policy }) {
 
   return failures;
 }
+
+/**
+ * Extracts key-value pairs from a locale dictionary block in src/i18n/ui.ts.
+ * @param {string} content
+ * @param {string} locale
+ * @returns {Map<string, string> | null}
+ */
+export function parseUiDictionaryBlock(content, locale) {
+  const blockMatch = content.match(
+    new RegExp(`(?:^|\\n)const\\s+${locale}(?:\\s*:[^=]+)?\\s*=\\s*\\{([\\s\\S]*?)\\}(?:\\s*as\\s*const)?;`),
+  );
+  if (!blockMatch) return null;
+
+  /** @type {Map<string, string>} */
+  const entries = new Map();
+  const entryRegex = /['"]([^'"]+)['"]\s*:\s*(['"])((?:\\.|(?!\2)[^\r\n])*)\2/g;
+  let match = entryRegex.exec(blockMatch[1]);
+  while (match !== null) {
+    entries.set(match[1], match[3]);
+    match = entryRegex.exec(blockMatch[1]);
+  }
+  return entries;
+}
+
+/**
+ * Verifies every locale in policy.pages.locales has a dictionary in src/i18n/ui.ts
+ * with identical keys to defaultLocale and no empty or whitespace-only values.
+ * @param {FindStaleOptions} options
+ * @returns {string[]}
+ */
+export function checkUiDictionaries({ root, policy }) {
+  /** @type {string[]} */
+  const failures = [];
+  const uiPath = join(root, 'src', 'i18n', 'ui.ts');
+  if (!existsSync(uiPath)) return failures;
+
+  const uiContent = readFileSync(uiPath, 'utf8');
+  const defaultLocale = policy.pages.defaultLocale;
+  const defaultDict = parseUiDictionaryBlock(uiContent, defaultLocale);
+  if (!defaultDict) {
+    failures.push(`UI dictionary missing for default locale "${defaultLocale}" in src/i18n/ui.ts`);
+    return failures;
+  }
+
+  for (const [key, value] of defaultDict) {
+    if (value.trim().length === 0) {
+      failures.push(`UI dictionary key "${key}" in locale "${defaultLocale}" has an empty value in src/i18n/ui.ts`);
+    }
+  }
+
+  for (const locale of policy.pages.locales) {
+    if (locale === defaultLocale) continue;
+    const dict = parseUiDictionaryBlock(uiContent, locale);
+    if (!dict) {
+      failures.push(`UI dictionary missing for locale "${locale}" in src/i18n/ui.ts`);
+      continue;
+    }
+
+    for (const key of defaultDict.keys()) {
+      if (!dict.has(key)) {
+        failures.push(`UI dictionary for locale "${locale}" is missing key "${key}" in src/i18n/ui.ts`);
+      }
+    }
+
+    for (const [key, value] of dict) {
+      if (!defaultDict.has(key)) {
+        failures.push(`UI dictionary for locale "${locale}" has unexpected key "${key}" in src/i18n/ui.ts`);
+      }
+      if (value.trim().length === 0) {
+        failures.push(`UI dictionary key "${key}" in locale "${locale}" has an empty value in src/i18n/ui.ts`);
+      }
+    }
+  }
+
+  return failures;
+}
+

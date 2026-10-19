@@ -83,6 +83,9 @@ export function makePassingTree(policy) {
   const enUiInner = `\n  'brand.home': 'Home',\n`;
   const enUiHash = hashSource(enUiInner);
   const hashLines = nonDefaultLocales.map((l) => `  ${l}: '${enUiHash}',`).join('\n');
+  const localeDicts = nonDefaultLocales
+    .map((l) => `const ${l}: Record<UiKey, string> = {${enUiInner}};`)
+    .join('\n\n');
   const uiContent = [
     `// Stale-translation check hashes the normalised text between 'const en = {' and '} as const;'.`,
     `const en = {${enUiInner}} as const;`,
@@ -92,6 +95,8 @@ export function makePassingTree(policy) {
     `export const UI_SOURCE_HASH = {`,
     hashLines,
     `} as const;`,
+    ``,
+    localeDicts,
     ``,
   ].join('\n');
   writeTreeFile(root, 'src/i18n/ui.ts', uiContent);
