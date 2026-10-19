@@ -6,7 +6,7 @@ import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { loadPolicy, localePath } from './lib/policy.mjs';
-import { findStale } from './lib/i18n-stale.mjs';
+import { findStale, checkUiDictionaries } from './lib/i18n-stale.mjs';
 
 /** @typedef {import('./lib/policy.mjs').Policy} Policy */
 /** @typedef {{ path: string, basePath: string, locale: string, sourceFile: string }} DiscoveredPage */
@@ -295,9 +295,11 @@ export function checkCoverage({ root, policy, distDir }) {
     }
   }
 
-  // 5b. Stale translation verification
+  // 5b. Stale translation & UI dictionary parity verification
   const staleFailures = findStale({ root, policy });
   failures.push(...staleFailures);
+  const dictFailures = checkUiDictionaries({ root, policy });
+  failures.push(...dictFailures);
 
   // 6. Dist half (if distDir provided)
   if (distDir !== undefined) {

@@ -6,6 +6,7 @@ import { rmSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadPolicy } from '../../scripts/lib/policy.mjs';
+import { hashSource } from '../../scripts/lib/i18n-stale.mjs';
 import { checkCoverage, discoverSourcePages } from '../../scripts/check-coverage.mjs';
 import { makePassingTree, makePassingCoverageDist, writeTreeFile } from './helpers/fixture-coverage.mjs';
 
@@ -339,3 +340,44 @@ test('checkCoverage CLI exits 0 on passing tree and 1 on failing tree', () => {
     rmSync(dist, { recursive: true, force: true });
   }
 });
+
+test('checkCoverage fails when a locale dictionary in src/i18n/ui.ts has an empty or whitespace-only value', () => {
+  const failures = checkSourceWith((root) => {
+    const enUiInner = `\n  'brand.home': 'Home',\n`;
+    const enUiHash = hashSource(enUiInner);
+    const uiContent = [
+      `const en = {${enUiInner}} as const;`,
+      `export type UiKey = keyof typeof en;`,
+      `export const UI_SOURCE_HASH = {\n  es: '${enUiHash}',\n} as const;`,
+      `const es: Record<UiKey, string> = {\n  'brand.home': '   ',\n};`,
+    ].join('\n');
+    writeTreeFile(root, 'src/i18n/ui.ts', uiContent);
+  });
+  assert.ok(
+    failures.some((f) => f.includes('es') && f.includes('brand.home') && f.includes('empty')),
+    `expected failure mentioning empty value for es brand.home, got ${JSON.stringify(failures)}`,
+  );
+});
+
+test('checkCoverage fails when a locale dictionary in src/i18n/ui.ts is missing a key or has an extra key', () => {
+  const failures = checkSourceWith((root) => {
+    const enUiInner = `\n  'brand.home': 'Home',\n  'nav.work': 'Work',\n`;
+    const enUiHash = hashSource(enUiInner);
+    const uiContent = [
+      `const en = {${enUiInner}} as const;`,
+      `export type UiKey = keyof typeof en;`,
+      `export const UI_SOURCE_HASH = {\n  es: '${enUiHash}',\n} as const;`,
+      `const es: Record<UiKey, string> = {\n  'brand.home': 'Inicio',\n  'extra.key': 'Extra',\n};`,
+    ].join('\n');
+    writeTreeFile(root, 'src/i18n/ui.ts', uiContent);
+  });
+  assert.ok(
+    failures.some((f) => f.includes('es') && f.includes('nav.work') && f.includes('missing')),
+    `expected failure mentioning missing key nav.work in es, got ${JSON.stringify(failures)}`,
+  );
+  assert.ok(
+    failures.some((f) => f.includes('es') && f.includes('extra.key') && f.includes('unexpected')),
+    `expected failure mentioning unexpected key extra.key in es, got ${JSON.stringify(failures)}`,
+  );
+});
+

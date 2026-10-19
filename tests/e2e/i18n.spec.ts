@@ -52,7 +52,7 @@ if (legalSlugs.length === 0) {
 
 const legalBasePaths = new Set(legalSlugs.map((slug) => `/${slug}/`));
 
-test.describe('i18n legal notices (8.4.6)', () => {
+test.describe('i18n legal notices', () => {
   for (const locale of nonDefaultLocales) {
     for (const legalSlug of legalSlugs) {
       const legalRoute = `/${locale}/${legalSlug}/`;
@@ -135,7 +135,7 @@ test.describe('i18n language switcher', () => {
   }
 });
 
-test.describe('i18n language tags, canonical, and alternates (8.4.5)', () => {
+test.describe('i18n language tags, canonical, and alternates', () => {
   for (const pageRef of policy.pages.expanded) {
     test(`canonical, alternates, and language tags on ${pageRef.path}`, async ({ page }) => {
       const pageRes = await page.goto(pageRef.path);
@@ -232,3 +232,85 @@ test.describe('i18n language tags, canonical, and alternates (8.4.5)', () => {
     });
   }
 });
+
+test.describe('i18n Latin subset glyph coverage', () => {
+  const spanishGlyphs = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', '¿', '¡', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ñ', 'Ü'] as const;
+  const webFontFamilies = ['Newsreader', 'Instrument Sans'] as const;
+
+  test('self-hosted Latin variable fonts cover Spanish glyphs without fallback or tofu', async ({ page }) => {
+    const res = await page.goto('/es/');
+    expect(res?.status()).toBe(200);
+
+    const results = await page.evaluate(
+      async ({ glyphs, families }) => {
+        await document.fonts.ready;
+        await Promise.all(families.map((f) => document.fonts.load(`400 48px "${f}"`)));
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 96;
+        canvas.height = 96;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Could not get 2d canvas context');
+
+        function renderSignature(fontSpec: string, text: string): { inkPixels: number; bitmap: string; width: number } {
+          ctx!.clearRect(0, 0, canvas.width, canvas.height);
+          ctx!.font = fontSpec;
+          ctx!.fillStyle = '#000000';
+          ctx!.textBaseline = 'alphabetic';
+          const width = ctx!.measureText(text).width;
+          ctx!.fillText(text, 16, 64);
+          const data = ctx!.getImageData(0, 0, canvas.width, canvas.height).data;
+          let inkPixels = 0;
+          const nonZero: number[] = [];
+          for (let i = 3; i < data.length; i += 4) {
+            if (data[i] > 0) {
+              inkPixels++;
+              nonZero.push(i, data[i]);
+            }
+          }
+          return { inkPixels, bitmap: nonZero.join(','), width };
+        }
+
+        const failures: string[] = [];
+        for (const family of families) {
+          const loaded = [...document.fonts].some(
+            (f) => f.family.replace(/"/g, '') === family && f.status === 'loaded',
+          );
+          if (!loaded) {
+            failures.push(`Font "${family}" is not in loaded state`);
+            continue;
+          }
+
+          const notdef = renderSignature(`400 48px "${family}"`, '\uFFFF');
+
+          for (const ch of glyphs) {
+            const withSerifFallback = renderSignature(`400 48px "${family}", serif`, ch);
+            const withMonoFallback = renderSignature(`400 48px "${family}", monospace`, ch);
+            const pureMono = renderSignature('400 48px monospace', ch);
+
+            if (withSerifFallback.inkPixels === 0) {
+              failures.push(`${family}: glyph "${ch}" rendered 0 ink pixels`);
+            }
+            if (withSerifFallback.bitmap === notdef.bitmap) {
+              failures.push(`${family}: glyph "${ch}" rendered .notdef tofu bitmap`);
+            }
+            if (
+              withSerifFallback.bitmap !== withMonoFallback.bitmap ||
+              withSerifFallback.width !== withMonoFallback.width
+            ) {
+              failures.push(`${family}: glyph "${ch}" fell back to secondary font stack`);
+            }
+            if (withMonoFallback.bitmap === pureMono.bitmap && withMonoFallback.width === pureMono.width) {
+              failures.push(`${family}: glyph "${ch}" matched pure monospace fallback`);
+            }
+          }
+        }
+        return failures;
+      },
+      { glyphs: [...spanishGlyphs], families: [...webFontFamilies] },
+    );
+
+    expect(results).toEqual([]);
+  });
+});
+
