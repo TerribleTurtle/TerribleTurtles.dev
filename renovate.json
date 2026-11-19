@@ -4,7 +4,16 @@
     "config:best-practices",
     "group:allNonMajor"
   ],
+  "schedule": [
+    "* 0-3 1,15 * *"
+  ],
+  "lockFileMaintenance": {
+    "schedule": [
+      "* 0-3 1,15 * *"
+    ]
+  },
   "minimumReleaseAge": "5 days",
+  "internalChecksFilter": "strict",
   "platformAutomerge": true,
   "packageRules": [
     {
