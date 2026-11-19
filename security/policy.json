@@ -126,15 +126,7 @@
   },
   "audit": {
     "failOnSeverities": ["high", "critical"],
-    "allowlist": [
-      {
-        "id": "GHSA-vfj7-8cjw-p6xm",
-        "package": "braces",
-        "scope": "dev",
-        "reason": "braces<=3.0.3 stack-exhaustion DoS with no patched release; reached only via stylelint and eslint-plugin-astro globbing our own lint patterns at dev time. Never shipped; production deps have 0 vulnerabilities.",
-        "expires": "2027-01-04"
-      }
-    ]
+    "allowlist": []
   },
   "live": {
     "origin": "https://terribleturtles.dev",

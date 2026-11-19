@@ -13,6 +13,21 @@ function rawPolicy() {
   return JSON.parse(readFileSync(POLICY_PATH, 'utf8'));
 }
 
+/**
+ * Builds a valid dev-allowlist entry with targeted field overrides for malformed-policy tests.
+ * @param {Record<string, unknown>} overrides
+ */
+function sampleAllowEntry(overrides) {
+  return {
+    id: 'GHSA-2222-3333-4444',
+    package: 'example-dev-pkg',
+    scope: 'dev',
+    reason: 'test fixture',
+    expires: '2099-01-01',
+    ...overrides,
+  };
+}
+
 test('the committed security/policy.json is valid', () => {
   const policy = loadPolicy();
   assert.equal(policy.version, 1);
@@ -33,8 +48,8 @@ const malformed = [
   ['route with neither paths nor discover', (p) => { p.routes.push({ class: 'x', status: 200 }); }, /paths.*discover/],
   ['route status not an integer', (p) => { p.routes[0].status = '200'; }, /status/],
   ['invalid discover regex', (p) => { p.routes[2].discover.pattern = '(['; }, /regular expression/],
-  ['allowlist expiry not a date', (p) => { p.audit.allowlist[0].expires = 'soon'; }, /expires/],
-  ['allowlist scope not dev', (p) => { p.audit.allowlist[0].scope = 'prod'; }, /scope/],
+  ['allowlist expiry not a date', (p) => { p.audit.allowlist = [sampleAllowEntry({ expires: 'soon' })]; }, /expires/],
+  ['allowlist scope not dev', (p) => { p.audit.allowlist = [sampleAllowEntry({ scope: 'prod' })]; }, /scope/],
   ['unknown observatory grade', (p) => { p.observatory.minGrade = 'A++'; }, /minGrade/],
   ['security.txt window inverted', (p) => { p.securityTxt.minDaysBeforeExpiry = 400; }, /minDaysBeforeExpiry/],
   ['non-array forbiddenHeaders', (p) => { p.forbiddenHeaders = 'Set-Cookie'; }, /forbiddenHeaders/],
