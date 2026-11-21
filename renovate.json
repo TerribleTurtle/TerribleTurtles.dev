@@ -5,11 +5,12 @@
     "group:allNonMajor"
   ],
   "schedule": [
-    "* 0-3 1,15 * *"
+    "* 0-3 1 * *"
   ],
+  "updateNotScheduled": false,
   "lockFileMaintenance": {
     "schedule": [
-      "* 0-3 1,15 * *"
+      "* 0-3 1 * *"
     ]
   },
   "minimumReleaseAge": "5 days",
