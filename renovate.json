@@ -9,6 +9,7 @@
   ],
   "updateNotScheduled": false,
   "lockFileMaintenance": {
+    "automerge": true,
     "schedule": [
       "* 0-3 1 * *"
     ]
@@ -30,7 +31,17 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "automerge": false
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchPackageNames": [
+        "/^stylelint/"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": "stylelint"
     }
   ],
   "vulnerabilityAlerts": {
