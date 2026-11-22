@@ -137,8 +137,8 @@ for (const route of routes) {
 
     if (browserName === 'chromium') {
       expect(returnedToEndTarget, 'focus must return to body or skip link at end').toBe(true);
-    } else {
-      // In headless Firefox on Windows, pressing Tab at the document boundary does not wrap without browser chrome.
+    } else if (!returnedToEndTarget) {
+      // In older headless Firefox builds, pressing Tab at the document boundary stays on the last link without wrapping.
       // Confirm there is no keyboard trap by verifying Shift+Tab moves focus backward to the preceding link.
       await page.keyboard.press('Shift+Tab');
       const prevIndex = await page.evaluate(() => {
